@@ -1,10 +1,10 @@
 {
   "dependencies": {
     "com.unity.2d.sprite": "1.0.0",
-    "com.unity.ide.visualstudio": "2.0.5",
+    "com.unity.ide.visualstudio": "2.0.8",
     "com.unity.ide.vscode": "1.2.3",
     "com.unity.ugui": "1.0.0",
-    "jillejr.newtonsoft.json-for-unity": "https://github.com/jilleJr/Newtonsoft.Json-for-Unity.git#12.0.301",
+    "jillejr.newtonsoft.json-for-unity": "13.0.102",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
@@ -25,6 +25,14 @@
       "url": "https://npm.cloudsmith.io/jillejr/newtonsoft-json-for-unity/",
       "scopes": [
         "jillejr"
+      ]
+    },
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.openupm",
+        "jillejr.newtonsoft.json-for-unity"
       ]
     }
   ]
