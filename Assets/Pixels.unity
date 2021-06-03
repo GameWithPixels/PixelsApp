@@ -1704,7 +1704,7 @@ PrefabInstance:
     - target: {fileID: 8686402109847964462, guid: cd0d12a5bb7cab2459059c0a5067b0a8,
         type: 3}
       propertyPath: m_Text
-      value: Dice Pool
+      value: Dice Bag
       objectReference: {fileID: 0}
     - target: {fileID: 8686402109847964462, guid: cd0d12a5bb7cab2459059c0a5067b0a8,
         type: 3}
@@ -8108,7 +8108,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Presets allow you to quickly associate behaviors to your dice.
+  m_Text: Presets allow you to quickly associate profiles to your dice.
 --- !u!222 &230265123
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9817,7 +9817,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.5
-  m_Text: Behavior Description
+  m_Text: Profile Description
 --- !u!222 &312100537
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -15778,7 +15778,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: This is where you can manage your quick presets.
+  m_Text: This is where you can manage your presets.
 --- !u!222 &576477692
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -16327,7 +16327,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Select Behavior
+  m_Text: Select Profile
 --- !u!222 &604149526
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -41126,7 +41126,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.5
-  m_Text: Behavior Description
+  m_Text: Profile Description
 --- !u!222 &1541218424
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -56301,7 +56301,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Let's go back to the Home screen to continue our tour!
+  m_Text: Let's go to the Home screen to continue our tour!
 --- !u!222 &2037951521
 CanvasRenderer:
   m_ObjectHideFlags: 0

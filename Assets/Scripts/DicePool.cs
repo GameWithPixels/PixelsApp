@@ -134,7 +134,7 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
         }
         else
         {
-            string errorMessage = "Pool atempting to connect to unknown die " + die.name;
+            string errorMessage = "Pool attempting to connect to unknown die " + die.name;
             Debug.LogError(errorMessage);
             onConnectionResult?.Invoke(die, false, errorMessage);
         }
@@ -172,7 +172,7 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
         }
         else
         {
-            errorMessage = "Pool atempting to disconnect to unknown die " + die.name;
+            errorMessage = "Pool attempting to disconnect to unknown die " + die.name;
             Debug.LogError(errorMessage);
             onDisconnectionResult?.Invoke(die, false, errorMessage);
         }
@@ -207,7 +207,7 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
         }
         else
         {
-            string errorMessage = "Pool atempting to forget unknown die " + die.name;
+            string errorMessage = "Pool attempting to forget unknown die " + die.name;
             Debug.LogError(errorMessage);
             onForgetDieResult?.Invoke(die, false, errorMessage);
         }
@@ -284,7 +284,7 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
         }
         else
         {
-            Debug.LogError("Die " + die.name + " not in avaiable state, instead: " + die.connectionState);
+            Debug.LogError("Die " + die.name + " not in available state, instead: " + die.connectionState);
         }
     }
 

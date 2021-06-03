@@ -468,7 +468,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.5
-  m_Text: This Behavior makes your phone speak the numbers. Lorem ipsum is placeholder
+  m_Text: This Preset makes your phone speak the numbers. Lorem ipsum is placeholder
     text commonly used in the graphic, print, and publishing industries..
 --- !u!1 &473734518439823749
 GameObject:
