@@ -98,7 +98,7 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
                     #endif
                     UnityWebRequest AudioFileRequest = UnityWebRequestMultimedia.GetAudioClip(streamingPath, audioFileInfo.type);
                     yield return AudioFileRequest.SendWebRequest();
-                    if (!AudioFileRequest.isNetworkError)
+                    if (AudioFileRequest.result != UnityWebRequest.Result.ConnectionError)
                     {
                         AudioClip clip = DownloadHandlerAudioClip.GetContent(AudioFileRequest);
                         clip.name = audioFileInfo.fileName;
@@ -182,7 +182,7 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
             #endif
             UnityWebRequest AudioFileRequest = UnityWebRequestMultimedia.GetAudioClip(streamingPath, isWav ? AudioType.WAV : AudioType.MPEG);
             yield return AudioFileRequest.SendWebRequest();
-            if (!AudioFileRequest.isNetworkError)
+            if (AudioFileRequest.result != UnityWebRequest.Result.ConnectionError)
             {
                 AudioClip clip = DownloadHandlerAudioClip.GetContent(AudioFileRequest);
                 clip.name = clipName;
