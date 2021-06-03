@@ -38,6 +38,8 @@ public class BluetoothLEHardwareInterface
 	private static DebugDelegate _ErrorDelegate;
 	private static SendBluetoothMessageDelegate _SendMessageDelegate;
 
+	const string DiceBLEWin = "DiceBLEWin";
+
 	private static void UnitySendMessageWrapper(string gameObjectName, string methodName, string message)
 	{
 		var gameObject = GameObject.Find(gameObjectName);
@@ -49,72 +51,72 @@ public class BluetoothLEHardwareInterface
 
 	private static void DebugLog(string message)
 	{
-		Debug.Log(message);
+		Debug.Log(DiceBLEWin + ": " + message);
 	}
 
 	private static void DebugLogWarning(string message)
 	{
-		Debug.LogWarning(message);
+		Debug.LogWarning(DiceBLEWin + ": " + message);
 	}
 
 	private static void DebugLogError(string message)
 	{
-		Debug.LogError(message);
+		Debug.LogError(DiceBLEWin + ": " + message);
 	}
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEConnectCallbacks(
 		[MarshalAs(UnmanagedType.FunctionPtr)]SendBluetoothMessageDelegate sendMessage,
 		[MarshalAs(UnmanagedType.FunctionPtr)]DebugDelegate log,
 		[MarshalAs(UnmanagedType.FunctionPtr)]DebugDelegate warning,
 		[MarshalAs(UnmanagedType.FunctionPtr)]DebugDelegate error);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEDisconnectCallbacks();
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLELog([MarshalAs(UnmanagedType.LPStr)]string message);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEInitialize(bool asCentral, bool asPeripheral);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEDeInitialize();
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEPauseMessages(bool isPaused);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEScanForPeripheralsWithServices([MarshalAs(UnmanagedType.LPStr)]string serviceUUIDsString, bool allowDuplicates, bool rssiOnly, bool clearPeripheralList);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLERetrieveListOfPeripheralsWithServices([MarshalAs(UnmanagedType.LPStr)]string serviceUUIDsString);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEStopScan();
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEConnectToPeripheral([MarshalAs(UnmanagedType.LPStr)]string name);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEDisconnectPeripheral([MarshalAs(UnmanagedType.LPStr)]string name);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEReadCharacteristic([MarshalAs(UnmanagedType.LPStr)]string name, [MarshalAs(UnmanagedType.LPStr)]string service, [MarshalAs(UnmanagedType.LPStr)]string characteristic);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEWriteCharacteristic([MarshalAs(UnmanagedType.LPStr)]string name, [MarshalAs(UnmanagedType.LPStr)]string service, [MarshalAs(UnmanagedType.LPStr)]string characteristic, byte[] data, int length, bool withResponse);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLESubscribeCharacteristic([MarshalAs(UnmanagedType.LPStr)]string name, [MarshalAs(UnmanagedType.LPStr)]string service, [MarshalAs(UnmanagedType.LPStr)]string characteristic);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEUnSubscribeCharacteristic([MarshalAs(UnmanagedType.LPStr)]string name, [MarshalAs(UnmanagedType.LPStr)]string service, [MarshalAs(UnmanagedType.LPStr)]string characteristic);
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEDisconnectAll();
 
-	[DllImport("DiceBLEWin")]
+	[DllImport(DiceBLEWin)]
 	private static extern void _winBluetoothLEUpdate();
 
 #elif ((UNITY_IPHONE || UNITY_TVOS) && !UNITY_EDITOR_OSX) && !UNITY_EDITOR_OSX
@@ -204,10 +206,10 @@ public class BluetoothLEHardwareInterface
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             _winBluetoothLELog(message);
 #elif (UNITY_IPHONE || UNITY_TVOS) && !UNITY_EDITOR_OSX
-		_iOSBluetoothLELog (message);
+			_iOSBluetoothLELog (message);
 #elif UNITY_ANDROID
-		if (_android != null)
-			_android.Call ("androidBluetoothLog", message);
+			if (_android != null)
+				_android.Call ("androidBluetoothLog", message);
 #endif
         }
     }
