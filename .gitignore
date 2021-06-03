@@ -73,3 +73,6 @@ crashlytics-build.properties
 
 # MacOSX
 .DS_Store
+
+# Build folder
+/Build/
