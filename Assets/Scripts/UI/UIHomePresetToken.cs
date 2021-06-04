@@ -47,7 +47,9 @@ public class UIHomePresetToken : MonoBehaviour
 
     public void RefreshState()
     {
-        checkMarkRoot.gameObject.SetActive(editPreset.IsActive());
+        // Displays a check mark if this preset is active
+        //checkMarkRoot.gameObject.SetActive(editPreset.IsActive());
+        checkMarkRoot.gameObject.SetActive(false);
     }
 
     void OnDestroy()

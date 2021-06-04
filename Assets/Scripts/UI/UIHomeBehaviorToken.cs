@@ -45,31 +45,32 @@ public class UIHomeBehaviorToken : MonoBehaviour
 
     public void RefreshState()
     {
-        var toDestroy = new List<UIHomeConnectedDieToken>(connectedDice);
-        foreach (var die in AppDataSet.Instance.dice)
-        {
-            if (die.currentBehavior == editBehavior)
-            {
-                int prevIndex = toDestroy.FindIndex(uidie => uidie.editDie == die);
-                if (prevIndex == -1)
-                {
-                    // New connected die
-                    var token = CreateConnectedDieToken(die);
-                    connectedDice.Add(token);
-                }
-                else
-                {
-                    toDestroy.RemoveAt(prevIndex);
-                }
-            }
-        }
+        // Displays an icon for each die with this profile activated
+        //var toDestroy = new List<UIHomeConnectedDieToken>(connectedDice);
+        //foreach (var die in AppDataSet.Instance.dice)
+        //{
+        //    if (die.currentBehavior == editBehavior)
+        //    {
+        //        int prevIndex = toDestroy.FindIndex(uidie => uidie.editDie == die);
+        //        if (prevIndex == -1)
+        //        {
+        //            // New connected die
+        //            var token = CreateConnectedDieToken(die);
+        //            connectedDice.Add(token);
+        //        }
+        //        else
+        //        {
+        //            toDestroy.RemoveAt(prevIndex);
+        //        }
+        //    }
+        //}
 
-        // Remove remaining
-        foreach (var uidie in toDestroy)
-        {
-            DestroyDieToken(uidie);
-            connectedDice.Remove(uidie);
-        }
+        //// Remove remaining
+        //foreach (var uidie in toDestroy)
+        //{
+        //    DestroyDieToken(uidie);
+        //    connectedDice.Remove(uidie);
+        //}
     }
 
     UIHomeConnectedDieToken CreateConnectedDieToken(Dice.EditDie die)
