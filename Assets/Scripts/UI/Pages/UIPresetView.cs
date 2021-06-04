@@ -176,9 +176,12 @@ public class UIPresetView : UIPage
             "Cancel",
             (res) =>
             {
-                base.pageDirty = true;
-                editPreset.dieAssignments.Remove(assignment);
-                RefreshView();
+                if (res)
+                {
+                    base.pageDirty = true;
+                    editPreset.dieAssignments.Remove(assignment);
+                    RefreshView();
+                }
             });
     }
 
