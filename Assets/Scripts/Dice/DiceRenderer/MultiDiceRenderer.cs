@@ -8,9 +8,9 @@ public class MultiDiceRenderer : DiceRenderer
     public MultiDiceRendererRootList[] diceRootsAndCam;
 
     public int dieCount { get; private set; } = 1;
-    public MultiDiceRendererRootList diceRoot => diceRootsAndCam[dieCount - 1];
-    public Camera dieCamera => diceRoot.captureCam;
-    public GameObject[] dieRoots => diceRoot.roots;
+    public MultiDiceRendererRootList diceRoot => dieCount <= 0 ? null : diceRootsAndCam[dieCount - 1];
+    public Camera dieCamera => diceRoot?.captureCam;
+    public GameObject[] dieRoots => diceRoot?.roots;
 
     List<DiceRendererDice> dice = new List<DiceRendererDice>();
 
@@ -29,16 +29,19 @@ public class MultiDiceRenderer : DiceRenderer
 
         // Find the proper camera
         dieCount = variants.Count;
-        diceRoot.gameObject.SetActive(true);
-        dieCamera.targetTexture = renderTexture;
-
-        // Instantiate the proper type of dice
-        for (int dieIndex = 0; dieIndex < variants.Count; ++dieIndex)
+        if (dieCount > 0)
         {
-            var variant = variants[dieIndex];
-            var root = dieRoots[dieIndex];
-            var die = GameObject.Instantiate<DiceRendererDice>(diceVariantPrefabs[(int)variant], root.transform);
-            dice.Add(die);
+            diceRoot.gameObject.SetActive(true);
+            dieCamera.targetTexture = renderTexture;
+
+            // Instantiate the proper type of dice
+            for (int dieIndex = 0; dieIndex < dieCount; ++dieIndex)
+            {
+                var variant = variants[dieIndex];
+                var root = dieRoots[dieIndex];
+                var die = GameObject.Instantiate<DiceRendererDice>(diceVariantPrefabs[(int)variant], root.transform);
+                dice.Add(die);
+            }
         }
     }
 
@@ -48,26 +51,29 @@ public class MultiDiceRenderer : DiceRenderer
         {
             base.SetIndex(index);
 
-            dieCamera.cullingMask = layerMask;
-
-            foreach (var light in dieLights)
+            if (dieCount > 0)
             {
-                light.cullingMask = layerMask;
-            }
+                dieCamera.cullingMask = layerMask;
 
-            // Instantiate the proper type of dice
-            for (int dieIndex = 0; dieIndex < dieRoots.Length; ++dieIndex)
-            {
-                dieRoots[dieIndex].layer = layerIndex;
-                var die = dice[dieIndex];
-                die.gameObject.layer = layerIndex;
-                foreach (var tr in die.gameObject.GetComponentsInChildren<Transform>())
-                {
-                    tr.gameObject.layer = layerIndex;
-                }
-                foreach (var light in die.gameObject.GetComponentsInChildren<Light>())
+                foreach (var light in dieLights)
                 {
                     light.cullingMask = layerMask;
+                }
+
+                // Instantiate the proper type of dice
+                for (int dieIndex = 0; dieIndex < dieRoots.Length; ++dieIndex)
+                {
+                    dieRoots[dieIndex].layer = layerIndex;
+                    var die = dice[dieIndex];
+                    die.gameObject.layer = layerIndex;
+                    foreach (var tr in die.gameObject.GetComponentsInChildren<Transform>())
+                    {
+                        tr.gameObject.layer = layerIndex;
+                    }
+                    foreach (var light in die.gameObject.GetComponentsInChildren<Light>())
+                    {
+                        light.cullingMask = layerMask;
+                    }
                 }
             }
         }
