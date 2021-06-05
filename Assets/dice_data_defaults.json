@@ -77522,22 +77522,6 @@
     }
   ],
   "presets": [
-    {
-      "name": "All dice basic",
-      "description": "Sets all dice to the basic profile.",
-      "dieAssignments": [
-        {
-          "deviceId": 0,
-          "behaviorIndex": 0,
-          "defaultDieAssignmentIndex": 0
-        },
-        {
-          "deviceId": 0,
-          "behaviorIndex": 0,
-          "defaultDieAssignmentIndex": 1
-        }
-      ]
-    }
   ],
   "audioClips": [
     {

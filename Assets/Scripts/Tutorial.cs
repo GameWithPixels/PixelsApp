@@ -149,17 +149,22 @@ public class Tutorial : SingletonMonoBehaviour<Tutorial>
                                 if (DiceManager.Instance.allDice.Count() > 0)
                                 {
                                     // Automatically assign dice!
-                                    List<Dice.EditDie> userDice = new List<Dice.EditDie>(DiceManager.Instance.allDice);
-                                    foreach (var preset in AppDataSet.Instance.presets)
+                                    var basicPreset = AppDataSet.Instance.presets.FirstOrDefault(p => p.name == "All dice basic");
+                                    if (basicPreset == null)
                                     {
-                                        foreach (var assignment in preset.dieAssignments)
+                                        basicPreset = new Presets.EditPreset
                                         {
-                                            if (assignment.die == null)
-                                            {
-                                                assignment.die = userDice[assignment.defaultDieAssignmentIndex % userDice.Count];
-                                            }
-                                        }
+                                            name = "All dice basic",
+                                            description = "Sets all dice to the basic profile.",
+                                        };
+                                        AppDataSet.Instance.presets.Insert(0, basicPreset);
                                     }
+                                    basicPreset.dieAssignments = DiceManager.Instance.allDice.Select(
+                                        d => new Presets.EditDieAssignment
+                                        {
+                                            die = d,
+                                            behavior = AppDataSet.Instance.behaviors?.FirstOrDefault(),
+                                        }).ToList();
 
                                     poolTutorialRoot.gameObject.SetActive(true);
                                     poolTutorialNext.onClick.RemoveAllListeners();
