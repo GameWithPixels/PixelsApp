@@ -31,6 +31,8 @@ public class UIColorPicker : MonoBehaviour
         titleText.text = title;
         editor.SelectColor(previousColor);
         this.closeAction = closeAction;
+        // Register at last as the call to SelectColor() above will trigger the event
+        editor.onColorSelected += Hide;
     }
 
     /// <summary>
@@ -45,11 +47,16 @@ public class UIColorPicker : MonoBehaviour
     void Awake()
     {
         backButton.onClick.AddListener(Back);
-        editor.onColorSelected += (newColor) => Hide(true, newColor);
+    }
+
+    void Hide(Color color)
+    {
+        Hide(true, color);
     }
 
     void Hide(bool result, Color color)
     {
+        editor.onColorSelected -= Hide;
         gameObject.SetActive(false);
         closeAction?.Invoke(result, color);
         closeAction = null;

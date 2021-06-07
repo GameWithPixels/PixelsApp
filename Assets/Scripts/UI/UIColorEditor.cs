@@ -11,6 +11,8 @@ public class UIColorEditor : MonoBehaviour
     public UIColorWheelSelection colorWheelSelection;
     public Button dimButton;
     public Button brightButton;
+    public Transform dimButtonSelected;
+    public Transform brightButtonSelected;
     public List<UIColorButton> colorButtons;
 
     [Header("Parameters")]
@@ -20,76 +22,70 @@ public class UIColorEditor : MonoBehaviour
     public ColorSelectedEvent onColorSelected;
 
     Color currentColor;
+    Color[] defaultButtonColors;
 
     /// <summary>
     /// Invoke the color picker
     /// </sumary>
-    public void SelectColor(Color previousColor)
+    public void SelectColor(Color color)
     {
-
         gameObject.SetActive(true);
-        currentColor = previousColor;
+        currentColor = color;
 
-        float hue, sat, val;
-        Color.RGBToHSV(previousColor, out hue, out sat, out val);
-        const float valueEpsilon = 0.01f;
-        var btn = colorButtons.FirstOrDefault(b => b.color == previousColor);
-        if (btn != null)
+        Color.RGBToHSV(color, out _, out _, out float val);
+        if (Mathf.Abs(valueDimColors - val) < 0.01f)
         {
-            colorWheel.colorValue = 1.0f;
-            colorWheelSelection.SetSelection(Color.black, -1, -1);
-            SetSelectedColorButton(btn);
+            ChangeColorsLightness(valueDimColors);
         }
         else
         {
-            if (Mathf.Abs(valueDimColors - val) < valueEpsilon)
-            {
-                SwitchColorWheel(valueDimColors);
-            }
-            else
-            {
-                // Any other case, initialize the color wheel to the bright one
-                SwitchColorWheel(1.0f);
-            }
-            SetSelectedColorButton(null);
+            // Any other case, initialize the color wheel to the bright one
+            ChangeColorsLightness(1.0f);
         }
+
+        UpdateSelection();
+
+        onColorSelected?.Invoke(currentColor);
     }
 
     public void ClearColorSelection()
     {
         // Any other case, initialize the color wheel to the bright one
-        SwitchColorWheel(1.0f);
+        ChangeColorsLightness(1.0f);
         SetSelectedColorButton(null);
-        colorWheelSelection.SetSelection(Color.black, -1, -1);
+        colorWheelSelection.ClearSelection();
     }
 
     void Awake()
     {
-        colorWheel.onClicked += OnColorWheelClicked;
+        defaultButtonColors = colorButtons.Select(btn => btn.color).ToArray();
+        colorWheel.onClicked += (color, _1, _2) => SelectColor(color);
         foreach (var btn in colorButtons)
         {
-            btn.onClick.AddListener(() => onColorSelected?.Invoke(btn.color));
+            btn.onClick.AddListener(() => SelectColor(btn.color));
         }
-        brightButton.onClick.AddListener(() => SwitchColorWheel(1.0f));
-        dimButton.onClick.AddListener(() => SwitchColorWheel(valueDimColors));
+        brightButton.onClick.AddListener(() => { ChangeColorsLightness(1.0f); UpdateSelection(); });
+        dimButton.onClick.AddListener(() => { ChangeColorsLightness(valueDimColors); UpdateSelection(); });
     }
 
-    void OnColorWheelClicked(Color color, int hueIndex, int saturationIndex)
+    void ChangeColorsLightness(float value)
     {
-        onColorSelected?.Invoke(color);
-    }
+        dimButtonSelected.gameObject.SetActive(value < 1);
+        brightButtonSelected.gameObject.SetActive(value >= 1);
 
-    void SwitchColorWheel(float value)
-    {
+        // Update wheel colors
         colorWheel.colorValue = value;
-        int selectedHueIndex = -1;
-        int selectedSatIndex = -1;
-        if (!colorWheel.FindColor(currentColor, out selectedHueIndex, out selectedSatIndex))
+
+        // Update preselected colors as well
+        for (int i = 0; i < colorButtons.Count; ++i)
         {
-            selectedHueIndex = -1;
-            selectedSatIndex = -1;
+            // We want to keep our black
+            if (defaultButtonColors[i] != Color.black)
+            {
+                Color.RGBToHSV(defaultButtonColors[i], out float hue, out float sat, out _);
+                colorButtons[i].GetComponent<Image>().color = Color.HSVToRGB(hue, sat, value);
+            }
         }
-        colorWheelSelection.SetSelection(currentColor, selectedHueIndex, selectedSatIndex);
     }
 
     void SetSelectedColorButton(UIColorButton btn)
@@ -100,5 +96,13 @@ public class UIColorEditor : MonoBehaviour
         }
     }
 
+    void UpdateSelection()
+    {
+        colorWheel.FindColor(currentColor, out int selectedHueIndex, out int selectedSatIndex);
+        colorWheelSelection.SetSelection(currentColor, selectedHueIndex, selectedSatIndex);
 
+        static bool AreColorEquals(Color c0, Color c1) =>
+            ((c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) + (c0.b - c1.b) * (c0.b - c1.b)) < 0.01f;
+        SetSelectedColorButton(colorButtons.FirstOrDefault(b => AreColorEquals(b.color, currentColor)));
+    }
 }

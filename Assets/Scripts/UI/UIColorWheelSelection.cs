@@ -32,6 +32,11 @@ public class UIColorWheelSelection : MaskableGraphic
         SetVerticesDirty();
     }
 
+    public void ClearSelection()
+    {
+        SetSelection(Color.black, -1, -1);
+    }
+
     protected override void OnRectTransformDimensionsChange()
     {
         base.OnRectTransformDimensionsChange();
