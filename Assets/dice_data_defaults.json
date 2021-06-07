@@ -76177,7 +76177,7 @@
     {
       "type": 3,
       "data": {
-        "name": "rotating rings",
+        "name": "Rotating Rings",
         "patternIndex": 6,
         "speedMultiplier": 1.35816538,
         "duration": 6.763664,
@@ -76241,7 +76241,7 @@
     {
       "type": 4,
       "data": {
-        "name": "Rotating ring",
+        "name": "Rotating Ring",
         "patternIndex": 10,
         "speedMultiplier": 0.764505863,
         "duration": 3.04273343,
@@ -76322,7 +76322,7 @@
     {
       "type": 3,
       "data": {
-        "name": "red to green rotation",
+        "name": "Red to Green Rotation",
         "patternIndex": 11,
         "speedMultiplier": 0.8658561,
         "duration": 3.44610739,
@@ -76521,7 +76521,7 @@
     {
       "type": 4,
       "data": {
-        "name": "More noise",
+        "name": "More Noise",
         "patternIndex": 15,
         "speedMultiplier": 1.25923622,
         "duration": 5.01176,
@@ -76902,7 +76902,7 @@
         },
         "count": 1,
         "fade": 1.0,
-        "name": "Slow charge blink",
+        "name": "Slow Charge Blink",
         "defaultPreviewSettings": {
           "design": 5
         },
