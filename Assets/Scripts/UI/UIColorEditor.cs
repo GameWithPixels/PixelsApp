@@ -21,6 +21,8 @@ public class UIColorEditor : MonoBehaviour
     public delegate void ColorSelectedEvent(Color color);
     public ColorSelectedEvent onColorSelected;
 
+    const float epsilon = 0.01f;
+
     Color currentColor;
     Color[] defaultButtonColors;
 
@@ -33,7 +35,7 @@ public class UIColorEditor : MonoBehaviour
         currentColor = color;
 
         Color.RGBToHSV(color, out _, out _, out float val);
-        if (Mathf.Abs(valueDimColors - val) < 0.01f)
+        if (Mathf.Abs(valueDimColors - val) < epsilon)
         {
             ChangeColorsLightness(valueDimColors);
         }
@@ -102,7 +104,7 @@ public class UIColorEditor : MonoBehaviour
         colorWheelSelection.SetSelection(currentColor, selectedHueIndex, selectedSatIndex);
 
         static bool AreColorEquals(Color c0, Color c1) =>
-            ((c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) + (c0.b - c1.b) * (c0.b - c1.b)) < 0.01f;
+            ((c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) + (c0.b - c1.b) * (c0.b - c1.b)) < epsilon;
         SetSelectedColorButton(colorButtons.FirstOrDefault(b => AreColorEquals(b.color, currentColor)));
     }
 }
