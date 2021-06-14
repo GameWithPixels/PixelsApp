@@ -494,8 +494,10 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
     }
 
     // Start is called before the first frame update
-    void Start()
+    IEnumerator Start()
     {
+        while (Central.Instance.state != Central.State.Idle) yield return null;
+
         // Pretend to have updated the current preset on load
         foreach (var die in AppDataSet.Instance.dice)
         {
@@ -504,11 +506,5 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                 onDieBehaviorUpdatedEvent?.Invoke(die, die.currentBehavior);
             }
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

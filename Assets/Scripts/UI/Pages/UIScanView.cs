@@ -33,7 +33,7 @@ public class UIScanView
 
     IEnumerator BeginScanCr()
     {
-        yield return new WaitUntil(() => Central.Instance.state == Central.State.Idle);
+        while (Central.Instance.state != Central.State.Idle) yield return null;
         DicePool.Instance.onDieDiscovered += OnDieDiscovered;
         DicePool.Instance.BeginScanForDice();
         pairSelectedDice.SetActive(false);

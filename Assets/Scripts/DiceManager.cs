@@ -40,10 +40,7 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
     {
         PixelsApp.Instance.ShowProgrammingBox("Adding Dice to the Dice Bag");
         _addingDice.AddRange(discoveredDice);
-        if (state != State.Idle)
-        {
-            yield return new WaitUntil(() => state == State.Idle);
-        }
+        while (state != State.Idle) yield return null;
         state = State.AddingDiscoveredDie;
         for (int i = 0; i < discoveredDice.Count; ++i)
         {
@@ -132,7 +129,7 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
 
     IEnumerator ConnectDieCr(EditDie editDie, System.Action<EditDie, bool, string> dieReadyCallback)
     {
-        yield return new WaitUntil(() => state == State.Idle);
+        while (state != State.Idle) yield return null;
         state = State.ConnectingDie;
         yield return StartCoroutine(DoConnectDieCr(editDie, dieReadyCallback));
         state = State.Idle;
@@ -191,7 +188,7 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
 
     IEnumerator DisconnectDieCr(EditDie editDie, System.Action<EditDie, bool, string> dieDisconnectedCallback)
     {
-        yield return new WaitUntil(() => state == State.Idle);
+        while (state != State.Idle) yield return null;
         yield return StartCoroutine(DoDisconnectDieCr(editDie, dieDisconnectedCallback));
     }
 
@@ -243,7 +240,7 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
 
     IEnumerator ConnectDiceListCr(List<EditDie> editDice, System.Action callback)
     {
-        yield return new WaitUntil(() => state == State.Idle);
+        while (state != State.Idle) yield return null;
         state = State.ConnectingDie;
         yield return StartCoroutine(DoConnectDiceListCr(editDice, callback));
         state = State.Idle;
@@ -279,7 +276,7 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
 
     IEnumerator ForgetDieCr(EditDie editDie)
     {
-        yield return new WaitUntil(() => state == State.Idle);
+        while (state != State.Idle) yield return null;
         DoForgetDie(editDie);
     }
 
@@ -310,7 +307,7 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
 
     IEnumerator RefreshPoolCr()
     {
-        yield return new WaitUntil(() => state == State.Idle);
+        while (state != State.Idle) yield return null;
         state = State.RefreshingPool;
         onBeginRefreshPool?.Invoke();
         foreach (var editDie in DiceManager.Instance.allDice)

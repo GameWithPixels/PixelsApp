@@ -143,7 +143,7 @@ public class Tutorial : SingletonMonoBehaviour<Tutorial>
                         {
                             IEnumerator waitUntilIdleAgainAndContinue()
                             {
-                                yield return new WaitUntil(() => DiceManager.Instance.state == DiceManager.State.Idle);
+                                while (DiceManager.Instance.state != DiceManager.State.Idle) yield return null;
 
                                 // Check that we DO in fact have dice in the list
                                 if (DiceManager.Instance.allDice.Count() > 0)
