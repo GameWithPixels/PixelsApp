@@ -19,6 +19,8 @@ namespace Behaviors
         public abstract ActionType type { get; }
         public abstract Action ToAction(EditDataSet editSet, DataSet set);
         public abstract EditAction Duplicate();
+        public abstract bool IsSame(EditAction editAction); // Don't want to override Equals
+
         public virtual void ReplaceAnimation(Animations.EditAnimation oldAnimation, Animations.EditAnimation newAnimation)
         {
             // Base does nothing
@@ -184,6 +186,15 @@ namespace Behaviors
                 loopCount = this.loopCount
             };
         }
+
+        public override bool IsSame(EditAction editAction)
+        {
+            static bool IsSameAnimation(Animations.EditAnimation animation1, Animations.EditAnimation animation2)
+                => (animation1 == animation2);// || ((animation1 != null) && (animation2 != null) && animation1.IsSame(animation2));
+
+            return (editAction is EditActionPlayAnimation action) && IsSameAnimation(animation, action.animation) && (faceIndex == action.faceIndex) && (loopCount == action.loopCount);
+        }
+
         public override void ReplaceAnimation(Animations.EditAnimation oldAnimation, Animations.EditAnimation newAnimation)
         {
             if (animation == oldAnimation)
@@ -303,6 +314,11 @@ namespace Behaviors
             {
                 clip = this.clip,
             };
+        }
+
+        public override bool IsSame(EditAction editAction)
+        {
+            return (editAction is EditActionPlayAudioClip action) && (clip == action.clip);
         }
 
         public override bool DependsOnAudioClip(AudioClips.EditAudioClip clip)

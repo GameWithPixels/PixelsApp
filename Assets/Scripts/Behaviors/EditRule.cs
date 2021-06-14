@@ -91,5 +91,24 @@ namespace Behaviors
         {
             return actions.Any(a => a.DependsOnAudioClip(clip));
         }
+
+        // Don't want to override Equals
+        public bool IsSame(EditRule rule)
+        {
+            static bool IsSameCondition(EditCondition condition1, EditCondition condition2)
+                => (condition1 == condition2) || ((condition1 != null) && (condition2 != null) && condition1.IsSame(condition2));
+
+            static bool IsSameActionList(List<EditAction> actions1, List<EditAction> actions2)
+                => (actions1 == actions2) || ((actions1 != null) && (actions2 != null) && actions1.SequenceEqual(actions2, new EditActionEqualityComparer()));
+
+            return (this == rule) || ((rule != null) && IsSameCondition(condition, rule.condition) && IsSameActionList(actions, rule.actions));
+        }
+
+        public class EditActionEqualityComparer : IEqualityComparer<EditAction>
+        {
+            public bool Equals(EditAction x, EditAction y) => (x == y) || ((x != null) && (y != null) && x.IsSame(y));
+
+            public int GetHashCode(EditAction obj) => obj.GetHashCode();
+        }
     }
 }

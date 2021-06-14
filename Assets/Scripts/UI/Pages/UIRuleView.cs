@@ -16,19 +16,21 @@ public class UIRuleView
     public UIRuleConditionToken conditionPrefab;
     public UIRuleActionToken actionPrefab;
 
-    public Behaviors.EditRule editRule { get; private set; }
-    Behaviors.EditRule workingRule;
+    public EditRule editRule { get; private set; }
+
+    EditRule workingRule;
     UIRuleConditionToken conditionToken;
-    List<UIRuleActionToken> actionTokens = new List<UIRuleActionToken>();
+    readonly List<UIRuleActionToken> actionTokens = new List<UIRuleActionToken>();
 
     public override void Enter(object context)
     {
         gameObject.SetActive(true);
         base.SetupHeader(false, false, "Edit Rule", null);
-        var rule = context as Behaviors.EditRule;
-        if (rule != null)
+        if (context is EditRule rule)
         {
-            Setup(rule);
+            editRule = rule;
+            workingRule = editRule.Duplicate();
+            SetupTokens();
         }
 
         if (AppSettings.Instance.ruleTutorialEnabled)
@@ -72,13 +74,6 @@ public class UIRuleView
             GameObject.Destroy(actionToken.gameObject);
         }
         actionTokens.Clear();
-    }
-
-    void Setup(Behaviors.EditRule rule)
-    {
-        editRule = rule;
-        workingRule = editRule.Duplicate();
-        SetupTokens();
     }
 
     void SetupTokens()
@@ -126,20 +121,20 @@ public class UIRuleView
     public override void OnSave()
     {
         workingRule.CopyTo(editRule);
-        AppDataSet.Instance.SaveData(); // Not sure about this one!
+        //AppDataSet.Instance.SaveData(); // Change will be saved when parent preset is saved
         pageDirty = false;
         NavigationManager.Instance.GoBack();
     }
 
     void AddAction()
     {
-        var action = Behaviors.EditAction.Create(Behaviors.ActionType.PlayAnimation);
+        var action = EditAction.Create(ActionType.PlayAnimation);
         AddActionToken(action, false);
         workingRule.actions.Add(action);
         base.pageDirty = true;
     }
 
-    void AddActionToken(Behaviors.EditAction action, bool first)
+    void AddActionToken(EditAction action, bool first)
     {
         var actionToken = GameObject.Instantiate<UIRuleActionToken>(actionPrefab, Vector3.zero, Quaternion.identity, contentRoot);
         UpdateActionToken(actionToken, action, first);
@@ -153,7 +148,7 @@ public class UIRuleView
         token.Setup(workingRule, action, first);
     }
 
-    void DestroyActionToken(Behaviors.EditAction action)
+    void DestroyActionToken(EditAction action)
     {
         var index = actionTokens.FindIndex(at => at.editAction == action);
         var token = actionTokens[index];
@@ -161,11 +156,11 @@ public class UIRuleView
         actionTokens.RemoveAt(index);
     }
 
-    void DeleteAction(Behaviors.EditAction action)
+    void DeleteAction(EditAction action)
     {
         if (workingRule.actions.Count > 1)
         {
-            PixelsApp.Instance.ShowDialogBox("Delete Action?", "Are you sure sure you want to delete this action?", "Ok", "Cancel", res =>
+            PixelsApp.Instance.ShowDialogBox("Delete Action?", "Are you sure you want to delete this action?", "Ok", "Cancel", res =>
             {
                 if (res)
                 {

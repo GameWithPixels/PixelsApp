@@ -16,7 +16,7 @@ public class UIBehaviorView
     public RectTransform spacer;
     public Button activateButton;
 
-    public Behaviors.EditBehavior editBehavior { get; private set; }
+    public EditBehavior editBehavior { get; private set; }
     public SingleDiceRenderer dieRenderer { get; private set; }
 
     [Header("Prefabs")]
@@ -24,18 +24,19 @@ public class UIBehaviorView
 
     public class Context
     {
-        public Behaviors.EditBehavior behavior;
+        public EditBehavior behavior;
         public Presets.EditPreset parentPreset;
         public Presets.EditDieAssignment dieAssignment;
     }
 
     // The list of controls we have created to display rules
-    List<UIRuleToken> rules = new List<UIRuleToken>();
+    readonly List<UIRuleToken> rules = new List<UIRuleToken>();
+    System.Func<bool> hasRuleChanged;
 
     public override void Enter(object context)
     {
         gameObject.SetActive(true);
-        var bhv = context as Behaviors.EditBehavior;
+        var bhv = context as EditBehavior;
         if (bhv != null)
         {
             SetupHeader(false, false, bhv.name, SetName);
@@ -68,7 +69,11 @@ public class UIBehaviorView
             dieRenderer.SetAnimations(editBehavior.CollectAnimations());
             dieRenderer.Play(true);
 
-            base.pageDirty = true;
+            if (hasRuleChanged?.Invoke() ?? false)
+            {
+                pageDirty = true;
+                hasRuleChanged = null;
+            }
         }
     }
 
@@ -123,7 +128,7 @@ public class UIBehaviorView
 
     void RefreshView()
     {
-        // Assume all rule uis will be destroyed
+        // Assume all rule UIs will be destroyed
         List<UIRuleToken> toDestroy = new List<UIRuleToken>(rules);
         foreach (var rule in editBehavior.rules)
         {
@@ -136,8 +141,8 @@ public class UIBehaviorView
                 {
                     var ruleui = GameObject.Instantiate<UIRuleToken>(ruleTokenPrefab, Vector3.zero, Quaternion.identity, rulesRoot);
                     ruleui.Setup(rule);
-                    ruleui.onClick.AddListener(() => NavigationManager.Instance.GoToPage(UIPage.PageId.Rule, rule));
-                    ruleui.onEdit.AddListener(() => NavigationManager.Instance.GoToPage(UIPage.PageId.Rule, rule));
+                    ruleui.onClick.AddListener(() => EditRule(rule));
+                    ruleui.onEdit.AddListener(() => EditRule(rule));
                     ruleui.onMoveUp.AddListener(() => MoveUp(rule));
                     ruleui.onMoveDown.AddListener(() => MoveDown(rule));
                     ruleui.onDuplicate.AddListener(() => DuplicateRule(rule));
@@ -163,7 +168,7 @@ public class UIBehaviorView
             }
         }
 
-        // Remove all remaining rule uis
+        // Remove all remaining rule UIs
         foreach (var ruleui in toDestroy)
         {
             rules.Remove(ruleui);
@@ -171,7 +176,15 @@ public class UIBehaviorView
         }
     }
 
-    void MoveUp(Behaviors.EditRule rule)
+    void EditRule(EditRule rule)
+    {
+        var ruleBeforeEditing = new EditRule();
+        rule.CopyTo(ruleBeforeEditing);
+        hasRuleChanged = () => !ruleBeforeEditing.IsSame(rule);
+        NavigationManager.Instance.GoToPage(UIPage.PageId.Rule, rule);
+    }
+
+    void MoveUp(EditRule rule)
     {
         int index = editBehavior.rules.IndexOf(rule);
         if (index > 0)
@@ -183,7 +196,7 @@ public class UIBehaviorView
         }
     }
 
-    void MoveDown(Behaviors.EditRule rule)
+    void MoveDown(EditRule rule)
     {
         int index = editBehavior.rules.IndexOf(rule);
         if (index < editBehavior.rules.Count - 1)
@@ -195,7 +208,7 @@ public class UIBehaviorView
         }
     }
 
-    void DuplicateRule(Behaviors.EditRule rule)
+    void DuplicateRule(EditRule rule)
     {
         var newRule = rule.Duplicate();
         editBehavior.rules.Add(newRule);
@@ -203,7 +216,7 @@ public class UIBehaviorView
         RefreshView();
     }
 
-    void DeleteRule(Behaviors.EditRule rule)
+    void DeleteRule(EditRule rule)
     {
         PixelsApp.Instance.ShowDialogBox("Delete Rule?", "Are you sure you want to delete this rule?", "Ok", "Cancel", res =>
         {
@@ -216,7 +229,7 @@ public class UIBehaviorView
         });
     }
 
-    void ExpandRule(Behaviors.EditRule rule)
+    void ExpandRule(EditRule rule)
     {
         foreach (var uip in rules)
         {

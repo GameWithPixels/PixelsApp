@@ -7,7 +7,8 @@ using Behaviors;
 public class UIRuleToken : MonoBehaviour
 {
     [Header("Controls")]
-    public Button editButtton;
+    [UnityEngine.Serialization.FormerlySerializedAs("editButtton")] // 3x 't', and we already have a "editButton" with 2 't'
+    public Button mainButton;
     public Button menuButton;
     public RectTransform tokenRoot;
     public Image menuButtonImage;
@@ -29,14 +30,13 @@ public class UIRuleToken : MonoBehaviour
 
     public EditRule editRule { get; private set; }
 
-    public Button.ButtonClickedEvent onClick => editButtton.onClick;
+    public Button.ButtonClickedEvent onClick => mainButton.onClick;
     public Button.ButtonClickedEvent onMoveUp => moveUpButton.onClick;
     public Button.ButtonClickedEvent onMoveDown => moveDownButton.onClick;
     public Button.ButtonClickedEvent onRemove => removeButton.onClick;
     public Button.ButtonClickedEvent onDuplicate => duplicateButton.onClick;
     public Button.ButtonClickedEvent onEdit => editButton.onClick;
     public Button.ButtonClickedEvent onExpand => menuButton.onClick;
-
 
     public bool isExpanded => expandedRoot.gameObject.activeSelf;
 

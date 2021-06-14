@@ -15,6 +15,7 @@ namespace Behaviors
         public abstract ConditionType type { get; }
         public abstract Condition ToCondition(EditDataSet editSet, DataSet set);
         public abstract EditCondition Duplicate();
+        public abstract bool IsSame(EditCondition editCondition); // Don't want to override Equals
 
         public static EditCondition Create(ConditionType type)
         {
@@ -110,13 +111,15 @@ namespace Behaviors
         public float period = 10.0f;
         public override Condition ToCondition(EditDataSet editSet, DataSet set)
         {
-            var ret = new ConditionIdle();
-            ret.repeatPeriodMs = (ushort)Mathf.RoundToInt(period * 1000.0f);
-            return ret;
+            return new ConditionIdle() { repeatPeriodMs = (ushort)Mathf.RoundToInt(period * 1000.0f) };
         }
         public override EditCondition Duplicate()
         {
             return new EditConditionIdle() { period = period };
+        }
+        public override bool IsSame(EditCondition editCondition)
+        {
+            return (editCondition is EditConditionIdle condition) && (period == condition.period);
         }
         public override string ToString()
         {
@@ -140,6 +143,10 @@ namespace Behaviors
         {
             return new EditConditionHandling();
         }
+        public override bool IsSame(EditCondition editCondition)
+        {
+            return editCondition is EditConditionHandling;
+        }
         public override string ToString()
         {
             return "die is picked up";
@@ -158,13 +165,15 @@ namespace Behaviors
         public float recheckAfter = 1.0f;
         public override Condition ToCondition(EditDataSet editSet, DataSet set)
         {
-            var ret = new ConditionRolling();
-            ret.repeatPeriodMs = (ushort)Mathf.RoundToInt(recheckAfter * 1000.0f);
-            return ret;
+            return new ConditionRolling { repeatPeriodMs = (ushort)Mathf.RoundToInt(recheckAfter * 1000.0f) };
         }
         public override EditCondition Duplicate()
         {
             return new EditConditionRolling() { recheckAfter = recheckAfter };
+        }
+        public override bool IsSame(EditCondition editCondition)
+        {
+            return (editCondition is EditConditionRolling condition) && (recheckAfter == condition.recheckAfter);
         }
         public override string ToString()
         {
@@ -187,6 +196,10 @@ namespace Behaviors
         public override EditCondition Duplicate()
         {
             return new EditConditionCrooked();
+        }
+        public override bool IsSame(EditCondition editCondition)
+        {
+            return editCondition is EditConditionCrooked;
         }
         public override string ToString()
         {
@@ -211,17 +224,21 @@ namespace Behaviors
         {
             return new ConditionFaceCompare()
             {
-                faceIndex = (byte)this.faceIndex,
-                flags = this.flags
+                faceIndex = (byte)faceIndex,
+                flags = flags
             };
         }
         public override EditCondition Duplicate()
         {
             return new EditConditionFaceCompare()
             {
-                faceIndex = this.faceIndex,
-                flags = this.flags
+                faceIndex = faceIndex,
+                flags = flags
             };
+        }
+        public override bool IsSame(EditCondition editCondition)
+        {
+            return (editCondition is EditConditionFaceCompare condition) && (faceIndex == condition.faceIndex) && (flags == condition.flags);
         }
         public override string ToString()
         {
@@ -287,15 +304,19 @@ namespace Behaviors
         {
             return new ConditionHelloGoodbye()
             {
-                flags = this.flags
+                flags = flags
             };
         }
         public override EditCondition Duplicate()
         {
             return new EditConditionHelloGoodbye()
             {
-                flags = this.flags
+                flags = flags
             };
+        }
+        public override bool IsSame(EditCondition editCondition)
+        {
+            return (editCondition is EditConditionHelloGoodbye condition) && (flags == condition.flags);
         }
         public override string ToString()
         {
@@ -337,15 +358,19 @@ namespace Behaviors
         {
             return new ConditionConnectionState()
             {
-                flags = this.flags
+                flags = flags
             };
         }
         public override EditCondition Duplicate()
         {
             return new EditConditionConnectionState()
             {
-                flags = this.flags
+                flags = flags
             };
+        }
+        public override bool IsSame(EditCondition editCondition)
+        {
+            return (editCondition is EditConditionConnectionState condition) && (flags == condition.flags);
         }
         public override string ToString()
         {
@@ -389,7 +414,7 @@ namespace Behaviors
         {
             return new ConditionBatteryState()
             {
-                flags = this.flags,
+                flags = flags,
                 repeatPeriodMs = (ushort)Mathf.RoundToInt(recheckAfter * 1000.0f)
             };
         }
@@ -397,9 +422,13 @@ namespace Behaviors
         {
             return new EditConditionBatteryState()
             {
-                flags = this.flags,
-                recheckAfter = this.recheckAfter
+                flags = flags,
+                recheckAfter = recheckAfter
             };
+        }
+        public override bool IsSame(EditCondition editCondition)
+        {
+            return (editCondition is EditConditionBatteryState condition) && (flags == condition.flags) && (recheckAfter == condition.recheckAfter);
         }
         public override string ToString()
         {

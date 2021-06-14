@@ -108,14 +108,14 @@ public class NavigationManager : SingletonMonoBehaviour<NavigationManager>
 
         void EnterPage(Page page)
         {
-            Debug.Log("Entering page " + page.page.name);
+            Debug.Log("Entering page: " + page.page.name);
             page.page.Enter(page.context);
             onPageEntered?.Invoke(page.page, page.context);
         }
 
         void LeavePage(Page page)
         {
-            Debug.Log("Leaving page " + page.page.name);
+            Debug.Log("Leaving page: " + page.page.name);
             onLeavingPage?.Invoke(page.page);
             page.page.Leave();
         }

@@ -23,21 +23,27 @@ public class UIPage
         AudioClips,
     }
 
+    bool _pageDirty;
     public bool pageDirty
     {
-        get { return _pageDirty; }
-        set
+        get => _pageDirty;
+        protected set
         {
-            _pageDirty = value;
+            if (_pageDirty != value)
+            {
+                string isNot = value ? "" : "not ";
+                Debug.Log($"Page set to {isNot} dirty: {name}");
+                _pageDirty = value;
+            }
             NavigationManager.Instance.header.EnableSaveButton(_pageDirty);
         }
     }
-    bool _pageDirty;
 
     public virtual void Enter(object context)
     {
         gameObject.SetActive(true);
     }
+
     public virtual void OnBack()
     {
         if (pageDirty)
@@ -62,12 +68,14 @@ public class UIPage
             NavigationManager.Instance.GoBack();
         }
     }
+
     public virtual void OnSave()
     {
         pageDirty = false;
         AppDataSet.Instance.SaveData(); // Not sure about this one!
         NavigationManager.Instance.GoBack();
     }
+
     public virtual void Leave()
     {
         gameObject.SetActive(false);
