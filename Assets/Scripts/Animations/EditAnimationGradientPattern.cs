@@ -33,7 +33,7 @@ namespace Animations
 
         public override AnimationType type => AnimationType.GradientPattern;
 
-        public override Animation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
+        public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
         {
             var ret = new AnimationGradientPattern();
 		    ret.duration = (ushort)(duration * 1000); // stored in milliseconds

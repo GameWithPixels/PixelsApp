@@ -21,7 +21,7 @@ namespace Animations
         public bool traveling = true;
 
         public override AnimationType type { get { return AnimationType.Rainbow; } }
-        public override Animation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
+        public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
         {
             var ret = new AnimationRainbow();
             ret.duration = (ushort)(this.duration * 1000.0f);

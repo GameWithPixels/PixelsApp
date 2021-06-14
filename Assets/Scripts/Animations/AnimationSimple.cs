@@ -11,7 +11,7 @@ namespace Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
 	public class AnimationSimple
-		: Animation
+		: IAnimation
 	{
 		public AnimationType type { get; set; } = AnimationType.Simple;
 		public byte padding_type { get; set; }
@@ -35,7 +35,7 @@ namespace Animations
 	{
         uint rgb = 0;
 
-		public AnimationInstanceSimple(Animation animation, DataSet.AnimationBits bits)
+		public AnimationInstanceSimple(IAnimation animation, DataSet.AnimationBits bits)
             : base(animation, bits)
         {
         }

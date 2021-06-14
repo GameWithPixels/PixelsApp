@@ -11,7 +11,7 @@ namespace Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
 	public class AnimationRainbow
-		: Animation
+		: IAnimation
 	{
         // face -> led:
         //  0   1   2   3   4    5  6    7  8    9 10   11 12   13 14   15  16  17  18 19
@@ -41,7 +41,7 @@ namespace Animations
 	public class AnimationInstanceRainbow
 		: AnimationInstance
 	{
-		public AnimationInstanceRainbow(Animation animation, DataSet.AnimationBits bits)
+		public AnimationInstanceRainbow(IAnimation animation, DataSet.AnimationBits bits)
             : base(animation, bits)
         {
         }

@@ -120,7 +120,7 @@ namespace Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
 	public class AnimationGradientPattern
-		: Animation
+		: IAnimation
 	{
 		public AnimationType type { get; set; } = AnimationType.GradientPattern;
 		public byte padding_type { get; set; } // to keep duration 16-bit aligned

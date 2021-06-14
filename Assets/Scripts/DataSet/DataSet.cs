@@ -126,7 +126,7 @@ public class DataSet
     }
 
     public AnimationBits animationBits = new AnimationBits();
-    public List<Animations.Animation> animations = new List<Animations.Animation>();
+    public List<Animations.IAnimation> animations = new List<Animations.IAnimation>();
     public List<Behaviors.Condition> conditions = new List<Behaviors.Condition>();
     public List<Behaviors.Action> actions = new List<Behaviors.Action>();
     public List<Behaviors.Rule> rules = new List<Behaviors.Rule>();
@@ -166,7 +166,7 @@ public class DataSet
         return hash;
     }
 
-    public Animations.Animation getAnimation(ushort animIndex) => animations[animIndex];
+    public Animations.IAnimation getAnimation(ushort animIndex) => animations[animIndex];
     public ushort getAnimationCount() => (ushort)animations.Count;
 	public Behaviors.Condition getCondition(int conditionIndex) => conditions[conditionIndex];
 	public ushort getConditionCount() => (ushort)conditions.Count;

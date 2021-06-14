@@ -11,7 +11,7 @@ namespace Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class AnimationFadeCandy
-        : Animation
+        : IAnimation
     {
         public AnimationType type { get; set; } = AnimationType.Gradient;
         public byte padding_type { get; set; }
@@ -72,7 +72,7 @@ namespace Animations
         public MovingSphere[] spheres;
         public int sphereCount;
 
-        public AnimationInstanceFadeCandy(Animation animation, DataSet.AnimationBits bits)
+        public AnimationInstanceFadeCandy(IAnimation animation, DataSet.AnimationBits bits)
             : base(animation, bits)
         {
         }

@@ -11,7 +11,7 @@ namespace Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class AnimationGradient
-        : Animation
+        : IAnimation
     {
         public AnimationType type { get; set; } = AnimationType.Gradient;
         public byte padding_type { get; set; }
@@ -32,7 +32,7 @@ namespace Animations
     public class AnimationInstanceGradient
         : AnimationInstance
     {
-        public AnimationInstanceGradient(Animation animation, DataSet.AnimationBits bits)
+        public AnimationInstanceGradient(IAnimation animation, DataSet.AnimationBits bits)
             : base(animation, bits)
         {
         }

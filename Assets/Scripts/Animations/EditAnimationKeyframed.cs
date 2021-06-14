@@ -78,7 +78,7 @@ namespace Animations
 
         public override AnimationType type => AnimationType.Keyframed;
 
-        public override Animation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
+        public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
         {
             var ret = new AnimationKeyframed();
 		    ret.duration = (ushort)(duration * 1000); // stored in milliseconds

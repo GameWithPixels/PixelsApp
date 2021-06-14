@@ -125,7 +125,7 @@ namespace Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
 	public class AnimationKeyframed
-		: Animation
+		: IAnimation
 	{
         public static int[] faceIndices = new int[] {  17, 1, 19, 13, 3, 10, 8, 5, 15, 7, 9, 11, 14, 4, 12, 0, 18, 2, 16, 6 };
 		public AnimationType type { get; set; } = AnimationType.Keyframed;

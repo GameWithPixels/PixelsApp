@@ -31,7 +31,7 @@ namespace Animations
 	/// Base class for animation presets. All presets have a few properties in common.
 	/// Presets are stored in flash, so do not have methods or vtables or anything like that.
 	/// </summary>
-	public interface Animation
+	public interface IAnimation
 	{
 		AnimationType type { get; set; }
 		byte padding_type { get; set; } // to keep duration 16-bit aligned
@@ -45,7 +45,7 @@ namespace Animations
 	/// </summary>
 	public abstract class AnimationInstance
 	{
-		public Animation animationPreset;
+		public IAnimation animationPreset;
 		public DataSet.AnimationBits animationBits;
 		public int startTime; //ms
 		public byte remapFace;
@@ -53,7 +53,7 @@ namespace Animations
 
         protected DataSet set;
 
-		public AnimationInstance(Animation animation, DataSet.AnimationBits bits)
+		public AnimationInstance(IAnimation animation, DataSet.AnimationBits bits)
         {
             animationPreset = animation;
 			animationBits = bits;
