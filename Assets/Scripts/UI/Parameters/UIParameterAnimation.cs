@@ -48,7 +48,7 @@ public class UIParameterAnimation
             animationRender.texture = dieRenderer.renderTexture;
         }
 
-        selectAnimationButton.onClick.AddListener(() => PixelsApp.Instance.ShowAnimationPicker("Select Animation", (EditAnimation)getterFunc.Invoke(), (res, newAnim) => 
+        selectAnimationButton.onClick.AddListener(() => PixelsApp.Instance.ShowAnimationPicker("Select Lighting Pattern", (EditAnimation)getterFunc.Invoke(), (res, newAnim) => 
         {
             if (res)
             {
