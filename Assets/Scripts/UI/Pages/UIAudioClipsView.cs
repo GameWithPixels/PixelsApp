@@ -99,7 +99,10 @@ public class UIAudioClipsView
 
     void FileSelected(string filePath)
     {
-        StartCoroutine(FileSelectedCr(filePath));
+        if (!string.IsNullOrEmpty(filePath))
+        {
+            StartCoroutine(FileSelectedCr(filePath));
+        }
     }
 
     void AddNewClip()
