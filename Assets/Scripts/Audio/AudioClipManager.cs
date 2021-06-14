@@ -22,6 +22,13 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
 
     public List<AudioClipInfo> audioClips = new List<AudioClipInfo>();
 
+    const string wavExtension = ".wav";
+    const string mp3Extension = ".mp3";
+    //const string m4aExtension = ".m4a";
+    const string oggExtension = ".ogg";
+
+    public static string[] supportedExtensions => new[] { wavExtension, mp3Extension, oggExtension };
+
     AudioSource audioSource;
 
     public AudioClipInfo FindClip(string name)
@@ -57,54 +64,35 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
             DirectoryInfo info = new DirectoryInfo(userClipsRootPath);
             foreach (FileInfo item in info.GetFiles())
             {
-                if (item.Extension == ".wav")
+                bool isWav = Path.GetExtension(item.Name) == wavExtension;
+                bool isMp3 = Path.GetExtension(item.Name) == mp3Extension;
+                bool isOgg = Path.GetExtension(item.Name) == oggExtension;
+                if (isWav || isMp3 || isOgg)
                 {
+                    var type = isWav ? AudioType.WAV : isOgg ? AudioType.OGGVORBIS : AudioType.MPEG;
                     audioFileInfos.Add(new AudioFileImportInfo()
                     {
                         fileName = item.Name,
-                        filePath = userClipsRootPath + "/" + item.Name,
-                        type = AudioType.WAV
+                        filePath = Path.Combine(userClipsRootPath, item.Name),
+                        type = type
                     });
                 }
-                else if (item.Extension == ".mp3")
-                {
-                    audioFileInfos.Add(new AudioFileImportInfo()
-                    {
-                        fileName = item.Name,
-                        filePath = userClipsRootPath + "/" + item.Name,
-                        type = AudioType.MPEG
-                    });
-                }
-                //else if (item.Extension == ".m4a")
-                //{
-                //    audioFileInfos.Add(new AudioFileImportInfo()
-                //    {
-                //        fileName = item.Name,
-                //        filePath = userClipsRootPath + "/" + item.Name,
-                //        type = AudioType.MPEG
-                //    });
-                //}
             }
 
             foreach (var audioFileInfo in audioFileInfos)
             {
-                #if UNITY_EDITOR || UNITY_STANDALONE_WIN
-                if (audioFileInfo.type == AudioType.WAV)
-                #endif
+                string streamingPath = audioFileInfo.filePath;
+#if UNITY_IOS
+                streamingPath = "file://" + audioFileInfo.filePath;
+#endif
+                UnityWebRequest AudioFileRequest = UnityWebRequestMultimedia.GetAudioClip(streamingPath, audioFileInfo.type);
+                yield return AudioFileRequest.SendWebRequest();
+                if (AudioFileRequest.result != UnityWebRequest.Result.ConnectionError)
                 {
-                    string streamingPath = audioFileInfo.filePath;
-                    #if UNITY_IOS
-                    streamingPath = "file://" + audioFileInfo.filePath;
-                    #endif
-                    UnityWebRequest AudioFileRequest = UnityWebRequestMultimedia.GetAudioClip(streamingPath, audioFileInfo.type);
-                    yield return AudioFileRequest.SendWebRequest();
-                    if (AudioFileRequest.result != UnityWebRequest.Result.ConnectionError)
-                    {
-                        AudioClip clip = DownloadHandlerAudioClip.GetContent(AudioFileRequest);
-                        clip.name = audioFileInfo.fileName;
-                        userClips.Add(clip);
-                        Debug.Log("Imported user audio clip: " + audioFileInfo.filePath);
-                    }
+                    AudioClip clip = DownloadHandlerAudioClip.GetContent(AudioFileRequest);
+                    clip.name = Path.GetFileNameWithoutExtension(audioFileInfo.fileName);
+                    userClips.Add(clip);
+                    Debug.Log("Imported user audio clip: " + audioFileInfo.filePath);
                 }
             }
         }
@@ -167,25 +155,26 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
             Directory.CreateDirectory(userClipsRootPath);
         }
 
-        string clipName = System.IO.Path.GetFileName(path);
-        string destPath = System.IO.Path.Combine(userClipsRootPath, clipName);
-        System.IO.File.Copy(path, destPath, true);
-        bool isWav = System.IO.Path.GetExtension(path) == ".wav";
-        bool isMp3 = System.IO.Path.GetExtension(path) == ".mp3";
-        bool isM4a = System.IO.Path.GetExtension(path) == ".m4a";
-        if (isWav || isMp3 || isM4a)
+        string clipName = Path.GetFileName(path);
+        string destPath = Path.Combine(userClipsRootPath, clipName);
+        File.Copy(path, destPath, true);
+        bool isWav = Path.GetExtension(path) == wavExtension;
+        bool isMp3 = Path.GetExtension(path) == mp3Extension;
+        bool isOgg = Path.GetExtension(path) == oggExtension;
+        if (isWav || isMp3 || isOgg)
         {
             Debug.Log("File path to import: " + destPath);
             string streamingPath = destPath;
-            #if UINTY_IOS
+#if UNITY_IOS
             streamingPath = "file://" + destPath;
-            #endif
-            UnityWebRequest AudioFileRequest = UnityWebRequestMultimedia.GetAudioClip(streamingPath, isWav ? AudioType.WAV : AudioType.MPEG);
+#endif
+            var type = isWav ? AudioType.WAV : isOgg ? AudioType.OGGVORBIS : AudioType.MPEG;
+            UnityWebRequest AudioFileRequest = UnityWebRequestMultimedia.GetAudioClip(streamingPath, type);
             yield return AudioFileRequest.SendWebRequest();
             if (AudioFileRequest.result != UnityWebRequest.Result.ConnectionError)
             {
                 AudioClip clip = DownloadHandlerAudioClip.GetContent(AudioFileRequest);
-                clip.name = clipName;
+                clip.name = Path.GetFileNameWithoutExtension(clipName);
                 userClips.Add(clip);
                 Debug.Log("Imported user audio clip: " + destPath);
 

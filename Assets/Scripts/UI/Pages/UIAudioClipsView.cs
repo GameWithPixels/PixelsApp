@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using AudioClips;
-using System.Text;
 using SimpleFileBrowser;
+using System.Linq;
+using System.Text;
 
 public class UIAudioClipsView
     : UIPage
@@ -20,7 +21,6 @@ public class UIAudioClipsView
     List<UIAudioClipsViewToken> audioClips = new List<UIAudioClipsViewToken>();
 
     AudioSource audioSource;
-    string currentFilepath;
 
     void Awake()
     {
@@ -87,6 +87,7 @@ public class UIAudioClipsView
     IEnumerator FileSelectedCr(string filePath)
     {
         Debug.Log("Audio file path: " + filePath);
+
         // Copy the file to the user directory
         string fileName = null;
         yield return AudioClipManager.Instance.AddUserClip(filePath, n => fileName = n);
@@ -108,7 +109,8 @@ public class UIAudioClipsView
     void AddNewClip()
     {
 #if UNITY_EDITOR
-        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select audio file", "", "wav"));
+        var supportedFormats = string.Join(",", AudioClipManager.supportedExtensions.Select(ex => ex.TrimStart('.')));
+        FileSelected(UnityEditor.EditorUtility.OpenFilePanelWithFilters("Select audio file", "", new[] { "Sound files", supportedFormats, "All files", "*" }));
 #elif UNITY_STANDALONE_WIN
         // Set filters (optional)
 		// It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
