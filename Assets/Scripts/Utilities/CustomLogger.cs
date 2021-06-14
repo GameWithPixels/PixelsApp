@@ -27,9 +27,8 @@ public class CustomLogger : MonoBehaviour
     {
 #if !UNITY_EDITOR
         enabled = false;
-        return;
-#endif
-        string filename = $"log_{DateTime.Now.ToString("o")}.txt";
+#else
+        string filename = $"log_{DateTime.Now:o}.txt";
         foreach (char c in Path.GetInvalidFileNameChars())
         {
             filename = filename.Replace(c.ToString(), "_");
@@ -40,6 +39,7 @@ public class CustomLogger : MonoBehaviour
         streamWriter.WriteLine(filename);
         streamWriter.WriteLine();
         Application.logMessageReceivedThreaded += Application_logMessageReceivedThreaded;
+#endif
     }
 
     void OnDisable()
