@@ -41,7 +41,7 @@ public class UIRuleToken : MonoBehaviour
     public bool isExpanded => expandedRoot.gameObject.activeSelf;
 
     UIRuleTokenConditionToken conditionToken = null;
-    List<UIRuleTokenActionToken> actionTokens = new List<UIRuleTokenActionToken>();
+    readonly List<UIRuleTokenActionToken> actionTokens = new List<UIRuleTokenActionToken>();
 
     public void Setup(EditRule rule)
     {
@@ -52,8 +52,7 @@ public class UIRuleToken : MonoBehaviour
         actionTokens.Clear();
         for (int i = 0; i < rule.actions.Count; ++i)
         {
-            var action = rule.actions[i];
-            actionTokens.Add(UIRuleTokenManager.Instance.CreateActionToken(action, i == 0, tokenRoot));
+            actionTokens.Add(UIRuleTokenManager.Instance.CreateActionToken(rule.actions[i], i == 0, tokenRoot));
         }
         Expand(false);
     }
@@ -61,9 +60,18 @@ public class UIRuleToken : MonoBehaviour
     public void Refresh()
     {
         conditionToken?.Setup(editRule.condition);
-        for (int i = 0; i < editRule.actions.Count; ++i)
+        for (int i = 0; i < Mathf.Min(editRule.actions.Count, actionTokens.Count); ++i)
         {
             actionTokens[i].Setup(editRule.actions[i], i == 0);
+        }
+        for (int i = actionTokens.Count; i < editRule.actions.Count; ++i)
+        {
+            actionTokens.Add(UIRuleTokenManager.Instance.CreateActionToken(editRule.actions[i], i == 0, tokenRoot));
+        }
+        for (int i = actionTokens.Count - 1; i >= editRule.actions.Count; --i)
+        {
+            Destroy(actionTokens[i].gameObject);
+            actionTokens.RemoveAt(i);
         }
     }
 
