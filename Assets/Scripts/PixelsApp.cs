@@ -182,29 +182,18 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
     public void ActivateBehavior(Behaviors.EditBehavior behavior, System.Action<EditDie, bool> callback)
     {
-        ShowDialogBox(
-            "Activate " + behavior.name + "?",
-            "Do you want to activate this profile on one of your dice?",
-            "Yes",
-            "Cancel",
-            (res) =>
+        // Select the die
+        ShowDiePicker("Select Die", null, null, (res, selectedDie) =>
+        {
+            if (res)
             {
-                if (res)
+                // Attempt to activate the behavior on the die
+                UploadBehavior(behavior, selectedDie, (res2) =>
                 {
-                    // Select the die
-                    ShowDiePicker("Select Die", null, null, (res2, selectedDie) =>
-                    {
-                        if (res2)
-                        {
-                            // Attempt to activate the behavior on the die
-                            UploadBehavior(behavior, selectedDie, (res3) =>
-                            {
-                                callback?.Invoke(selectedDie, res3);
-                            });
-                        }
-                    });
-                }
-            });
+                    callback?.Invoke(selectedDie, res2);
+                });
+            }
+        });
     }
 
     public void UpdateDieDataSet(Presets.EditDieAssignment editDieAssignment, System.Action<bool> callback)
