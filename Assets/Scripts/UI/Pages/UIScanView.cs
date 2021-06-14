@@ -169,6 +169,7 @@ public class UIScanView
 
     void ClearList()
     {
+        //TODO it's possible that the scan doesn't stop if it was triggered more than once
         DicePool.Instance.StopScanForDice();
         DicePool.Instance.ClearScanList();
         RefreshView();

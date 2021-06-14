@@ -43,7 +43,7 @@ public class UIDicePoolView
         if (connectAllDiceCoroutine != null)
         {
             StopCoroutine(connectAllDiceCoroutine);
-            ((System.IDisposable)connectAllDiceCoroutine).Dispose(); // This will make sure the
+            ((System.IDisposable)connectAllDiceCoroutine).Dispose(); // This will make sure the finally {} block is run
             connectAllDiceCoroutine = null;
         }
         foreach (var editDie in connectedDice)
