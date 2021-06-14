@@ -142,6 +142,7 @@ public class UIPresetsView
     {
         // Create a new default preset
         var newPreset = AppDataSet.Instance.AddNewDefaultPreset();
+        AppDataSet.Instance.SaveData();
         NavigationManager.Instance.GoToPage(UIPage.PageId.Preset, newPreset);
     }
 
