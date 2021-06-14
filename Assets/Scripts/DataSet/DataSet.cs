@@ -149,19 +149,21 @@ public class DataSet
     public uint ComputeHash()
     {
         byte[] dataSetDataBytes = ToByteArray();
+        var hash = Utils.computeHash(dataSetDataBytes);
 
-        StringBuilder hexdumpBuilder = new StringBuilder();
-        for (int i = 0; i < dataSetDataBytes.Length; ++i)
-        {
-            if (i % 8 == 0)
-            {
-                hexdumpBuilder.AppendLine();
-            }
-            hexdumpBuilder.Append(dataSetDataBytes[i].ToString("X02") + " ");
-        }
-        Debug.Log(hexdumpBuilder.ToString());
+        //StringBuilder hexdumpBuilder = new StringBuilder("Profile hash: ");
+        //hexdumpBuilder.Append(hash);
+        //for (int i = 0; i < dataSetDataBytes.Length; ++i)
+        //{
+        //    if (i % 8 == 0)
+        //    {
+        //        hexdumpBuilder.AppendLine();
+        //    }
+        //    hexdumpBuilder.Append(dataSetDataBytes[i].ToString("X02") + " ");
+        //}
+        //Debug.Log(hexdumpBuilder.ToString());
 
-        return Utils.computeHash(dataSetDataBytes);
+        return hash;
     }
 
     public Animations.Animation getAnimation(ushort animIndex) => animations[animIndex];

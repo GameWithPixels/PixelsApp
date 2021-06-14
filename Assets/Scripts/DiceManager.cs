@@ -18,7 +18,6 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
     public PoolRefreshEvent onEndRefreshPool;
 
     public IEnumerable<EditDie> allDice => dice;
-    public IEnumerable<Die> addingDice => _addingDice;
 
     public enum State
     {
@@ -27,7 +26,20 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
         ConnectingDie,
         RefreshingPool,
     }
-    public State state { get; private set; } = State.Idle;
+    
+    State _state = State.Idle; // Use property to change value
+    public State state
+    {
+        get => _state;
+        private set
+        {
+            if (value != _state)
+            {
+                Debug.Log($"DiceManager state change: {_state} => {value}");
+                _state = value;
+            }
+        }
+    }
 
     List<Die> _addingDice = new List<Die>();
 

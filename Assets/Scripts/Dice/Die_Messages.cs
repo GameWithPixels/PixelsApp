@@ -423,7 +423,7 @@ public partial class Die
     {
         // Handle the message
         var stateMsg = (DieMessageState)message;
-        Debug.Log("State: " + ((RollState)(stateMsg.state)).ToString() + ", " + stateMsg.face);
+        Debug.Log($"State: {stateMsg.state}, {stateMsg.face}");
 
         var newState = (RollState)stateMsg.state;
         var newFace = stateMsg.face;

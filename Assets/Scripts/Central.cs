@@ -80,8 +80,19 @@ public class Central : SingletonMonoBehaviour<Central>
         Error,
     }
 
-    State _state = State.Uninitialized;
-    public State state => _state;
+    State _state = State.Uninitialized; // Use property to change value
+    public State state
+    {
+        get => _state;
+        private set
+        {
+            if (value != _state)
+            {
+                Debug.Log($"Central state change: {_state} => {value}");
+                _state = value;
+            }
+        }
+    }
 
     Dictionary<string, Die> _dice;
 
@@ -140,16 +151,16 @@ public class Central : SingletonMonoBehaviour<Central>
     /// </summary>
     public bool BeginScanForDice(System.Action<IDie> onDieDiscovered, System.Action<IDie, int, byte[]> onCustomAdvertisingData)
     {
-        if (_state != State.Idle)
+        if (state != State.Idle)
         {
-            Debug.LogError("Central not ready to start scanning, state: " + _state);
+            Debug.LogError("Central not ready to start scanning, state: " + state);
             return false;
         }
 
         Debug.Log("start scan");
 
         // Begin scanning
-        _state = State.Scanning;
+        state = State.Scanning;
 
         // Notify of all the already known advertising dice
         foreach (var die in _dice.Values)
@@ -174,7 +185,7 @@ public class Central : SingletonMonoBehaviour<Central>
     /// </summary>
     public bool StopScanForDice()
     {
-        if (_state != State.Scanning)
+        if (state != State.Scanning)
         {
             Debug.LogError("Die Manager not scanning, so can't stop scanning");
             return false;
@@ -184,7 +195,7 @@ public class Central : SingletonMonoBehaviour<Central>
 
         // Stop scanning
         BluetoothLEHardwareInterface.StopScan();
-        _state = State.Idle;
+        state = State.Idle;
         return true;
     }
 
@@ -257,7 +268,7 @@ public class Central : SingletonMonoBehaviour<Central>
 
             Debug.Log("Connecting to die " + ddie.name);
 
-            _state = State.Connecting;
+            state = State.Connecting;
 
             // And kick off the connection!
             BluetoothLEHardwareInterface.ConnectToPeripheral(die.address, OnDeviceConnected, OnServiceDiscovered, OnCharacteristicDiscovered, OnDeviceDisconnected);
@@ -284,7 +295,7 @@ public class Central : SingletonMonoBehaviour<Central>
                 return;
             }
 
-            _state = State.Disconnecting;
+            state = State.Disconnecting;
 
             // And kick off the disconnection!
             ddie.state = Die.State.Disconnecting;
@@ -321,7 +332,7 @@ public class Central : SingletonMonoBehaviour<Central>
     // Start is called before the first frame update
     void Awake()
     {
-        _state = State.Uninitialized;
+        state = State.Uninitialized;
         _dice = new Dictionary<string, Die>();
     }
 
@@ -373,7 +384,7 @@ public class Central : SingletonMonoBehaviour<Central>
     void OnBluetoothInitComplete()
     {
         // We're ready!
-        _state = State.Idle;
+        state = State.Idle;
     }
 
     void OnError(string error)
@@ -385,8 +396,8 @@ public class Central : SingletonMonoBehaviour<Central>
             switch (die.state)
             {
                 case Die.State.Disconnecting:
-                    Debug.Assert(_state == State.Disconnecting);
-                    _state = State.Idle;
+                    Debug.Assert(state == State.Disconnecting);
+                    state = State.Idle;
                     // We got an error while this die was disconnecting,
                     // Just indicate it
                     die.onDisconnectionResult?.Invoke(die, false, error);
@@ -399,8 +410,8 @@ public class Central : SingletonMonoBehaviour<Central>
                     // Ignore this die
                     break;
                 case Die.State.Connecting:
-                    Debug.Assert(_state == State.Connecting);
-                    _state = State.Idle;
+                    Debug.Assert(state == State.Connecting);
+                    state = State.Idle;
                     die.onConnectionResult?.Invoke(die, false, error);
                     die.onConnectionResult = null;
                     die.onUnexpectedDisconnection = null;
@@ -410,7 +421,7 @@ public class Central : SingletonMonoBehaviour<Central>
                     // And force a disconnect
                     // Note: I'm not completely sure if we should trigger the disconnect or just remove the die
                     die.state = Die.State.Disconnecting;
-                    _state = State.Disconnecting;
+                    state = State.Disconnecting;
                     BluetoothLEHardwareInterface.DisconnectPeripheral(die.address, null);
                     errorAttributed = true;
                     break;
@@ -419,8 +430,8 @@ public class Central : SingletonMonoBehaviour<Central>
                     break;
                 case Die.State.Subscribing:
                     {
-                        Debug.Assert(_state == State.Connecting);
-                        _state = State.Idle;
+                        Debug.Assert(state == State.Connecting);
+                        state = State.Idle;
                         Debug.LogError("Characteristic Error: " + die.name + ": " + error);
                         die.onConnectionResult?.Invoke(die, false, error);
                         die.onConnectionResult = null;
@@ -430,7 +441,7 @@ public class Central : SingletonMonoBehaviour<Central>
                         // Temporarily add the die to the connected list to avoid an error message during the disconnect
                         // And force a disconnect
                         die.state = Die.State.Disconnecting;
-                        _state = State.Disconnecting;
+                        state = State.Disconnecting;
                         BluetoothLEHardwareInterface.DisconnectPeripheral(die.address, null);
                         errorAttributed = true;
 
@@ -546,8 +557,8 @@ public class Central : SingletonMonoBehaviour<Central>
             switch (die.state)
             {
                 case Die.State.Disconnecting:
-                    Debug.Assert(_state == State.Disconnecting, "Wrong state " + _state.ToString());
-                    _state = State.Idle;
+                    Debug.Assert(state == State.Disconnecting, "Wrong state " + state.ToString());
+                    state = State.Idle;
                     // This is perfectly okay
                     die.onDisconnectionResult?.Invoke(die,true, null);
                     die.onDisconnectionResult = null;
@@ -565,8 +576,8 @@ public class Central : SingletonMonoBehaviour<Central>
                 case Die.State.Connecting:
                 case Die.State.Connected:
                     {
-                        Debug.Assert(_state == State.Connecting);
-                        _state = State.Idle;
+                        Debug.Assert(state == State.Connecting);
+                        state = State.Idle;
                         string errorString = "Disconnected before subscribing (state = " + die.state + ")";
                         die.onConnectionResult?.Invoke(die, false, errorString);
                         _dice.Remove(address);
@@ -575,8 +586,8 @@ public class Central : SingletonMonoBehaviour<Central>
                     break;
                 case Die.State.Subscribing:
                     {
-                        Debug.Assert(_state == State.Connecting);
-                        _state = State.Idle;
+                        Debug.Assert(state == State.Connecting);
+                        state = State.Idle;
                         string errorString = "Disconnected while subscribing";
                         die.onConnectionResult?.Invoke(die, false, errorString);
                         _dice.Remove(address);
@@ -657,8 +668,8 @@ public class Central : SingletonMonoBehaviour<Central>
             // Check timeout!
             if (Time.time - die.startTime > DiscoverCharacteristicsTimeout)
             {
-                Debug.Assert(_state == State.Connecting);
-                _state = State.Idle;
+                Debug.Assert(state == State.Connecting);
+                state = State.Idle;
                 // Wrong characteristics, we can't talk to this die!
                 string errorString = "Timeout looking for characteristics on Die";
                 die.onConnectionResult?.Invoke(die, false, errorString);
@@ -670,7 +681,7 @@ public class Central : SingletonMonoBehaviour<Central>
                 // Temporarily add the die to the connected list to avoid an error message during the disconnect
                 // And force a disconnect
                 die.state = Die.State.Disconnecting;
-                _state = State.Disconnecting;
+                state = State.Disconnecting;
                 BluetoothLEHardwareInterface.DisconnectPeripheral(die.address, null);
             }
             // Else just keep waiting
@@ -703,8 +714,8 @@ public class Central : SingletonMonoBehaviour<Central>
         Die sub = _dice.Values.FirstOrDefault(d => d.state == Die.State.Subscribing);
         if (sub != null)
         {
-            Debug.Assert(_state == State.Connecting);
-            _state = State.Idle;
+            Debug.Assert(state == State.Connecting);
+            state = State.Idle;
             sub.state = Die.State.Ready;
             sub.onConnectionResult?.Invoke(sub, true, null);
             sub.onConnectionResult = null;
@@ -725,8 +736,8 @@ public class Central : SingletonMonoBehaviour<Central>
     {
         if (Time.time - die.startTime > SubscribeCharacteristicsTimeout)
         {
-            Debug.Assert(_state == State.Connecting);
-            _state = State.Idle;
+            Debug.Assert(state == State.Connecting);
+            state = State.Idle;
             string errorString = "Timeout trying to subscribe to die";
             Debug.LogError("Characteristic Error: " + die.name + ": " + errorString);
             die.onConnectionResult?.Invoke(die, false, errorString);
@@ -737,7 +748,7 @@ public class Central : SingletonMonoBehaviour<Central>
             // Temporarily add the die to the connected list to avoid an error message during the disconnect
             // And force a disconnect
             die.state = Die.State.Disconnecting;
-            _state = State.Disconnecting;
+            state = State.Disconnecting;
             BluetoothLEHardwareInterface.DisconnectPeripheral(die.address, null);
 
             StartNextSubscribeToCharacteristic();

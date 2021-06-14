@@ -25,6 +25,8 @@ public class UIDialogBox : MonoBehaviour
     /// </sumary>
     public void Show(string title, string message, string okMessage, string cancelMessage, System.Action<bool> closeAction)
     {
+        Debug.Log($"Showing dialog: title={title}, message={message}, okMessage={okMessage}, cancelMessage={cancelMessage}");
+
         if (isShown)
         {
             Debug.LogWarning("Previous Message box still active");
@@ -56,14 +58,8 @@ public class UIDialogBox : MonoBehaviour
 
     void Awake()
     {
-        cancelButton.onClick.AddListener(() =>
-        {
-            Hide(false);
-        });
-        okButton.onClick.AddListener(() =>
-        {
-            Hide(true);
-        });
+        cancelButton.onClick.AddListener(() => Hide(false));
+        okButton.onClick.AddListener(() => Hide(true));
     }
 
     /// <summary>
@@ -77,6 +73,8 @@ public class UIDialogBox : MonoBehaviour
 
     void Hide(bool result)
     {
+        Debug.Log($"Hiding dialog: title={titleText.text}, message={messageText.text}, result={result}");
+
         gameObject.SetActive(false);
         isShown = false;
         var closeActionCopy = closeAction;

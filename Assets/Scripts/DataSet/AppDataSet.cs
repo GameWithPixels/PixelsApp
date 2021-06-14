@@ -348,6 +348,8 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         var path = System.IO.Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
         if (System.IO.File.Exists(path))
         {
+            Debug.Log("LoadData");
+
             var serializer = CreateSerializer();
             using (StreamReader sw = new StreamReader(path))
             using (JsonReader reader = new JsonTextReader(sw))
@@ -357,6 +359,8 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         }
         else
         {
+            Debug.Log("CreateData");
+
             var serializer = CreateSerializer();
             using (StringReader sw = new StringReader(AppConstants.Instance.defaultDiceJson.text))
             using (JsonReader reader = new JsonTextReader(sw))
@@ -371,6 +375,8 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     /// </sumary>
     public void SaveData()
     {
+        Debug.Log("SaveData");
+
         var path = System.IO.Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
         var serializer = CreateSerializer();
         using (StreamWriter sw = new StreamWriter(path))

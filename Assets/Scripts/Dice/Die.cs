@@ -61,7 +61,19 @@ namespace Dice
             Disconnecting,  // We are currently disconnecting from this die
         }
 
-        public ConnectionState connectionState { get; private set; } = ConnectionState.Invalid;
+        ConnectionState _connectionState = ConnectionState.Invalid; // Use property to change value
+        public ConnectionState connectionState
+        {
+            get => _connectionState;
+            private set
+            {
+                if (value != _connectionState)
+                {
+                    Debug.Log($"Die connection state change: {_connectionState} => {value}");
+                    _connectionState = value;
+                }
+            }
+        }
 
         public enum LastError
         {

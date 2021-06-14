@@ -28,7 +28,7 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
         public int currentConnectionCount = 0;
         public float lastRequestDisconnectTime = 0.0f;
     }
-    List<PoolDie> dice = new List<PoolDie>();
+    readonly List<PoolDie> dice = new List<PoolDie>();
 
     public IEnumerable<Die> allDice => dice.Select(d => d.die);
 
@@ -54,7 +54,11 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
         scanRequestCount++;
         if (scanRequestCount == 1)
         {
-            DoBeginScanForDice();
+            Central.Instance.BeginScanForDice(OnDieDiscovered, OnDieAdvertisingData);
+        }
+        else
+        {
+            Debug.Log("Already scanning");
         }
     }
 
@@ -72,7 +76,7 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
             scanRequestCount--;
             if (scanRequestCount == 0)
             {
-                DoStopScanForDice();
+                Central.Instance.StopScanForDice();
             }
             // Else ignore
         }
@@ -80,6 +84,8 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
 
     public void ClearScanList()
     {
+        Debug.Log("Clearing scan list");
+
         var diceCopy = new List<PoolDie>(dice);
         foreach (var die in diceCopy)
         {
@@ -255,23 +261,6 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// Start scanning for new and existing dice, filling our lists in the process from
-    /// events triggered by Central.
-    /// </sumary>
-    void DoBeginScanForDice()
-    {
-        Central.Instance.BeginScanForDice(OnDieDiscovered, OnDieAdvertisingData);
-    }
-
-    /// <summary>
-    /// Stops the current scan 
-    /// </sumary>
-    void DoStopScanForDice()
-    {
-        Central.Instance.StopScanForDice();
     }
 
     void DoConnectDie(Die die)
@@ -590,14 +579,6 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
                 DestroyDie(die);
             }
         }
-    }
-
-    /// <summary>
-    /// Empties the pool, disconnecting/destroying dice in the process
-    /// </sumary>
-    void ClearPool()
-    {
-        DestroyAll();
     }
 
 }
