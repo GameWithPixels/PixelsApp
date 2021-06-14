@@ -38,13 +38,6 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
 
     string userClipsRootPath => Path.Combine(Application.persistentDataPath, AppConstants.Instance.AudioClipsFolderName);
 
-    class AudioFileImportInfo
-    {
-        public string fileName;
-        public string filePath;
-        public AudioType type;
-    }
-
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -60,71 +53,77 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
     {
         if (Directory.Exists(userClipsRootPath))
         {
-            var audioFileInfos = new List<AudioFileImportInfo>();
-            DirectoryInfo info = new DirectoryInfo(userClipsRootPath);
-            foreach (FileInfo item in info.GetFiles())
+            var dirInfo = new DirectoryInfo(userClipsRootPath);
+            foreach (FileInfo item in dirInfo.GetFiles())
             {
-                bool isWav = Path.GetExtension(item.Name) == wavExtension;
-                bool isMp3 = Path.GetExtension(item.Name) == mp3Extension;
-                bool isOgg = Path.GetExtension(item.Name) == oggExtension;
-                if (isWav || isMp3 || isOgg)
-                {
-                    var type = isWav ? AudioType.WAV : isOgg ? AudioType.OGGVORBIS : AudioType.MPEG;
-                    audioFileInfos.Add(new AudioFileImportInfo()
-                    {
-                        fileName = item.Name,
-                        filePath = Path.Combine(userClipsRootPath, item.Name),
-                        type = type
-                    });
-                }
-            }
-
-            foreach (var audioFileInfo in audioFileInfos)
-            {
-                string streamingPath = audioFileInfo.filePath;
-#if UNITY_IOS
-                streamingPath = "file://" + audioFileInfo.filePath;
-#endif
-                UnityWebRequest AudioFileRequest = UnityWebRequestMultimedia.GetAudioClip(streamingPath, audioFileInfo.type);
-                yield return AudioFileRequest.SendWebRequest();
-                if (AudioFileRequest.result != UnityWebRequest.Result.ConnectionError)
-                {
-                    AudioClip clip = DownloadHandlerAudioClip.GetContent(AudioFileRequest);
-                    clip.name = Path.GetFileNameWithoutExtension(audioFileInfo.fileName);
-                    userClips.Add(clip);
-                    Debug.Log("Imported user audio clip: " + audioFileInfo.filePath);
-                }
+                yield return LoadClip(Path.Combine(userClipsRootPath, item.Name));
             }
         }
 
         // Generate previews for all clips
-        for (int i = 0; i < builtInClips.Count; ++i)
+        foreach (var clip in builtInClips)
         {
-            var clip = builtInClips[i];
-            var preview = AudioUtils.PaintWaveformSpectrum(clip, 0.7f, 256, 256, AppConstants.Instance.AudioClipsWaveformColor);
-            var hash = AudioUtils.GenerateWaveformHash(clip);
-            audioClips.Add(new AudioClipInfo() {
-                builtIn = true,
-                clip = clip,
-                preview = preview });
-
+            CreatePreview(clip, builtIn: true);
             // Wait until next frame to continue
             yield return null;
         }
 
-        for (int i = 0; i < userClips.Count; ++i)
+        foreach (var clip in userClips)
         {
-            var clip = userClips[i];
-            var preview = AudioUtils.PaintWaveformSpectrum(clip, 0.7f, 256, 256, AppConstants.Instance.AudioClipsWaveformColor);
-            var hash = AudioUtils.GenerateWaveformHash(clip);
-            audioClips.Add(new AudioClipInfo() {
-                builtIn = false,
-                clip = clip,
-                preview = preview });
-
+            CreatePreview(clip);
             // Wait until next frame to continue
             yield return null;
         }
+    }
+
+    IEnumerator LoadClip(string filePath, System.Action<AudioClip> doneCb = null)
+    {
+        AudioClip clip = null;
+
+        bool isWav = Path.GetExtension(filePath) == wavExtension;
+        bool isMp3 = Path.GetExtension(filePath) == mp3Extension;
+        bool isOgg = Path.GetExtension(filePath) == oggExtension;
+        if (isWav || isMp3 || isOgg)
+        {
+#if !UNITY_IOS
+            string streamingPath = filePath;
+#else
+            string streamingPath = "file://" + filePath;
+#endif
+            var audioType = isWav ? AudioType.WAV : isOgg ? AudioType.OGGVORBIS : AudioType.MPEG;
+            UnityWebRequest AudioFileRequest = UnityWebRequestMultimedia.GetAudioClip(streamingPath, audioType);
+            yield return AudioFileRequest.SendWebRequest();
+
+            if (AudioFileRequest.result != UnityWebRequest.Result.ConnectionError)
+            {
+                clip = DownloadHandlerAudioClip.GetContent(AudioFileRequest);
+                clip.name = Path.GetFileNameWithoutExtension(filePath);
+                userClips.Add(clip);
+                Debug.Log("Imported user audio clip: " + streamingPath);
+            }
+            else
+            {
+                Debug.LogError("Failed to load audio file: " + filePath);
+            }
+        }
+        else
+        {
+            Debug.LogError("Unsupported audio format: " + filePath);
+        }
+
+        doneCb?.Invoke(clip);
+    }
+
+    void CreatePreview(AudioClip clip, bool builtIn = false)
+    {
+        var preview = AudioUtils.PaintWaveformSpectrum(clip, 0.7f, 256, 256, AppConstants.Instance.AudioClipsWaveformColor);
+        //var hash = AudioUtils.GenerateWaveformHash(clip);
+        audioClips.Add(new AudioClipInfo()
+        {
+            builtIn = builtIn,
+            clip = clip,
+            preview = preview
+        });
     }
 
     public void PlayAudioClip(uint clipId)
@@ -148,6 +147,7 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
         }
     }
 
+    // The action returns the user friendly filename
     public IEnumerator AddUserClip(string path, System.Action<string> fileLoadedCallback)
     {
         if (!Directory.Exists(userClipsRootPath))
@@ -155,48 +155,23 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
             Directory.CreateDirectory(userClipsRootPath);
         }
 
-        string clipName = Path.GetFileName(path);
-        string destPath = Path.Combine(userClipsRootPath, clipName);
+        string destPath = Path.Combine(userClipsRootPath, Path.GetFileName(path));
         File.Copy(path, destPath, true);
-        bool isWav = Path.GetExtension(path) == wavExtension;
-        bool isMp3 = Path.GetExtension(path) == mp3Extension;
-        bool isOgg = Path.GetExtension(path) == oggExtension;
-        if (isWav || isMp3 || isOgg)
+
+        Debug.Log("Copied audio file to: " + destPath);
+
+        yield return LoadClip(destPath, clip =>
         {
-            Debug.Log("File path to import: " + destPath);
-            string streamingPath = destPath;
-#if UNITY_IOS
-            streamingPath = "file://" + destPath;
-#endif
-            var type = isWav ? AudioType.WAV : isOgg ? AudioType.OGGVORBIS : AudioType.MPEG;
-            UnityWebRequest AudioFileRequest = UnityWebRequestMultimedia.GetAudioClip(streamingPath, type);
-            yield return AudioFileRequest.SendWebRequest();
-            if (AudioFileRequest.result != UnityWebRequest.Result.ConnectionError)
+            if (clip != null)
             {
-                AudioClip clip = DownloadHandlerAudioClip.GetContent(AudioFileRequest);
-                clip.name = Path.GetFileNameWithoutExtension(clipName);
-                userClips.Add(clip);
-                Debug.Log("Imported user audio clip: " + destPath);
-
-                var preview = AudioUtils.PaintWaveformSpectrum(clip, 0.7f, 256, 256, AppConstants.Instance.AudioClipsWaveformColor);
-                var hash = AudioUtils.GenerateWaveformHash(clip);
-                audioClips.Add(new AudioClipInfo()
-                {
-                    builtIn = false,
-                    clip = clip,
-                    preview = preview
-                });
-
-                fileLoadedCallback?.Invoke(clipName);
+                CreatePreview(clip);
+                fileLoadedCallback?.Invoke(clip.name);
             }
             else
             {
+                File.Delete(destPath);
                 fileLoadedCallback?.Invoke(null);
             }
-        }
-        else
-        {
-            fileLoadedCallback?.Invoke(null);
-        }
+        });
     }
 }

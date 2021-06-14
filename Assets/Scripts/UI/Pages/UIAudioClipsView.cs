@@ -93,7 +93,7 @@ public class UIAudioClipsView
         yield return AudioClipManager.Instance.AddUserClip(filePath, n => fileName = n);
         if (!string.IsNullOrEmpty(fileName))
         {
-            AppDataSet.Instance.AddAudioClip(filePath);
+            AppDataSet.Instance.AddAudioClip(fileName);
             RefreshView();
         }
     }
