@@ -20,8 +20,9 @@ public class CustomLogger : MonoBehaviour
 
     ConcurrentQueue<LogEntry> queue = new ConcurrentQueue<LogEntry>();
     StreamWriter streamWriter;
-    StringBuilder stringBuilder = new StringBuilder();
-    string[] logTypesUpperCase = Enum.GetNames(typeof(LogType)).Select(s => s.Length < 4 ? s.ToUpper() + "\t" : s.ToUpper()).ToArray();
+    readonly StringBuilder stringBuilder = new StringBuilder();
+    readonly string[] logTypesUpperCase = Enum.GetNames(typeof(LogType)).Select(s => s.Length < 4 ? s.ToUpper() + "\t" : s.ToUpper()).ToArray();
+    const string logsFolder = "Logs";
 
     void Awake()
     {
@@ -33,7 +34,13 @@ public class CustomLogger : MonoBehaviour
         {
             filename = filename.Replace(c.ToString(), "_");
         }
-        string pathname = Path.Combine(Application.persistentDataPath, filename);
+        string path = Path.Combine(Application.persistentDataPath, logsFolder);
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        string pathname = Path.Combine(path, filename);
         Debug.Log("Writing logs to: " + pathname);
         streamWriter = new StreamWriter(pathname);
         streamWriter.WriteLine(filename);
