@@ -10,6 +10,7 @@ public class UIPairedDieToken : MonoBehaviour
 {
     // Controls
     [Header("Controls")]
+    public Button mainButton;
     public Image backgroundImage;
     public Button expandButton;
     public Image expandButtonImage;
@@ -49,6 +50,7 @@ public class UIPairedDieToken : MonoBehaviour
     void Awake()
     {
         // Hook up to events
+        mainButton.onClick.AddListener(OnToggle);
         expandButton.onClick.AddListener(OnToggle);
         forgetButton.onClick.AddListener(OnForget);
         renameButton.onClick.AddListener(OnRename);
