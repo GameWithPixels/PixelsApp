@@ -42,6 +42,8 @@ public partial class Die
     void PostMessage<T>(T message)
         where T : DieMessage
     {
+        Debug.Log($"Posting message of type {message.GetType()}");
+
         byte[] msgBytes = DieMessages.ToByteArray(message);
         DicePool.Instance.WriteDie(this, msgBytes, msgBytes.Length, null);
     }
@@ -68,6 +70,8 @@ public partial class Die
     IEnumerator SendMessageWithAckOrTimeoutCr<T>(T message, DieMessageType ackType, float timeOut, System.Action<DieMessage> ackAction, System.Action timeoutAction, System.Action errorAction)
         where T : DieMessage
     {
+        Debug.Log($"Sending message of type {message.GetType()}");
+
         DieMessage ackMessage = null;
         float startTime = Time.time;
         MessageReceivedDelegate callback = (ackMsg) =>
