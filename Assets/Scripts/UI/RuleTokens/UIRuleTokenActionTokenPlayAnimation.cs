@@ -29,10 +29,10 @@ public class UIRuleTokenActionTokenPlayAnimation
 
     void OnDestroy()
     {
-        if (DiceRendererManager.Instance != null && this.dieRenderer != null)
+        if (DiceRendererManager.Instance != null && dieRenderer != null)
         {
-            DiceRendererManager.Instance.DestroyDiceRenderer(this.dieRenderer);
-            this.dieRenderer = null;
+            DiceRendererManager.Instance.DestroyDiceRenderer(dieRenderer);
+            dieRenderer = null;
         }
     }
 
@@ -42,14 +42,14 @@ public class UIRuleTokenActionTokenPlayAnimation
         actionText.text = action.ToString();
         labelText.text = first ? "Then" : "And";
 
-        if (this.dieRenderer == null)
+        if (dieRenderer == null)
         {
             var design = DesignAndColor.V5_Grey;
             if (playAnimAction.animation != null)
             {
                 design = playAnimAction.animation.defaultPreviewSettings.design;
             }
-            this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(design, 160);
+            dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(design, 160);
             if (dieRenderer != null)
             {
                 dieRenderImage.texture = dieRenderer.renderTexture;

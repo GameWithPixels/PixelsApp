@@ -54,7 +54,7 @@ namespace Dice
         public enum ConnectionState
         {
             Invalid = -1,   // This is the value right after creation
-            Available,      // This is a die we new about and scanned
+            Available,      // This is a die we knew about and scanned
             Connecting,     // This die is in the process of being connected to
             Identifying,    // Getting info from the die, making sure it is valid to be used (right firmware, etc...)
             Ready,          // Die is ready for general use

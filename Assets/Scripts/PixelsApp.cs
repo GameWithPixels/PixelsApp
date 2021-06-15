@@ -430,7 +430,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
     public void ImportPattern()
     {
-        void FileSelected(string filePath)
+        static void FileSelected(string filePath)
         {
             // Load the pattern from JSON
             AppDataSet.Instance.ImportAnimation(filePath);
