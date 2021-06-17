@@ -345,28 +345,24 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     /// </sumary>
     public void LoadData()
     {
-        var path = System.IO.Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
-        if (System.IO.File.Exists(path))
-        {
-            Debug.Log("LoadData");
+        var serializer = CreateSerializer();
 
-            var serializer = CreateSerializer();
-            using (StreamReader sw = new StreamReader(path))
-            using (JsonReader reader = new JsonTextReader(sw))
-            {
-                FromJson(reader, serializer);
-            }
+        var path = Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
+        if (File.Exists(path))
+        {
+            Debug.Log("AppDataSet: loading user's file");
+
+            using StreamReader sw = new StreamReader(path);
+            using JsonReader reader = new JsonTextReader(sw);
+            FromJson(reader, serializer);
         }
         else
         {
-            Debug.Log("CreateData");
+            Debug.Log("AppDataSet: loading default contents");
 
-            var serializer = CreateSerializer();
-            using (StringReader sw = new StringReader(AppConstants.Instance.defaultDiceJson.text))
-            using (JsonReader reader = new JsonTextReader(sw))
-            {
-                FromJson(reader, serializer);
-            }
+            using StringReader sw = new StringReader(AppConstants.Instance.defaultDiceJson.text);
+            using JsonReader reader = new JsonTextReader(sw);
+            FromJson(reader, serializer);
         }
     }
 
@@ -375,9 +371,9 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     /// </sumary>
     public void SaveData()
     {
-        Debug.Log("SaveData");
+        Debug.Log("AppDataSet: saving to user's file");
 
-        var path = System.IO.Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
+        var path = Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
         var serializer = CreateSerializer();
         using (StreamWriter sw = new StreamWriter(path))
         using (JsonWriter writer = new JsonTextWriter(sw))
@@ -401,7 +397,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
     public void ImportAnimation(string jsonFilePath)
     {
-        if (System.IO.File.Exists(jsonFilePath))
+        if (File.Exists(jsonFilePath))
         {
             var serializer = CreateSerializer();
             using (StreamReader sw = new StreamReader(jsonFilePath))
@@ -428,7 +424,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         }
     }
     
-public static AppDataSet CreateTestDataSet()
+    public static AppDataSet CreateTestDataSet()
     {
         AppDataSet ret = new AppDataSet();
 
