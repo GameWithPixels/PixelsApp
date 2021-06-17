@@ -35,7 +35,7 @@ IN THE SOFTWARE.
    				 the GL context. Change is necessary as of 4.6.2p2 to be
    				 compatible with new Metal graphics backend.
    --------------------------------------------------------------------- */
-
+#if UNITY_IPHONE || UNITY_TVOS
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
@@ -154,3 +154,4 @@ public class iVidCapPro_PostBuild {
 		return true;
 	}
 }
+#endif
