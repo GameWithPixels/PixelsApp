@@ -31,7 +31,20 @@ public class Central : SingletonMonoBehaviour<Central>
             Disconnecting,
         }
 
-        public State state;
+        State _state = State.Advertising; // Use property to change value
+        public State state
+        {
+            get => _state;
+            set
+            {
+                if (value != _state)
+                {
+                    Debug.Log($"Die state change: {_state} => {value}");
+                    _state = value;
+                }
+            }
+        }
+
         public string name;
         public string address;
 
@@ -51,11 +64,11 @@ public class Central : SingletonMonoBehaviour<Central>
         {
             this.name = name;
             this.address = address;
-            this.state = State.Advertising;
-            this.startTime = float.MaxValue;
-            this.deviceConnected = false;
-            this.messageWriteCharacteristicFound = false;
-            this.messageReadCharacteristicFound = false;
+            state = State.Advertising;
+            startTime = float.MaxValue;
+            deviceConnected = false;
+            messageWriteCharacteristicFound = false;
+            messageReadCharacteristicFound = false;
         }
 
         string IDie.name => name;
@@ -505,7 +518,7 @@ public class Central : SingletonMonoBehaviour<Central>
             die = new Die(address, name);
             _dice.Add(address, die);
 
-            Debug.Log("Discovered new die " + die.name);
+            Debug.Log($"Discovered new die {address} - {name}");
 
             // Notify die!
             die.state = Die.State.Advertising; // <-- this is the default value, but it doesn't hurt to be explicit

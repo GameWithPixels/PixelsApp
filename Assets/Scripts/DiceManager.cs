@@ -406,9 +406,14 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
 #endif
         if (ourDie != null)
         {
+            Debug.Log($"Pairing discovered die: {die.address} - {die.deviceId} - {die.name}");
             ourDie.die = die;
         }
-        // Else this is a die we don't care about
+        else
+        {
+            // Else this is a die we don't care about
+            Debug.Log($"Discovered die is unpaired: {die.address} - {die.deviceId} - {die.name}");
+        }
     }
 
     void OnWillDestroyDie(Die die)
