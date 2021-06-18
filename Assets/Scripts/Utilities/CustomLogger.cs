@@ -18,17 +18,14 @@ public class CustomLogger : MonoBehaviour
         public string message;
     }
 
-    ConcurrentQueue<LogEntry> queue = new ConcurrentQueue<LogEntry>();
+    readonly ConcurrentQueue<LogEntry> queue = new ConcurrentQueue<LogEntry>();
     StreamWriter streamWriter;
     readonly StringBuilder stringBuilder = new StringBuilder();
     readonly string[] logTypesUpperCase = Enum.GetNames(typeof(LogType)).Select(s => s.Length < 4 ? s.ToUpper() + "\t" : s.ToUpper()).ToArray();
     const string logsFolder = "Logs";
 
-    void Awake()
+    void OnEnable()
     {
-#if !UNITY_EDITOR
-        enabled = false;
-#else
         string filename = $"log_{DateTime.Now:o}.txt";
         foreach (char c in Path.GetInvalidFileNameChars())
         {
@@ -46,12 +43,13 @@ public class CustomLogger : MonoBehaviour
         streamWriter.WriteLine(filename);
         streamWriter.WriteLine();
         Application.logMessageReceivedThreaded += Application_logMessageReceivedThreaded;
-#endif
     }
 
     void OnDisable()
     {
+        Application.logMessageReceivedThreaded -= Application_logMessageReceivedThreaded;
         streamWriter.Close();
+        streamWriter = null;
     }
 
     void Application_logMessageReceivedThreaded(string condition, string stackTrace, LogType type)
