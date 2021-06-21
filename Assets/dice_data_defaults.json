@@ -90,7 +90,7 @@
   ],
   "patterns": [
     {
-      "name": "color_pattern_2",
+      "name": "Orange to Purple",
       "gradients": [
         {
           "keyframes": [
@@ -1525,7 +1525,7 @@
       "duration": 2.98
     },
     {
-      "name": "pattern",
+      "name": "Simple",
       "gradients": [
         {
           "keyframes": [
@@ -2762,7 +2762,7 @@
       "duration": 2.04
     },
     {
-      "name": "crazy_pattern_1",
+      "name": "Colored Twinkle",
       "gradients": [
         {
           "keyframes": [
@@ -5700,7 +5700,7 @@
       "duration": 2.98
     },
     {
-      "name": "crazy_pattern_1",
+      "name": "Tiger",
       "gradients": [
         {
           "keyframes": [
@@ -12373,7 +12373,7 @@
       "duration": 2.98
     },
     {
-      "name": "rainbow_falls",
+      "name": "Rainbow Falls",
       "gradients": [
         {
           "keyframes": [
@@ -14114,7 +14114,7 @@
       "duration": 2.98
     },
     {
-      "name": "pattern_down_up",
+      "name": "Down and Up",
       "gradients": [
         {
           "keyframes": [
@@ -15351,7 +15351,7 @@
       "duration": 2.98
     },
     {
-      "name": "circles-2",
+      "name": "Circles",
       "gradients": [
         {
           "keyframes": [
@@ -21727,7 +21727,7 @@
       "duration": 4.98
     },
     {
-      "name": "twinkle_all",
+      "name": "Twinkle All",
       "gradients": [
         {
           "keyframes": [
@@ -24458,7 +24458,7 @@
       "duration": 1.9799999
     },
     {
-      "name": "flicker-on",
+      "name": "Flicker On",
       "gradients": [
         {
           "keyframes": [
@@ -27891,7 +27891,7 @@
       "duration": 5.18
     },
     {
-      "name": "noise",
+      "name": "Noise",
       "gradients": [
         {
           "keyframes": [
@@ -31729,7 +31729,7 @@
       "duration": 1.9799999
     },
     {
-      "name": "rotating-wide-ring",
+      "name": "Rotating Wide Ring",
       "gradients": [
         {
           "keyframes": [
@@ -38798,7 +38798,7 @@
       "duration": 3.98
     },
     {
-      "name": "red-green-rotating-ring",
+      "name": "Rotating Rings",
       "gradients": [
         {
           "keyframes": [
@@ -43851,7 +43851,7 @@
       "duration": 3.98
     },
     {
-      "name": "trifold",
+      "name": "Trifold",
       "gradients": [
         {
           "keyframes": [
@@ -46555,7 +46555,7 @@
       "duration": 1.9799999
     },
     {
-      "name": "acceleration",
+      "name": "Acceleration",
       "gradients": [
         {
           "keyframes": [
@@ -57521,7 +57521,7 @@
       "duration": 3.98
     },
     {
-      "name": "Ring-3",
+      "name": "Rings",
       "gradients": [
         {
           "keyframes": [
@@ -64059,7 +64059,7 @@
       "duration": 0.979999959
     },
     {
-      "name": "more_noise",
+      "name": "Long Noise",
       "gradients": [
         {
           "keyframes": [
@@ -71074,7 +71074,7 @@
       "duration": 3.98
     },
     {
-      "name": "short_noise",
+      "name": "Short Noise",
       "gradients": [
         {
           "keyframes": [
@@ -72887,7 +72887,7 @@
       "duration": 0.979999959
     },
     {
-      "name": "New Pattern",
+      "name": "Basic",
       "gradients": [
         {
           "keyframes": [
@@ -73593,7 +73593,7 @@
       "duration": 1.0
     },
     {
-      "name": "LEDs-dim",
+      "name": "Dim",
       "gradients": [
         {
           "keyframes": [
@@ -74479,7 +74479,7 @@
       "duration": 1.9799999
     },
     {
-      "name": "very_short_noise",
+      "name": "Very Short Noise",
       "gradients": [
         {
           "keyframes": [
@@ -75068,7 +75068,7 @@
       "duration": 0.12
     },
     {
-      "name": "LEDs-dimer",
+      "name": "Dimer",
       "gradients": [
         {
           "keyframes": [
@@ -75933,7 +75933,7 @@
         },
         "count": 3,
         "fade": 1.0,
-        "name": "Three red blinks",
+        "name": "Three Red Blinks",
         "defaultPreviewSettings": {
           "design": 5
         },
@@ -75955,7 +75955,7 @@
         },
         "count": 1,
         "fade": 1.0,
-        "name": "Picked up solid",
+        "name": "Picked Up Solid",
         "defaultPreviewSettings": {
           "design": 5
         },
