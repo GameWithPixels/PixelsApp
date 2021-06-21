@@ -33,6 +33,10 @@ namespace Behaviors
         {
             return false;
         }
+        public virtual void DeleteAudioClip(AudioClips.EditAudioClip clip)
+        {
+            // Base does nothing
+        }
         public virtual bool DependsOnAudioClip(AudioClips.EditAudioClip clip)
         {
             return false;
@@ -124,8 +128,8 @@ namespace Behaviors
             return new ActionPlayAnimation()
             {
                 animIndex = (byte)editSet.animations.IndexOf(animation),
-                faceIndex = (byte)this.faceIndex,
-                loopCount = (byte)this.loopCount
+                faceIndex = (byte)faceIndex,
+                loopCount = (byte)loopCount
             };
         }
 
@@ -181,9 +185,9 @@ namespace Behaviors
         {
             return new EditActionPlayAnimation()
             {
-                animation = this.animation,
-                faceIndex = this.faceIndex,
-                loopCount = this.loopCount
+                animation = animation,
+                faceIndex = faceIndex,
+                loopCount = loopCount
             };
         }
 
@@ -262,7 +266,7 @@ namespace Behaviors
         {
             return new ActionPlayAudioClip()
             {
-                clipId = (byte)clip.id,
+                clipId = (byte)(clip?.id ?? 0),
             };
         }
 
@@ -312,13 +316,21 @@ namespace Behaviors
         {
             return new EditActionPlayAudioClip()
             {
-                clip = this.clip,
+                clip = clip,
             };
         }
 
         public override bool IsSame(EditAction editAction)
         {
             return (editAction is EditActionPlayAudioClip action) && (clip == action.clip);
+        }
+
+        public override void DeleteAudioClip(AudioClips.EditAudioClip clip)
+        {
+            if (this.clip == clip)
+            {
+                this.clip = null;
+            }
         }
 
         public override bool DependsOnAudioClip(AudioClips.EditAudioClip clip)
@@ -328,9 +340,9 @@ namespace Behaviors
 
         public override IEnumerable<AudioClips.EditAudioClip> CollectAudioClips()
         {
-            if (this.clip != null)
+            if (clip != null)
             {
-                yield return this.clip;
+                yield return clip;
             }
         }
 

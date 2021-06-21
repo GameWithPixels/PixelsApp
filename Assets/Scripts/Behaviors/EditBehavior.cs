@@ -108,6 +108,14 @@ namespace Behaviors
             return ret;
         }
 
+        public void DeleteAudioClip(AudioClips.EditAudioClip clip)
+        {
+            foreach (var rule in rules)
+            {
+                rule.DeleteAudioClip(clip);
+            }
+        }
+
         public IEnumerable<AudioClips.EditAudioClip> CollectAudioClips()
         {
             foreach (var action in rules.SelectMany(r => r.actions))

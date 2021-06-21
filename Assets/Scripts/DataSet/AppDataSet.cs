@@ -24,32 +24,32 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     {
         public int jsonVersion = 1;
         public List<EditDie> dice = new List<EditDie>();
+        public List<EditAudioClip> audioClips = new List<EditAudioClip>();
         public List<EditPattern> patterns = new List<EditPattern>();
         public List<EditAnimation> animations = new List<EditAnimation>();
         public List<EditBehavior> behaviors = new List<EditBehavior>();
         public List<EditPreset> presets = new List<EditPreset>();
-        public List<EditAudioClip> audioClips = new List<EditAudioClip>();
         public EditBehavior defaultBehavior = null;
         public uint nextAudioClipUniqueId = 0;
 
         public void Clear()
         {
             dice.Clear();
+            audioClips.Clear();
             patterns.Clear();
             animations.Clear();
             behaviors.Clear();
             presets.Clear();
-            audioClips.Clear();
         }
     }
 
     Data data = new Data();
     public List<EditDie> dice => data.dice;
+    public List<EditAudioClip> audioClips => data.audioClips;
     public List<EditPattern> patterns => data.patterns;
     public List<EditAnimation> animations => data.animations;
     public List<EditBehavior> behaviors => data.behaviors;
     public List<EditPreset> presets => data.presets;
-    public List<EditAudioClip> audioClips => data.audioClips;
     public EditBehavior defaultBehavior { get { return data.defaultBehavior; } set { data.defaultBehavior = value; } }
 
     JsonSerializer CreateSerializer()
@@ -60,6 +60,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         serializer.Converters.Add(new EditAnimationKeyframed.Converter(this));
         serializer.Converters.Add(new EditActionConverter());
         serializer.Converters.Add(new EditActionPlayAnimation.Converter(this));
+        serializer.Converters.Add(new EditActionPlayAudioClip.Converter(this));
         serializer.Converters.Add(new EditDieAssignmentConverter(this));
         serializer.Converters.Add(new EditConditionConverter());
         return serializer;
@@ -123,7 +124,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
     public EditAnimation AddNewDefaultAnimation()
     {
-        var newAnim = new Animations.EditAnimationSimple();
+        var newAnim = new EditAnimationSimple();
         newAnim.duration = 3.0f;
         newAnim.color = EditColor.MakeRGB(new Color32(0xFF, 0x30, 0x00, 0xFF));
         newAnim.faces = 0b11111111111111111111;
@@ -160,7 +161,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
     public EditPattern AddNewDefaultPattern()
     {
-        var newPattern = new Animations.EditPattern();
+        var newPattern = new EditPattern();
         newPattern.name = "New Pattern";
         for (int i = 0; i < 20; ++i)
         {
@@ -193,35 +194,35 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         patterns.Remove(pattern);
     }
 
-    public IEnumerable<Animations.EditAnimation> CollectAnimationsForPattern(Animations.EditPattern pattern)
+    public IEnumerable<EditAnimation> CollectAnimationsForPattern(EditPattern pattern)
     {
-        return animations.Where(b => { bool ignore; return b.DependsOnPattern(pattern, out ignore); });
+        return animations.Where(b => b.DependsOnPattern(pattern, out bool _));
     }
 
-    public IEnumerable<Presets.EditPreset> CollectPresetsForAnimation(Animations.EditAnimation anim)
+    public IEnumerable<EditBehavior> CollectBehaviorsForAnimation(EditAnimation anim)
+    {
+        return behaviors.Where(b => b.DependsOnAnimation(anim));
+    }
+
+    public IEnumerable<EditPreset> CollectPresetsForAnimation(EditAnimation anim)
     {
         var behaviors = CollectBehaviorsForAnimation(anim);
         return presets.Where(p => p.dieAssignments.Any(da => behaviors.Contains(da.behavior)));
     }
 
-    public IEnumerable<Behaviors.EditBehavior> CollectBehaviorsForAnimation(Animations.EditAnimation anim)
-    {
-        return behaviors.Where(b => b.DependsOnAnimation(anim));
-    }
-
     public EditBehavior AddNewDefaultBehavior()
     {
-        var newBehavior = new Behaviors.EditBehavior();
+        var newBehavior = new EditBehavior();
         newBehavior.name = "New Profile";
-        newBehavior.rules.Add(new Behaviors.EditRule()
+        newBehavior.rules.Add(new EditRule()
         {
-            condition = new Behaviors.EditConditionFaceCompare()
+            condition = new EditConditionFaceCompare()
             {
                 flags = ConditionFaceCompare_Flags.Equal,
                 faceIndex = 19
             },
-            actions = new List<Behaviors.EditAction> () {
-                new Behaviors.EditActionPlayAnimation()
+            actions = new List<EditAction> () {
+                new EditActionPlayAnimation()
                 {
                     animation = null,
                     faceIndex = 0,
@@ -249,7 +250,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         behaviors.Remove(behavior);
     }
 
-    public IEnumerable<Presets.EditPreset> CollectPresetsForBehavior(Behaviors.EditBehavior behavior)
+    public IEnumerable<EditPreset> CollectPresetsForBehavior(EditBehavior behavior)
     {
         return presets.Where(b => b.DependsOnBehavior(behavior));
     }
@@ -289,7 +290,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         presets.Remove(editPreset);
     }
 
-    public IEnumerable<Presets.EditPreset> CollectPresetsForDie(Dice.EditDie die)
+    public IEnumerable<EditPreset> CollectPresetsForDie(Dice.EditDie die)
     {
         return presets.Where(b => b.DependsOnDie(die));
     }
@@ -324,15 +325,24 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         return ret;
     }
 
-    public IEnumerable<Presets.EditPreset> CollectPresetsForAudioClip(EditAudioClip clip)
+    public void DeleteAudioClip(EditAudioClip clip)
     {
-        var behaviors = CollectBehaviorsForAudioClip(clip);
-        return presets.Where(p => p.dieAssignments.Any(da => behaviors.Contains(da.behavior)));
+        foreach (var behavior in behaviors)
+        {
+            behavior.DeleteAudioClip(clip);
+        }
+        audioClips.Remove(clip);
     }
 
-    public IEnumerable<Behaviors.EditBehavior> CollectBehaviorsForAudioClip(EditAudioClip clip)
+    public IEnumerable<EditBehavior> CollectBehaviorsForAudioClip(EditAudioClip clip)
     {
         return behaviors.Where(b => b.DependsOnAudioClip(clip));
+    }
+
+    public IEnumerable<EditPreset> CollectPresetsForAudioClip(EditAudioClip clip)
+    {
+        var behaviors = CollectBehaviorsForAudioClip(clip).ToList();
+        return presets.Where(p => p.dieAssignments.Any(da => behaviors.Contains(da.behavior)));
     }
 
     void OnEnable()

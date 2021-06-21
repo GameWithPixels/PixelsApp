@@ -147,7 +147,7 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
         }
     }
 
-    // The action returns the user friendly filename
+    // The action gets the user friendly filename
     public IEnumerator AddUserClip(string path, System.Action<string> fileLoadedCallback)
     {
         if (!Directory.Exists(userClipsRootPath))
@@ -169,9 +169,39 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
             }
             else
             {
+                Debug.Log("Deleting audio file: " + destPath);
                 File.Delete(destPath);
                 fileLoadedCallback?.Invoke(null);
             }
         });
+    }
+
+    public void RemoveUserClip(AudioClip clip)
+    {
+        if (!userClips.Contains(clip))
+        {
+            return;
+        }
+
+        if (Directory.Exists(userClipsRootPath))
+        {
+            string pathname = Directory.EnumerateFiles(userClipsRootPath, clip.name + ".*").FirstOrDefault();
+            if (!string.IsNullOrEmpty(pathname))
+            {
+                Debug.Log("Deleting audio file: " + pathname);
+                try
+                {
+                    File.Delete(pathname);
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("Failed to delete audio file");
+                    Debug.LogException(e);
+                }
+            }
+        }
+
+        userClips.Remove(clip);
+        audioClips.RemoveAll(c => c.clip == clip);
     }
 }

@@ -2,6 +2,92 @@
   "jsonVersion": 1,
   "dice": [
   ],
+  "audioClips": [
+    {
+      "name": "01",
+      "id": 5
+    },
+    {
+      "name": "02",
+      "id": 6
+    },
+    {
+      "name": "03",
+      "id": 7
+    },
+    {
+      "name": "04",
+      "id": 8
+    },
+    {
+      "name": "05",
+      "id": 9
+    },
+    {
+      "name": "06",
+      "id": 10
+    },
+    {
+      "name": "07",
+      "id": 11
+    },
+    {
+      "name": "08",
+      "id": 12
+    },
+    {
+      "name": "09",
+      "id": 13
+    },
+    {
+      "name": "10",
+      "id": 14
+    },
+    {
+      "name": "11",
+      "id": 15
+    },
+    {
+      "name": "12",
+      "id": 16
+    },
+    {
+      "name": "13",
+      "id": 17
+    },
+    {
+      "name": "14",
+      "id": 18
+    },
+    {
+      "name": "15",
+      "id": 19
+    },
+    {
+      "name": "16",
+      "id": 20
+    },
+    {
+      "name": "17",
+      "id": 21
+    },
+    {
+      "name": "18",
+      "id": 22
+    },
+    {
+      "name": "19",
+      "id": 23
+    },
+    {
+      "name": "20",
+      "id": 24
+    },
+    {
+      "name": "sad_trombone.wav",
+      "id": 25
+    }
+  ],
   "patterns": [
     {
       "name": "color_pattern_2",
@@ -77027,10 +77113,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "01",
-                  "id": 5
-                }
+                "audioClipIndex": 0
               }
             }
           ]
@@ -77047,10 +77130,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "02",
-                  "id": 6
-                }
+                "audioClipIndex": 1
               }
             }
           ]
@@ -77067,10 +77147,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "03",
-                  "id": 7
-                }
+                "audioClipIndex": 2
               }
             }
           ]
@@ -77087,10 +77164,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "04",
-                  "id": 8
-                }
+                "audioClipIndex": 3
               }
             }
           ]
@@ -77107,10 +77181,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "05",
-                  "id": 9
-                }
+                "audioClipIndex": 4
               }
             }
           ]
@@ -77127,10 +77198,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "06",
-                  "id": 10
-                }
+                "audioClipIndex": 5
               }
             }
           ]
@@ -77147,10 +77215,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "07",
-                  "id": 11
-                }
+                "audioClipIndex": 6
               }
             }
           ]
@@ -77167,10 +77232,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "08",
-                  "id": 12
-                }
+                "audioClipIndex": 7
               }
             }
           ]
@@ -77187,10 +77249,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "09",
-                  "id": 13
-                }
+                "audioClipIndex": 8
               }
             }
           ]
@@ -77207,10 +77266,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "10",
-                  "id": 14
-                }
+                "audioClipIndex": 9
               }
             }
           ]
@@ -77227,10 +77283,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "11",
-                  "id": 15
-                }
+                "audioClipIndex": 10
               }
             }
           ]
@@ -77247,10 +77300,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "12",
-                  "id": 16
-                }
+                "audioClipIndex": 11
               }
             }
           ]
@@ -77267,10 +77317,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "13",
-                  "id": 17
-                }
+                "audioClipIndex": 12
               }
             }
           ]
@@ -77287,10 +77334,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "14",
-                  "id": 18
-                }
+                "audioClipIndex": 13
               }
             }
           ]
@@ -77307,10 +77351,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "15",
-                  "id": 19
-                }
+                "audioClipIndex": 14
               }
             }
           ]
@@ -77327,10 +77368,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "16",
-                  "id": 20
-                }
+                "audioClipIndex": 15
               }
             }
           ]
@@ -77347,10 +77385,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "17",
-                  "id": 21
-                }
+                "audioClipIndex": 16
               }
             }
           ]
@@ -77367,10 +77402,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "18",
-                  "id": 22
-                }
+                "audioClipIndex": 17
               }
             }
           ]
@@ -77387,10 +77419,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "19",
-                  "id": 23
-                }
+                "audioClipIndex": 18
               }
             }
           ]
@@ -77407,10 +77436,7 @@
             {
               "type": 2,
               "data": {
-                "clip": {
-                  "name": "20",
-                  "id": 24
-                }
+                "audioClipIndex": 19
               }
             }
           ]
@@ -77522,92 +77548,6 @@
     }
   ],
   "presets": [
-  ],
-  "audioClips": [
-    {
-      "name": "01",
-      "id": 5
-    },
-    {
-      "name": "02",
-      "id": 6
-    },
-    {
-      "name": "03",
-      "id": 7
-    },
-    {
-      "name": "04",
-      "id": 8
-    },
-    {
-      "name": "05",
-      "id": 9
-    },
-    {
-      "name": "06",
-      "id": 10
-    },
-    {
-      "name": "07",
-      "id": 11
-    },
-    {
-      "name": "08",
-      "id": 12
-    },
-    {
-      "name": "09",
-      "id": 13
-    },
-    {
-      "name": "10",
-      "id": 14
-    },
-    {
-      "name": "11",
-      "id": 15
-    },
-    {
-      "name": "12",
-      "id": 16
-    },
-    {
-      "name": "13",
-      "id": 17
-    },
-    {
-      "name": "14",
-      "id": 18
-    },
-    {
-      "name": "15",
-      "id": 19
-    },
-    {
-      "name": "16",
-      "id": 20
-    },
-    {
-      "name": "17",
-      "id": 21
-    },
-    {
-      "name": "18",
-      "id": 22
-    },
-    {
-      "name": "19",
-      "id": 23
-    },
-    {
-      "name": "20",
-      "id": 24
-    },
-    {
-      "name": "sad_trombone.wav",
-      "id": 25
-    }
   ],
   "defaultBehavior": {
     "name": null,

@@ -87,6 +87,14 @@ namespace Behaviors
             return actions.Any(a => a.DependsOnAnimation(animation));
         }
 
+        public void DeleteAudioClip(AudioClips.EditAudioClip clip)
+        {
+            foreach (var action in actions)
+            {
+                action.DeleteAudioClip(clip);
+            }
+        }
+
         public bool DependsOnAudioClip(AudioClips.EditAudioClip clip)
         {
             return actions.Any(a => a.DependsOnAudioClip(clip));

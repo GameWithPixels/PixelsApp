@@ -76,11 +76,11 @@ public class UIAudioClipsView
             }
         }
 
-        // Remove all remaining behaviors
-        foreach (var bh in toDestroy)
+        // Remove all remaining clips
+        foreach (var clip in toDestroy)
         {
-            audioClips.Remove(bh);
-            DestroyClipToken(bh);
+            audioClips.Remove(clip);
+            DestroyClipToken(clip);
         }
     }
 
@@ -133,36 +133,48 @@ public class UIAudioClipsView
         {
             if (res)
             {
-                // var dependentActions = AppDataSet.Instance.CollectActionsForAudioClip(clip);
-                // if (dependentActions.Any())
-                // {
-                //     StringBuilder builder = new StringBuilder();
-                //     builder.Append("The following presets depend on ");
-                //     builder.Append(behavior.name);
-                //     builder.AppendLine(":");
-                //     foreach (var b in dependentPresets)
-                //     {
-                //         builder.Append("\t");
-                //         builder.AppendLine(b.name);
-                //     }
-                //     builder.Append("Are you sure you want to delete it?");
+                var audioClip = AppDataSet.Instance.FindAudioClip(clip.clip.name);
+                if (audioClip != null)
+                {
+                    void RemoveClip()
+                    {
+                        AudioClipManager.Instance.RemoveUserClip(clip.clip);
+                        AppDataSet.Instance.DeleteAudioClip(audioClip);
+                        AppDataSet.Instance.SaveData();
+                        RefreshView();
+                    }
 
-                //     PixelsApp.Instance.ShowDialogBox("Behavior In Use!", builder.ToString(), "Ok", "Cancel", res2 =>
-                //     {
-                //         if (res2)
-                //         {
-                //             AppDataSet.Instance.DeleteBehavior(behavior);
-                //             AppDataSet.Instance.SaveData();
-                //             RefreshView();
-                //         }
-                //     });
-                // }
-                // else
-                // {
-                //     AppDataSet.Instance.DeleteBehavior(behavior);
-                //     AppDataSet.Instance.SaveData();
-                //     RefreshView();
-                // }
+                    var dependentPresets = AppDataSet.Instance.CollectPresetsForAudioClip(audioClip);
+                    if (dependentPresets.Any())
+                    {
+                        StringBuilder builder = new StringBuilder();
+                        builder.Append("The following profiles depend on");
+                        builder.Append(audioClip.name);
+                        builder.AppendLine(":");
+                        foreach (var b in dependentPresets)
+                        {
+                            builder.Append("\t");
+                            builder.AppendLine(b.name);
+                        }
+                        builder.Append("Are you sure you want to delete it?");
+
+                        PixelsApp.Instance.ShowDialogBox("AudioClip In Use!", builder.ToString(), "Ok", "Cancel", res2 =>
+                        {
+                            if (res2)
+                            {
+                                RemoveClip();
+                            }
+                        });
+                    }
+                    else
+                    {
+                        RemoveClip();
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Cannot find audio clip " + clip.clip.name);
+                }
             }
         });
     }
