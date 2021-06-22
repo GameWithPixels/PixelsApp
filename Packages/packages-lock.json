@@ -49,6 +49,27 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "com.yasirkula.nativefilepicker": {
+      "version": "1.2.3",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
+    "com.yasirkula.nativegallery": {
+      "version": "1.6.3",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
+    "com.yasirkula.simplefilebrowser": {
+      "version": "1.4.7",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "jillejr.newtonsoft.json-for-unity": {
       "version": "13.0.102",
       "depth": 0,

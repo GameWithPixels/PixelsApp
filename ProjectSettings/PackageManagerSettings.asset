@@ -36,6 +36,9 @@ MonoBehaviour:
     m_Url: https://package.openupm.com
     m_Scopes:
     - com.openupm
+    - com.yasirkula.nativefilepicker
+    - com.yasirkula.nativegallery
+    - com.yasirkula.simplefilebrowser
     - jillejr.newtonsoft.json-for-unity
     m_IsDefault: 0
     m_Capabilities: 0

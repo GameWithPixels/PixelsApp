@@ -17,7 +17,10 @@
     "com.unity.modules.ui": "1.0.0",
     "com.unity.modules.uielements": "1.0.0",
     "com.unity.modules.unitywebrequest": "1.0.0",
-    "com.unity.modules.unitywebrequestaudio": "1.0.0"
+    "com.unity.modules.unitywebrequestaudio": "1.0.0",
+    "com.yasirkula.nativefilepicker": "1.2.3",
+    "com.yasirkula.nativegallery": "1.6.3",
+    "com.yasirkula.simplefilebrowser": "1.4.7"
   },
   "scopedRegistries": [
     {
@@ -32,6 +35,9 @@
       "url": "https://package.openupm.com",
       "scopes": [
         "com.openupm",
+        "com.yasirkula.nativefilepicker",
+        "com.yasirkula.nativegallery",
+        "com.yasirkula.simplefilebrowser",
         "jillejr.newtonsoft.json-for-unity"
       ]
     }
