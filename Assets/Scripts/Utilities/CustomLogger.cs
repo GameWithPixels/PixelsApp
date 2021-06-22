@@ -23,10 +23,12 @@ public class CustomLogger : MonoBehaviour
     readonly StringBuilder stringBuilder = new StringBuilder();
     readonly string[] logTypesUpperCase = Enum.GetNames(typeof(LogType)).Select(s => s.Length < 4 ? s.ToUpper() + "\t" : s.ToUpper()).ToArray();
     const string logsFolder = "Logs";
+    const string lineSeparator = "===============================================================================";
 
     void OnEnable()
     {
-        string filename = $"log_{DateTime.Now:o}.txt";
+        string now = $"{DateTime.Now:o}";
+        string filename = $"log_{now}.txt";
         foreach (char c in Path.GetInvalidFileNameChars())
         {
             filename = filename.Replace(c.ToString(), "_");
@@ -40,7 +42,9 @@ public class CustomLogger : MonoBehaviour
         string pathname = Path.Combine(path, filename);
         Debug.Log("Writing logs to: " + pathname);
         streamWriter = new StreamWriter(pathname);
-        streamWriter.WriteLine(filename);
+        streamWriter.WriteLine($"Log started at {DateTime.Now:o}");
+        streamWriter.WriteLine();
+        streamWriter.WriteLine(lineSeparator);
         streamWriter.WriteLine();
         Application.logMessageReceivedThreaded += Application_logMessageReceivedThreaded;
     }
@@ -48,6 +52,10 @@ public class CustomLogger : MonoBehaviour
     void OnDisable()
     {
         Application.logMessageReceivedThreaded -= Application_logMessageReceivedThreaded;
+        streamWriter.WriteLine();
+        streamWriter.WriteLine(lineSeparator);
+        streamWriter.WriteLine();
+        streamWriter.WriteLine($"Log ended at {DateTime.Now:o}");
         streamWriter.Close();
         streamWriter = null;
     }
