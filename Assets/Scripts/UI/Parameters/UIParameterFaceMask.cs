@@ -73,7 +73,7 @@ public class UIParameterFaceMask
             {
                 if (!first)
                 {
-                    builder.Append(" | ");
+                    builder.Append("  /  ");
                 }
                 first = false;
                 builder.Append(i+1);
