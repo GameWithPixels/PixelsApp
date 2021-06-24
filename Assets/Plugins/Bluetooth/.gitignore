@@ -1,0 +1,9 @@
+# Ignore everything
+/*
+
+# But itself
+!.gitignore
+ 
+# And our Windows lib
+!Windows.meta
+!/Windows/
