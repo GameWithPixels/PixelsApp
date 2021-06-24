@@ -7,7 +7,7 @@ using System.Linq;
 
 public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
 {
-    [Header("Built-in Audio files")]
+    // The list of clips provided by the app
     public List<AudioClip> builtInClips;
 
     // The list of clips scanned from the app persistent storage
