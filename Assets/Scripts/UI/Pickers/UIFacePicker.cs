@@ -24,6 +24,8 @@ public class UIFacePicker : MonoBehaviour
 
     public bool isShown => gameObject.activeSelf;
 
+    public bool isDirty => saveButton.gameObject.activeSelf;
+
     /// <summary>
     /// Invoke the die picker
     /// </sumary>
@@ -46,7 +48,7 @@ public class UIFacePicker : MonoBehaviour
         gameObject.SetActive(true);
         this.previousFaceMask = previousFaceMask;
         titleText.text = title;
-
+        saveButton.gameObject.SetActive(false);
 
         this.closeAction = closeAction;
     }
@@ -99,7 +101,24 @@ public class UIFacePicker : MonoBehaviour
 
     void DiscardAndBack()
     {
-        Hide(false, previousFaceMask);
+        if (isDirty)
+        {
+            PixelsApp.Instance.ShowDialogBox(
+                "Discard Changes",
+                "You have unsaved changes, are you sure you want to discard them?",
+                "Discard",
+                "Cancel", discard =>
+                {
+                    if (discard)
+                    {
+                        Hide(false, previousFaceMask);
+                    }
+                });
+        }
+        else
+        {
+            Hide(false, previousFaceMask);
+        }
     }
 
     void SaveAndBack()

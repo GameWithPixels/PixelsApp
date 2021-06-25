@@ -17,7 +17,8 @@ public class UIGradientEditor : MonoBehaviour
 
     EditRGBGradient currentGradient;
     System.Action<bool, EditRGBGradient> closeAction;
-    public bool isDirty { get; private set; }
+
+    public bool isDirty => saveButton.gameObject.activeSelf;
 
     /// <summary>
     /// Invoke the color picker
@@ -39,8 +40,9 @@ public class UIGradientEditor : MonoBehaviour
 		multiSlider.SelectHandle(multiSlider.AllHandles[0]);
         colorEditor.onColorSelected += OnColorSelected;
 
+        saveButton.gameObject.SetActive(true); // Always dirty for now...
+
         this.closeAction = closeAction;
-        saveButton.gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -72,7 +74,24 @@ public class UIGradientEditor : MonoBehaviour
 
     void DiscardAndBack()
     {
-        Hide(false, currentGradient);
+        if (isDirty)
+        {
+            PixelsApp.Instance.ShowDialogBox(
+                "Discard Changes",
+                "You have unsaved changes, are you sure you want to discard them?",
+                "Discard",
+                "Cancel", discard =>
+                {
+                    if (discard)
+                    {
+                        Hide(false, currentGradient);
+                    }
+                });
+        }
+        else
+        {
+            Hide(false, currentGradient);
+        }
     }
 
     void OnHandleSelected(MultiSliderHandle handle)
