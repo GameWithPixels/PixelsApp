@@ -18,23 +18,22 @@ public class UIPatternEditor : MonoBehaviour
     public Button loadFromFile;
     public Button reloadFromFile;
 
-    // public UIColorEditor colorEditor;
-    // public MultiSlider multiSlider;
-    public SingleDiceRenderer dieRenderer { get; private set; }
-
-    public bool isShown => gameObject.activeSelf;
-
-	Texture2D _texture;
+    Texture2D _texture;
 
     EditPattern currentPattern;
     System.Action<bool, EditPattern> closeAction;
     string currentFilepath;
-    public bool isDirty { get; private set; }
+
+    public SingleDiceRenderer dieRenderer { get; private set; }
+
+    public bool isShown => gameObject.activeSelf;
+
+    public bool isDirty => saveButton.gameObject.activeSelf;
 
     /// <summary>
     /// Invoke the color picker
     /// </sumary>
-    public void Show(string title, EditPattern previousPattern, System.Action<bool, EditPattern> closeAction)
+    public void Show(string title, EditPattern pattern, System.Action<bool, EditPattern> closeAction)
     {
         if (isShown)
         {
@@ -42,20 +41,20 @@ public class UIPatternEditor : MonoBehaviour
             ForceHide();
         }
 
-        this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(Dice.DesignAndColor.V5_Black);
+        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(Dice.DesignAndColor.V5_Black);
         if (dieRenderer != null)
         {
             diePreviewImage.texture = dieRenderer.renderTexture;
         }
 
         gameObject.SetActive(true);
-        currentPattern = previousPattern;
+        currentPattern = pattern;
         titleText.text = title;
 
         RepaintPreview();
 
         this.closeAction = closeAction;
-        saveButton.gameObject.SetActive(true);
+        saveButton.gameObject.SetActive(false);
         reloadFromFile.interactable = false;
     }
 
@@ -85,14 +84,20 @@ public class UIPatternEditor : MonoBehaviour
 		patternPreview.texture = null;
 		Object.Destroy(_texture);
 		_texture = null;
-	}
+
+        if (DiceRendererManager.Instance != null)
+        {
+            DiceRendererManager.Instance.DestroyDiceRenderer(dieRenderer);
+            dieRenderer = null;
+        }
+    }
 
     void Hide(bool result, EditPattern pattern)
     {
-        if (this.dieRenderer != null)
+        if (dieRenderer != null)
         {
-            DiceRendererManager.Instance.DestroyDiceRenderer(this.dieRenderer);
-            this.dieRenderer = null;
+            DiceRendererManager.Instance.DestroyDiceRenderer(dieRenderer);
+            dieRenderer = null;
         }
         gameObject.SetActive(false);
         closeAction?.Invoke(result, pattern);
@@ -106,22 +111,45 @@ public class UIPatternEditor : MonoBehaviour
 
     void DiscardAndBack()
     {
-        Hide(false, currentPattern);
+        if (isDirty)
+        {
+            PixelsApp.Instance.ShowDialogBox(
+                "Discard Changes",
+                "You have unsaved changes, are you sure you want to discard them?",
+                "Discard",
+                "Cancel", discard =>
+                {
+                    if (discard)
+                    {
+                        Hide(false, currentPattern);
+                    }
+                });
+        }
+        else
+        {
+            Hide(false, currentPattern);
+        }
     }
 
     void FileSelected(string filePath)
     {
-        Debug.Log("file path: " + filePath);
-        currentFilepath = filePath;
-        UpdateFromCurrentFile();
+        Debug.Log("Selected image pattern file: " + filePath);
+        if (!string.IsNullOrEmpty(filePath))
+        {
+            currentFilepath = filePath;
+            UpdateFromCurrentFile();
+        }
     }
 
     void UpdateFromCurrentFile()
     {
         byte[] fileData = File.ReadAllBytes(currentFilepath);
         var tex = new Texture2D(2, 2);
-        tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
-        if (tex.height > 20 || tex.width > 1000)
+        if (!tex.LoadImage(fileData)) //..this will auto-resize the texture dimensions.
+        {
+            PixelsApp.Instance.ShowDialogBox("Error loading image", "Sorry the image you selected can't be loaded. Check that it is a valid image", "Ok", null, null);
+        }
+        else if (tex.height > 20 || tex.width > 1000)
         {
             PixelsApp.Instance.ShowDialogBox("Image too big", "Sorry the image you selected is too large. It should be smaller than 1000x20 pixels", "Ok", null, null);
         }
@@ -132,7 +160,6 @@ public class UIPatternEditor : MonoBehaviour
             currentPattern.FromTexture(tex);
             currentPattern.name = System.IO.Path.GetFileNameWithoutExtension(currentFilepath);
             titleText.text = currentPattern.name;
-            isDirty = true;
             saveButton.gameObject.SetActive(true);
             reloadFromFile.interactable = false;
             RepaintPreview();
@@ -143,7 +170,7 @@ public class UIPatternEditor : MonoBehaviour
     void LoadFromFile()
     {
 #if UNITY_EDITOR
-        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select png", "", "png"));
+        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select Pattern Image", "", "png"));
 #elif UNITY_STANDALONE_WIN
         // Set filters (optional)
 		// It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
@@ -156,21 +183,21 @@ public class UIPatternEditor : MonoBehaviour
 		FileBrowser.SetDefaultFilter( ".png" );
         FileBrowser.ShowLoadDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Select png", "Select");
 #else
-        NativeGallery.GetImageFromGallery(FileSelected, "Select Pattern");
+        NativeGallery.GetImageFromGallery(FileSelected, "Select Pattern  Image");
         // NativeFilePicker.PickFile( FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType( "png" ) });
 #endif
-
-        //var filePath = System.IO.Path.Combine(Application.persistentDataPath, $"pattern.png");
     }
 
     void RepaintPreview()
     {
 		Object.Destroy(_texture);
 
-        var anim = new EditAnimationKeyframed();
-        anim.name = "temp anim";
-        anim.pattern = currentPattern;
-        anim.duration = currentPattern.duration;
+        var anim = new EditAnimationKeyframed
+        {
+            name = "temp anim",
+            pattern = currentPattern,
+            duration = currentPattern.duration
+        };
 
         dieRenderer.SetAuto(true);
         dieRenderer.SetAnimation(anim);

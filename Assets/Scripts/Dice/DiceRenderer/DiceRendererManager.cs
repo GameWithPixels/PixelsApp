@@ -10,11 +10,11 @@ public class DiceRendererManager : SingletonMonoBehaviour<DiceRendererManager>
     public MultiDiceRenderer MultiDiceRendererPrefab;
 
     // Our renderer slots
-    // The max of 24 renderers is a bit arbitrary, it needs to be less than 32 and leave some room
+    // The max of 20 visible renderers is a bit arbitrary, it needs to be less than 32 and leave some room
     // for a few other render layers for the rest of the app
     const int visibleLayerCount = 20;
-    DiceRenderer[] visibleRenderers = new DiceRenderer[visibleLayerCount];
-    List<DiceRenderer> allRenderers = new List<DiceRenderer>();
+    readonly DiceRenderer[] visibleRenderers = new DiceRenderer[visibleLayerCount];
+    readonly List<DiceRenderer> allRenderers = new List<DiceRenderer>();
 
     public SingleDiceRenderer CreateDiceRenderer(Dice.DesignAndColor variant, int widthHeight = 256)
     {
@@ -41,17 +41,20 @@ public class DiceRendererManager : SingletonMonoBehaviour<DiceRendererManager>
 
     public void DestroyDiceRenderer(DiceRenderer renderer)
     {
-        int slot = FindSlot(renderer);
-        if (slot != -1)
+        if (renderer != null)
         {
-            visibleRenderers[slot] = null;
-        }
-        allRenderers.Remove(renderer);
-        GameObject.Destroy(renderer.gameObject);
+            int slot = FindSlot(renderer);
+            if (slot != -1)
+            {
+                visibleRenderers[slot] = null;
+            }
+            allRenderers.Remove(renderer);
+            GameObject.Destroy(renderer.gameObject);
 
-        if (slot != -1)
-        {
-            RecycleSlot(slot);
+            if (slot != -1)
+            {
+                RecycleSlot(slot);
+            }
         }
     }
 

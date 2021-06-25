@@ -17,7 +17,7 @@ public class UIGradientPatternsView
     public UIGradientPatternViewToken patternTokenPrefab;
 
     // The list of controls we have created to display patterns
-    List<UIGradientPatternViewToken> patterns = new List<UIGradientPatternViewToken>();
+    readonly List<UIGradientPatternViewToken> patterns = new List<UIGradientPatternViewToken>();
 
     void OnEnable()
     {
@@ -37,22 +37,14 @@ public class UIGradientPatternsView
         }
     }
 
-    UIGradientPatternViewToken CreatePatternToken(Animations.EditPattern pattern)
+    UIGradientPatternViewToken CreatePatternToken(EditPattern pattern)
     {
         // Create the gameObject
         var ret = GameObject.Instantiate<UIGradientPatternViewToken>(patternTokenPrefab, Vector3.zero, Quaternion.identity, contentRoot.transform);
 
         // When we click on the pattern main button, go to the edit page
-        ret.onClick.AddListener(() => 
-        {
-            ret.Expand(false);
-            PixelsApp.Instance.ShowPatternEditor(pattern.name, pattern, (r, p) => SetPattern(r, pattern, p));
-        });
-        ret.onEdit.AddListener(() => 
-        {
-            ret.Expand(false);
-            PixelsApp.Instance.ShowPatternEditor(pattern.name, pattern, (r, p) => SetPattern(r, pattern, p));
-        });
+        ret.onClick.AddListener(() => { ret.Expand(false); EditPattern(pattern); });
+        ret.onEdit.AddListener(() => { ret.Expand(false); EditPattern(pattern); });
         ret.onRemove.AddListener(() => DeletePattern(pattern));
         ret.onExpand.AddListener(() => ExpandPattern(pattern));
 
@@ -101,13 +93,20 @@ public class UIGradientPatternsView
 
     void AddNewPattern()
     {
-        // Create a new default animation
+        // Create a new default pattern
         var newPattern = AppDataSet.Instance.AddNewDefaultPattern();
         AppDataSet.Instance.SaveData();
-        PixelsApp.Instance.ShowPatternEditor(newPattern.name, newPattern, (r, p) => SetPattern(r, newPattern, p));
+        EditPattern(newPattern);
     }
 
-    void DeletePattern(Animations.EditPattern pattern)
+    void EditPattern(EditPattern pattern)
+    {
+        // Keep a copy of the original pattern as the editor will modify the one it's given
+        var patternCopy = pattern.Duplicate();
+        PixelsApp.Instance.ShowPatternEditor(pattern.name, pattern, (r, p) => SetPattern(r, p, patternCopy));
+    }
+
+    void DeletePattern(EditPattern pattern)
     {
         PixelsApp.Instance.ShowDialogBox("Delete LED Pattern?", "Are you sure you want to delete " + pattern.name + "?", "Ok", "Cancel", res =>
         {
@@ -147,7 +146,7 @@ public class UIGradientPatternsView
         });
     }
 
-    void ExpandPattern(Animations.EditPattern pattern)
+    void ExpandPattern(EditPattern pattern)
     {
         foreach (var uip in patterns)
         {
@@ -162,8 +161,25 @@ public class UIGradientPatternsView
         }
     }
 
-    void SetPattern(bool res, EditPattern previousPattern, EditPattern newPattern)
+    void SetPattern(bool res, EditPattern pattern, EditPattern originalPatternCopy)
     {
-        AppDataSet.Instance.ReplacePattern(previousPattern, newPattern);
+        // Because the pattern is rendered, the UIPatternEditor is editing the original pattern
+        // so we have to restore it if edition was canceled
+        var newPattern = res ? pattern : originalPatternCopy;
+
+        AppDataSet.Instance.ReplacePattern(pattern, newPattern);
+        AppDataSet.Instance.SaveData();
+
+        // Replace pattern token
+        int i = patterns.FindIndex(a => a.editPattern == pattern);
+        if (i >= 0)
+        {
+            int siblingIndex = patterns[i].transform.GetSiblingIndex();
+            DestroyPatternToken(patterns[i]);
+            patterns[i] = CreatePatternToken(newPattern);
+            patterns[i].transform.SetSiblingIndex(siblingIndex);
+        }
+
+        RefreshView();
     }
 }

@@ -44,8 +44,8 @@ public class UIGradientPatternViewToken : MonoBehaviour
 
     public void Setup(EditPattern pattern)
     {
-        this.editPattern = pattern;
-        this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(Dice.DesignAndColor.V5_Black);
+        editPattern = pattern;
+        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(Dice.DesignAndColor.V5_Black);
         if (dieRenderer != null)
         {
             animRenderImage.texture = dieRenderer.renderTexture;
@@ -88,10 +88,13 @@ public class UIGradientPatternViewToken : MonoBehaviour
 
     void OnDestroy()
     {
-        if (this.dieRenderer != null)
+        GameObject.Destroy(textureImage.texture);
+        textureImage.texture = null;
+
+        if (DiceRendererManager.Instance != null)
         {
-            DiceRendererManager.Instance.DestroyDiceRenderer(this.dieRenderer);
-            this.dieRenderer = null;
+            DiceRendererManager.Instance.DestroyDiceRenderer(dieRenderer);
+            dieRenderer = null;
         }
     }
 
