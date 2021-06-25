@@ -432,12 +432,16 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
     {
         static void FileSelected(string filePath)
         {
-            // Load the pattern from JSON
-            AppDataSet.Instance.ImportAnimation(filePath);
+            Debug.Log("Selected JSON pattern file: " + filePath);
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                // Load the pattern from JSON
+                AppDataSet.Instance.ImportAnimation(filePath);
+            }
         }
 
 #if UNITY_EDITOR
-        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select pattern json", "", "json"));
+        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select JSON Pattern", "", "json"));
 #elif UNITY_STANDALONE_WIN
         // Set filters (optional)
 		// It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
