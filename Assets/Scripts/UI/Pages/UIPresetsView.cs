@@ -113,7 +113,8 @@ public class UIPresetsView
 
     void RefreshView()
     {
-        List<UIPresetToken> toDestroy = new List<UIPresetToken>(presets);
+        // Assume all presets will be destroyed
+        var toDestroy = new List<UIPresetToken>(presets);
         foreach (var preset in AppDataSet.Instance.presets)
         {
             int prevIndex = toDestroy.FindIndex(a => a.editPreset == preset);
@@ -125,12 +126,11 @@ public class UIPresetsView
             }
             else
             {
-                // Previous die is still advertising, good
                 toDestroy.RemoveAt(prevIndex);
             }
         }
 
-        // Remove all remaining dice
+        // Remove all remaining presets
         foreach (var uipreset in toDestroy)
         {
             presets.Remove(uipreset);

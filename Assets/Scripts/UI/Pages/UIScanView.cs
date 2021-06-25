@@ -59,7 +59,7 @@ public class UIScanView
     void RefreshView()
     {
         // Assume all scanned dice will be destroyed
-        List<UIDiscoveredDieView> toDestroy = new List<UIDiscoveredDieView>(discoveredDice);
+        var toDestroy = new List<UIDiscoveredDieView>(discoveredDice);
         foreach (var die in DicePool.Instance.allDice.Where(d =>
             d.connectionState == Die.ConnectionState.Available))
         {
@@ -75,7 +75,6 @@ public class UIScanView
                 }
                 else
                 {
-                    // Previous die is still advertising, good
                     toDestroy.RemoveAt(prevIndex);
                 }
             }

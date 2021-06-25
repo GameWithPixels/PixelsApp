@@ -74,8 +74,8 @@ public class UIGradientPatternsView
 
     void RefreshView()
     {
-        // Assume all pool dice will be destroyed
-        List<UIGradientPatternViewToken> toDestroy = new List<UIGradientPatternViewToken>(patterns);
+        // Assume all patterns will be destroyed
+        var toDestroy = new List<UIGradientPatternViewToken>(patterns);
         foreach (var pattern in AppDataSet.Instance.patterns)
         {
             int prevIndex = toDestroy.FindIndex(a => a.editPattern == pattern);
@@ -87,12 +87,11 @@ public class UIGradientPatternsView
             }
             else
             {
-                // Previous die is still advertising, good
                 toDestroy.RemoveAt(prevIndex);
             }
         }
 
-        // Remove all remaining dice
+        // Remove all remaining patterns
         foreach (var uipattern in toDestroy)
         {
             patterns.Remove(uipattern);

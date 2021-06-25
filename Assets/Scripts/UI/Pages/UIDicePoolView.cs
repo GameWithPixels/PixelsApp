@@ -99,7 +99,7 @@ public class UIDicePoolView
     void RefreshView()
     {
         // Assume all pool dice will be destroyed
-        List<UIPairedDieToken> toDestroy = new List<UIPairedDieToken>(pairedDice);
+        var toDestroy = new List<UIPairedDieToken>(pairedDice);
         foreach (var die in DiceManager.Instance.allDice)
         {
             int prevIndex = toDestroy.FindIndex(uid => uid.die == die);

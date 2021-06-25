@@ -116,7 +116,9 @@ public class UIHomePage
     void RefreshView()
     {
         newsSection.gameObject.SetActive(AppSettings.Instance.displayWhatsNew);
-        List<UIHomePresetToken> toDestroy = new List<UIHomePresetToken>(presets);
+
+        // Assume all presets will be destroyed
+        var toDestroy = new List<UIHomePresetToken>(presets);
         foreach (var preset in AppDataSet.Instance.presets)
         {
             int prevIndex = toDestroy.FindIndex(a => a.editPreset == preset);
@@ -128,19 +130,19 @@ public class UIHomePage
             }
             else
             {
-                // Previous die is still advertising, good
                 toDestroy.RemoveAt(prevIndex);
             }
         }
 
-        // Remove all remaining dice
+        // Remove all remaining presets
         foreach (var uipreset in toDestroy)
         {
             presets.Remove(uipreset);
             DestroyPresetToken(uipreset);
         }
 
-        List<UIHomeBehaviorToken> toDestroy2 = new List<UIHomeBehaviorToken>(behaviors);
+        // Assume all behaviors will be destroyed
+        var toDestroy2 = new List<UIHomeBehaviorToken>(behaviors);
         foreach (var behavior in AppDataSet.Instance.behaviors)
         {
             int prevIndex = toDestroy2.FindIndex(a => a.editBehavior == behavior);
@@ -152,12 +154,11 @@ public class UIHomePage
             }
             else
             {
-                // Previous die is still advertising, good
                 toDestroy.RemoveAt(prevIndex);
             }
         }
 
-        // Remove all remaining dice
+        // Remove all remaining behaviors
         foreach (var uibehavior in toDestroy2)
         {
             behaviors.Remove(uibehavior);

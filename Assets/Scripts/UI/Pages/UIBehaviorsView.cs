@@ -68,8 +68,8 @@ public class UIBehaviorsView
 
     void RefreshView()
     {
-        // Assume all pool dice will be destroyed
-        List<UIBehaviorToken> toDestroy = new List<UIBehaviorToken>(behaviors);
+        // Assume all behavior will be destroyed
+       var toDestroy = new List<UIBehaviorToken>(behaviors);
         foreach (var bh in AppDataSet.Instance.behaviors)
         {
             int prevIndex = toDestroy.FindIndex(a => a.editBehavior == bh);
@@ -81,7 +81,6 @@ public class UIBehaviorsView
             }
             else
             {
-                // Previous die is still advertising, good
                 toDestroy.RemoveAt(prevIndex);
             }
         }

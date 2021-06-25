@@ -75,8 +75,8 @@ public class UIPatternsView
 
     void RefreshView()
     {
-        // Assume all pool dice will be destroyed
-        List<UIPatternToken> toDestroy = new List<UIPatternToken>(patterns);
+        // Assume all patterns will be destroyed
+        var toDestroy = new List<UIPatternToken>(patterns);
         foreach (var anim in AppDataSet.Instance.animations)
         {
             int prevIndex = toDestroy.FindIndex(a => a.editAnimation == anim);
@@ -88,12 +88,11 @@ public class UIPatternsView
             }
             else
             {
-                // Previous die is still advertising, good
                 toDestroy.RemoveAt(prevIndex);
             }
         }
 
-        // Remove all remaining dice
+        // Remove all remaining patterns
         foreach (var uipattern in toDestroy)
         {
             patterns.Remove(uipattern);

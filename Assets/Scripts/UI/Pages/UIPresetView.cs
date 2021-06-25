@@ -126,24 +126,24 @@ public class UIPresetView : UIPage
 
     void RefreshView()
     {
-        List<UIAssignmentToken> toDestroy = new List<UIAssignmentToken>(assignments);
+        // Assume all assignments will be destroyed
+        var toDestroy = new List<UIAssignmentToken>(assignments);
         foreach (var dass in editPreset.dieAssignments)
         {
             int prevIndex = toDestroy.FindIndex(a => a.editAssignment == dass);
             if (prevIndex == -1)
             {
-                // New preset
+                // New assignment
                 var newassui = CreateAssignmentToken(dass);
                 assignments.Add(newassui);
             }
             else
             {
-                // Previous die is still advertising, good
                 toDestroy.RemoveAt(prevIndex);
             }
         }
 
-        // Remove all remaining dice
+        // Remove all remaining assignments
         foreach (var uiass in toDestroy)
         {
             assignments.Remove(uiass);
