@@ -18,7 +18,7 @@ public class UIAudioClipsView
     [Header("Prefabs")]
     public UIAudioClipsViewToken audioClipTokenPrefab;
 
-    List<UIAudioClipsViewToken> audioClips = new List<UIAudioClipsViewToken>();
+    readonly List<UIAudioClipsViewToken> audioClips = new List<UIAudioClipsViewToken>();
 
     AudioSource audioSource;
 
@@ -45,6 +45,9 @@ public class UIAudioClipsView
         ret.onRemove.AddListener(() => DeleteClip(clip));
         ret.onExpand.AddListener(() => ExpandClip(clip));
         ret.onClick.AddListener(() => ExpandClip(clip));
+
+        ret.removeButton.gameObject.SetActive(!clip.builtIn);
+        ret.builtInInfo.gameObject.SetActive(clip.builtIn);
 
         addAudioClipButton.transform.SetAsLastSibling();
         // Initialize it

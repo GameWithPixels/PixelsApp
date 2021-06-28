@@ -17,6 +17,7 @@ public class UIAudioClipsViewToken : MonoBehaviour
     public RectTransform expandedRoot;
     public Button removeButton;
     public Button renameButton;
+    public Transform builtInInfo;
 
     [Header("Properties")]
     public Sprite expandImage;
