@@ -13,6 +13,7 @@ public class CustomLogger : MonoBehaviour
     {
         public DateTime timestamp;
         public int threadId;
+        public int frame;
         public LogType type;
         public string stackTrace;
         public string message;
@@ -66,6 +67,7 @@ public class CustomLogger : MonoBehaviour
         {
             timestamp = DateTime.Now,
             threadId = System.Threading.Thread.CurrentThread.ManagedThreadId,
+            frame = Time.frameCount,
             type = type,
             stackTrace = stackTrace,
             message = condition,
@@ -80,6 +82,10 @@ public class CustomLogger : MonoBehaviour
             streamWriter.Write(entry.timestamp.ToString("o"));
             streamWriter.Write("\t");
             streamWriter.Write(entry.threadId);
+            if (entry.threadId < 1000) streamWriter.Write("\t");
+            streamWriter.Write("\t");
+            streamWriter.Write(entry.frame);
+            if (entry.frame < 1000) streamWriter.Write("\t");
             streamWriter.Write("\t");
             streamWriter.Write(logTypesUpperCase[(int)entry.type]);
             streamWriter.Write("\t");
