@@ -70,7 +70,7 @@ public partial class Die
     IEnumerator SendMessageWithAckOrTimeoutCr<T>(T message, DieMessageType ackType, float timeOut, System.Action<DieMessage> ackAction, System.Action timeoutAction, System.Action errorAction)
         where T : DieMessage
     {
-        Debug.Log($"Sending message of type {message.GetType()}");
+        Debug.Log($"Sending message with ack of type {message.GetType()}");
 
         DieMessage ackMessage = null;
         float startTime = Time.time;
@@ -93,6 +93,7 @@ public partial class Die
         }
         else
         {
+            Debug.LogError($"Timeout on sending message of type {message.GetType()}");
             timeoutAction?.Invoke();
         }
     }

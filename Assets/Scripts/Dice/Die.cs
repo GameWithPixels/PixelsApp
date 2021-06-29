@@ -285,6 +285,8 @@ namespace Dice
             var message = DieMessages.FromByteArray(data);
             if (message != null)
             {
+                Debug.Log("Got message of type " + message.GetType());
+
                 MessageReceivedDelegate del;
                 if (messageDelegates.TryGetValue(message.type, out del))
                 {

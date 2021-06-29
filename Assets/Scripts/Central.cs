@@ -489,7 +489,7 @@ public class Central : SingletonMonoBehaviour<Central>
         // Print something!
         if (!errorAttributed)
         {
-            Debug.LogError(error);
+            Debug.LogError("Bluetooth error: " + error);
         }
     }
 
