@@ -411,12 +411,13 @@ public class Central : SingletonMonoBehaviour<Central>
                 case Die.State.Disconnecting:
                     Debug.Assert(state == State.Disconnecting);
                     state = State.Idle;
+                    Debug.LogError($"Error while disconnecting from {die.name} (connected={die.deviceConnected}): {error}");
+
                     // We got an error while this die was disconnecting,
                     // Just indicate it
                     die.onDisconnectionResult?.Invoke(die, false, error);
                     die.onDisconnectionResult = null;
                     addressesToRemove.Add(die.address);
-                    Debug.LogError("Error while disconnecting " + die.name + ": " + error);
                     errorAttributed = true;
                     break;
                 case Die.State.Advertising:
@@ -425,6 +426,8 @@ public class Central : SingletonMonoBehaviour<Central>
                 case Die.State.Connecting:
                     Debug.Assert(state == State.Connecting);
                     state = State.Idle;
+
+                    Debug.LogError($"Error while connecting to {die.name} (connected={die.deviceConnected}): {error}");
                     die.onConnectionResult?.Invoke(die, false, error);
                     die.onConnectionResult = null;
                     die.onUnexpectedDisconnection = null;
@@ -432,10 +435,17 @@ public class Central : SingletonMonoBehaviour<Central>
 
                     // Temporarily add the die to the connected list to avoid an error message during the disconnect
                     // And force a disconnect
-                    // Note: I'm not completely sure if we should trigger the disconnect or just remove the die
-                    die.state = Die.State.Disconnecting;
-                    state = State.Disconnecting;
-                    BluetoothLEHardwareInterface.DisconnectPeripheral(die.address, null);
+                    if (die.deviceConnected)
+                    {
+                        die.state = Die.State.Disconnecting;
+                        state = State.Disconnecting;
+                        BluetoothLEHardwareInterface.DisconnectPeripheral(die.address, null);
+                    }
+                    else
+                    {
+                        state = State.Idle;
+                        addressesToRemove.Add(die.address);
+                    }
                     errorAttributed = true;
                     break;
                 case Die.State.Connected:
@@ -445,7 +455,8 @@ public class Central : SingletonMonoBehaviour<Central>
                     {
                         Debug.Assert(state == State.Connecting);
                         state = State.Idle;
-                        Debug.LogError("Characteristic Error: " + die.name + ": " + error);
+                        Debug.LogError($"Characteristic error with {die.name} (connected={die.deviceConnected}): {error}");
+
                         die.onConnectionResult?.Invoke(die, false, error);
                         die.onConnectionResult = null;
                         die.onUnexpectedDisconnection = null;
@@ -486,7 +497,6 @@ public class Central : SingletonMonoBehaviour<Central>
 
         // Then pass it onto the current error handler(s)
         onBluetoothError?.Invoke(error);
-        
     }
 
     void OnDeviceDiscovered(
