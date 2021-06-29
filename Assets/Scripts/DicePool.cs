@@ -14,7 +14,6 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
     // A bunch of events for UI to hook onto and display pool state updates
     public DieCreationEvent onDieDiscovered;
     public DieCreationEvent onWillDestroyDie;
-    public BluetoothErrorEvent onBluetoothError;
 
     class PoolDie
     {
@@ -58,7 +57,7 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
         }
         else
         {
-            Debug.Log("Already scanning");
+            Debug.Log("Already scanning, scanRequestCount=" + scanRequestCount);
         }
     }
 
@@ -231,11 +230,6 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
         });
     }
 
-    void Awake()
-    {
-        Central.Instance.onBluetoothError += OnBluetoothError;
-    }
-
     void Update()
     {
         foreach (var poolDie in dice)
@@ -292,11 +286,6 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
         {
             Debug.LogError("Die " + die.name + " not in ready state, instead: " + die.connectionState);
         }
-    }
-
-    void OnBluetoothError(string message)
-    {
-        onBluetoothError?.Invoke(message);
     }
 
     /// <summary>

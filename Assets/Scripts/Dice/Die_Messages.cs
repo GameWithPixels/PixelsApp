@@ -140,22 +140,14 @@ public partial class Die
                 // Busy, wait until we can talk to the die
                 yield return null;
             }
-            bool errorOccured = false;
-            DicePool.BluetoothErrorEvent errorHandler = (err) => errorOccured = true;
             try
             {
-                DicePool.Instance.onBluetoothError += errorHandler;
                 bluetoothOperationInProgress = true;
                 // Attach to the error event
                 yield return StartCoroutine(operationCr);
-                if (errorOccured)
-                {
-                    Debug.LogError("Die " + name + " error while performing action");
-                }
             }
             finally
             {
-                DicePool.Instance.onBluetoothError -= errorHandler;
                 bluetoothOperationInProgress = false;
             }
         }

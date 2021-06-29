@@ -156,9 +156,6 @@ public class Central : SingletonMonoBehaviour<Central>
 
     Queue<Operation> operations = new Queue<Operation>();
 
-    public delegate void BluetoothErrorEvent(string errorString);
-    public BluetoothErrorEvent onBluetoothError;
-
     /// <summary>
     /// Initiates a bluetooth scan
     /// </summary>
@@ -494,9 +491,6 @@ public class Central : SingletonMonoBehaviour<Central>
         {
             Debug.LogError(error);
         }
-
-        // Then pass it onto the current error handler(s)
-        onBluetoothError?.Invoke(error);
     }
 
     void OnDeviceDiscovered(
