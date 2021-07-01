@@ -28,10 +28,6 @@ namespace Animations
         {
             // Base does nothing
         }
-        public virtual void DeletePattern(Animations.EditPattern pattern)
-        {
-            // Base does nothing
-        }
         public virtual bool DependsOnPattern(Animations.EditPattern pattern, out bool asRGB)
         {
             // Base does not

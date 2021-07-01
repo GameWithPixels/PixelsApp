@@ -108,42 +108,35 @@ public class UIGradientPatternsView
 
     void DeletePattern(EditPattern pattern)
     {
-        PixelsApp.Instance.ShowDialogBox("Delete LED Pattern?", "Are you sure you want to delete " + pattern.name + "?", "Ok", "Cancel", res =>
+        var dependentAnimations = AppDataSet.Instance.CollectAnimationsForPattern(pattern).ToArray();
+        if (dependentAnimations.Length > 0)
         {
-            if (res)
+            string pluralStr = dependentAnimations.Length > 1 ? "s" : "";
+            StringBuilder builder = new StringBuilder();
+            builder.Append($"The following animation{pluralStr} depend on ");
+            builder.Append(pattern.name);
+            builder.AppendLine(":");
+            foreach (var b in dependentAnimations)
             {
-                var dependentAnimations = AppDataSet.Instance.CollectAnimationsForPattern(pattern);
-                if (dependentAnimations.Any())
-                {
-                    StringBuilder builder = new StringBuilder();
-                    builder.Append("The following animations depend on ");
-                    builder.Append(pattern.name);
-                    builder.AppendLine(":");
-                    foreach (var b in dependentAnimations)
-                    {
-                        builder.Append("\t");
-                        builder.AppendLine(b.name);
-                    }
-                    builder.Append("Are you sure you want to delete it?");
+                builder.Append("\t");
+                builder.AppendLine(b.name);
+            }
+            builder.Append($"First remove or modify the animation{pluralStr}.");
 
-                    PixelsApp.Instance.ShowDialogBox("Pattern In Use!", builder.ToString(), "Ok", "Cancel", res2 =>
-                    {
-                        if (res2)
-                        {
-                            AppDataSet.Instance.DeletePattern(pattern);
-                            AppDataSet.Instance.SaveData();
-                            RefreshView();
-                        }
-                    });
-                }
-                else
+            PixelsApp.Instance.ShowDialogBox("LED Pattern In Use!", builder.ToString());
+        }
+        else
+        {
+            PixelsApp.Instance.ShowDialogBox("Delete LED Pattern?", "Are you sure you want to delete " + pattern.name + "?", "Ok", "Cancel", res =>
+            {
+                if (res)
                 {
                     AppDataSet.Instance.DeletePattern(pattern);
                     AppDataSet.Instance.SaveData();
                     RefreshView();
                 }
-            }
-        });
+            });
+        }
     }
 
     void ExpandPattern(EditPattern pattern)

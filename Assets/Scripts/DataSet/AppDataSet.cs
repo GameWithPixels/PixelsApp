@@ -187,9 +187,18 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
     public void DeletePattern(EditPattern pattern)
     {
+        EditPattern replacementPattern = null;
         foreach (var animation in animations)
         {
-            animation.DeletePattern(pattern);
+            if (animation.DependsOnPattern(pattern, out bool _))
+            {
+                if (replacementPattern == null)
+                {
+                    // We can't have a null pattern in an animation so create a new one for the occasion
+                    replacementPattern = AddNewDefaultPattern();
+                }
+                animation.ReplacePattern(pattern, replacementPattern);
+            }
         }
         patterns.Remove(pattern);
     }

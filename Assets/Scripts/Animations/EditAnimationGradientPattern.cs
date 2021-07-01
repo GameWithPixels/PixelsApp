@@ -70,13 +70,6 @@ namespace Animations
                 pattern = newPattern;
             }
         }
-        public override void DeletePattern(Animations.EditPattern pattern)
-        {
-            if (this.pattern == pattern)
-            {
-                this.pattern = null;
-            }
-        }
         public override bool DependsOnPattern(Animations.EditPattern pattern, out bool asRGB)
         {
             asRGB = false;
