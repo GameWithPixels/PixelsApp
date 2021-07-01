@@ -6,7 +6,6 @@ using Animations;
 using System.IO;
 using SimpleFileBrowser;
 
-
 public class UIPatternEditor : MonoBehaviour
 {
     [Header("Controls")]
@@ -158,7 +157,7 @@ public class UIPatternEditor : MonoBehaviour
             tex.filterMode = FilterMode.Point;
             tex.wrapMode = TextureWrapMode.Clamp;
             currentPattern.FromTexture(tex);
-            currentPattern.name = System.IO.Path.GetFileNameWithoutExtension(currentFilepath);
+            currentPattern.name = Path.GetFileNameWithoutExtension(currentFilepath);
             titleText.text = currentPattern.name;
             saveButton.gameObject.SetActive(true);
             reloadFromFile.interactable = false;
@@ -183,7 +182,7 @@ public class UIPatternEditor : MonoBehaviour
 		FileBrowser.SetDefaultFilter( ".png" );
         FileBrowser.ShowLoadDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Select png", "Select");
 #else
-        NativeGallery.GetImageFromGallery(FileSelected, "Select Pattern  Image");
+        NativeGallery.GetImageFromGallery(FileSelected, "Select Pattern Image");
         // NativeFilePicker.PickFile( FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType( "png" ) });
 #endif
     }

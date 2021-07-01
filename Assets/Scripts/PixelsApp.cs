@@ -454,8 +454,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 		FileBrowser.SetDefaultFilter( ".json" );
         FileBrowser.ShowLoadDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Select JSON", "Select");
 #else
-        //NativeGallery.GetImageFromGallery(FileSelected, "Select Pattern JSON");
-        NativeFilePicker.PickFile( FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType( "json" ) });
+        NativeFilePicker.PickFile(FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType("json") });
 #endif
     }
 
@@ -481,8 +480,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 		FileBrowser.SetDefaultFilter( ".json" );
         FileBrowser.ShowSaveDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Save JSON", "Select");
 #else
-        ////NativeGallery.GetImageFromGallery(FileSelected, "Select Pattern JSON");
-        //NativeFilePicker.PickFile( FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType( "json" ) });
+        //NativeFilePicker.PickFile(FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType("json") });
 #endif
     }
 

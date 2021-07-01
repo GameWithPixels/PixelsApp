@@ -360,7 +360,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         var path = Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
         if (File.Exists(path))
         {
-            Debug.Log("AppDataSet: loading user's file");
+            Debug.Log("AppDataSet: loading user's file " + path);
 
             using StreamReader sw = new StreamReader(path);
             using JsonReader reader = new JsonTextReader(sw);
@@ -381,9 +381,12 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     /// </sumary>
     public void SaveData()
     {
-        Debug.Log("AppDataSet: saving to user's file");
+        var stopWatch = new System.Diagnostics.Stopwatch();
+        stopWatch.Start();
 
         var path = Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
+        Debug.Log("AppDataSet: saving to user's file " + path);
+
         var serializer = CreateSerializer();
         using (StreamWriter sw = new StreamWriter(path))
         using (JsonWriter writer = new JsonTextWriter(sw))
@@ -391,6 +394,9 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             writer.Formatting = Formatting.Indented;
             ToJson(writer, serializer);
         }
+
+        stopWatch.Stop();
+        Debug.Log($"AppDataSet: it took {stopWatch.Elapsed.TotalMilliseconds} ms to serialize data to JSON file");
     }
 
     public void ExportAnimation(EditAnimation animation, string jsonFilePath)
