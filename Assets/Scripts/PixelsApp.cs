@@ -180,7 +180,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         return ret;
     }
 
-    public void ActivateBehavior(Behaviors.EditBehavior behavior, System.Action<EditDie, bool> callback)
+    public void ActivateBehavior(Behaviors.EditBehavior behavior, System.Action<EditDie, bool> callback = null)
     {
         // Select the die
         ShowDiePicker("Select Die", null, null, (res, selectedDie) =>
@@ -196,12 +196,12 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         });
     }
 
-    public void UpdateDieDataSet(Presets.EditDieAssignment editDieAssignment, System.Action<bool> callback)
+    public void UpdateDieDataSet(Presets.EditDieAssignment editDieAssignment, System.Action<bool> callback = null)
     {
         UpdateDieDataSet(editDieAssignment.behavior, editDieAssignment.die, callback);
     }
 
-    public void UpdateDieDataSet(Behaviors.EditBehavior behavior, Dice.EditDie die, System.Action<bool> callback)
+    public void UpdateDieDataSet(Behaviors.EditBehavior behavior, Dice.EditDie die, System.Action<bool> callback = null)
     {
         // Make sure the die is ready!
         ShowProgrammingBox("Connecting to " + die.name + "...");
@@ -317,7 +317,6 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                                             else
                                             {
                                                 die.currentBehavior = behavior;
-                                                AppDataSet.Instance.SaveData();
                                                 onDieBehaviorUpdatedEvent?.Invoke(die, die.currentBehavior);
                                                 callback?.Invoke(true);
                                             }
@@ -368,7 +367,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         });
     }
 
-    public void UploadPreset(Presets.EditPreset editPreset, System.Action<bool> callback)
+    public void UploadPreset(Presets.EditPreset editPreset, System.Action<bool> callback = null)
     {
         int currentAssignment = 0;
         void updateNextDie()
@@ -402,11 +401,11 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         }
         else
         {
-            callback(false);
+            callback?.Invoke(false);
         }
     }
 
-    public void UploadBehavior(Behaviors.EditBehavior behavior, Dice.EditDie die, System.Action<bool> callback)
+    public void UploadBehavior(Behaviors.EditBehavior behavior, Dice.EditDie die, System.Action<bool> callback = null)
     {
         UpdateDieDataSet(behavior, die, (res) =>
         {

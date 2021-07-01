@@ -119,22 +119,22 @@ namespace Dice
         public int? rssi { get; private set; } = null;
 
         public delegate void TelemetryEvent(Die die, AccelFrame frame);
-        public TelemetryEvent _OnTelemetry;
-        public event TelemetryEvent OnTelemetry
+        public TelemetryEvent _TelemetryReceived;
+        public event TelemetryEvent TelemetryReceived
         {
             add
             {
-                if (_OnTelemetry == null)
+                if (_TelemetryReceived == null)
                 {
                     // The first time around, we make sure to request telemetry from the die
                     RequestTelemetry(true);
                 }
-                _OnTelemetry += value;
+                _TelemetryReceived += value;
             }
             remove
             {
-                _OnTelemetry -= value;
-                if (_OnTelemetry == null || _OnTelemetry.GetInvocationList().Length == 0)
+                _TelemetryReceived -= value;
+                if (_TelemetryReceived == null || _TelemetryReceived.GetInvocationList().Length == 0)
                 {
                     if (connectionState == ConnectionState.Ready)
                     {

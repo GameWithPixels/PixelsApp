@@ -438,11 +438,11 @@ public partial class Die
     {
         // Don't bother doing anything with the message if we don't have
         // anybody interested in telemetry data.
-        if (_OnTelemetry != null)
+        if (_TelemetryReceived != null)
         {
             // Notify anyone who cares
             var telem = (DieMessageAcc)message;
-            _OnTelemetry.Invoke(this, telem.data);
+            _TelemetryReceived.Invoke(this, telem.data);
         }
     }
 

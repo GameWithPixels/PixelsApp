@@ -79,10 +79,10 @@ public class UIBehaviorView
 
     public override void Leave()
     {
-        if (DiceRendererManager.Instance != null && this.dieRenderer != null)
+        if (DiceRendererManager.Instance != null && dieRenderer != null)
         {
-            DiceRendererManager.Instance.DestroyDiceRenderer(this.dieRenderer);
-            this.dieRenderer = null;
+            DiceRendererManager.Instance.DestroyDiceRenderer(dieRenderer);
+            dieRenderer = null;
         }
 
         foreach (var ruleui in rules)
@@ -96,7 +96,7 @@ public class UIBehaviorView
     void Setup(EditBehavior behavior)
     {
         editBehavior = behavior;
-        this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(editBehavior.defaultPreviewSettings.design, 300);
+        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(editBehavior.defaultPreviewSettings.design, 300);
         if (dieRenderer != null)
         {
             previewImage.texture = dieRenderer.renderTexture;
@@ -107,7 +107,7 @@ public class UIBehaviorView
         RefreshView();
 
         dieRenderer.SetAuto(true);
-        dieRenderer.SetAnimations(this.editBehavior.CollectAnimations());
+        dieRenderer.SetAnimations(editBehavior.CollectAnimations());
         dieRenderer.Play(true);
     }
 
@@ -121,7 +121,7 @@ public class UIBehaviorView
     void AddNewRule()
     {
         var newRule = editBehavior.AddNewDefaultRule();
-        base.pageDirty = true;
+        pageDirty = true;
         RefreshView();
         NavigationManager.Instance.GoToPage(UIPage.PageId.Rule, newRule);
     }
@@ -191,7 +191,7 @@ public class UIBehaviorView
         {
             editBehavior.rules.RemoveAt(index);
             editBehavior.rules.Insert(index - 1, rule);
-            base.pageDirty = true;
+            pageDirty = true;
             RefreshView();
         }
     }
@@ -203,7 +203,7 @@ public class UIBehaviorView
         {
             editBehavior.rules.RemoveAt(index);
             editBehavior.rules.Insert(index + 1, rule);
-            base.pageDirty = true;
+            pageDirty = true;
             RefreshView();
         }
     }
@@ -212,7 +212,7 @@ public class UIBehaviorView
     {
         var newRule = rule.Duplicate();
         editBehavior.rules.Add(newRule);
-        base.pageDirty = true;
+        pageDirty = true;
         RefreshView();
     }
 
@@ -223,7 +223,7 @@ public class UIBehaviorView
             if (res)
             {
                 editBehavior.rules.Remove(rule);
-                base.pageDirty = true;
+                pageDirty = true;
                 RefreshView();
             }
         });
@@ -247,17 +247,24 @@ public class UIBehaviorView
     void SetName(string newName)
     {
         editBehavior.name = newName;
-        base.pageDirty = true;
+        pageDirty = true;
     }
 
     void SetDescription(string newDescription)
     {
         editBehavior.description = newDescription;
-        base.pageDirty = true;
+        pageDirty = true;
     }
 
     void ActivateBehavior()
     {
-        PixelsApp.Instance.ActivateBehavior(editBehavior, null);
+        PixelsApp.Instance.ActivateBehavior(editBehavior, (die, res) =>
+        {
+            if (res)
+            {
+                AppDataSet.Instance.SaveData();
+                pageDirty = false;
+            }
+        });
     }
 }
