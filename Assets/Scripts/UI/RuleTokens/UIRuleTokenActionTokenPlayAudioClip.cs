@@ -25,7 +25,7 @@ public class UIRuleTokenActionTokenPlayAudioClip
 
     public override void Setup(EditAction action, bool first)
     {
-        var playAudioClipAction = action as EditActionPlayAudioClip;
+        var playAudioClipAction = (EditActionPlayAudioClip)action;
         actionText.text = action.ToString();
         labelText.text = first ? "Then" : "And";
 

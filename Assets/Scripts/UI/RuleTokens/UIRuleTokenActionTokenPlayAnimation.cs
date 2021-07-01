@@ -38,7 +38,7 @@ public class UIRuleTokenActionTokenPlayAnimation
 
     public override void Setup(EditAction action, bool first)
     {
-        var playAnimAction = action as EditActionPlayAnimation;
+        var playAnimAction = (EditActionPlayAnimation)action;
         actionText.text = action.ToString();
         labelText.text = first ? "Then" : "And";
 

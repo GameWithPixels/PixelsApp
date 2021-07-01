@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Behaviors;
@@ -62,6 +63,12 @@ public class UIRuleToken : MonoBehaviour
         conditionToken?.Setup(editRule.condition);
         for (int i = 0; i < Mathf.Min(editRule.actions.Count, actionTokens.Count); ++i)
         {
+            if (!actionTokens[i].actionTypes.Contains(editRule.actions[i].type))
+            {
+                // Replace action token if current one doesn't support the action's type
+                GameObject.Destroy(actionTokens[i].gameObject);
+                actionTokens[i] = UIRuleTokenManager.Instance.CreateActionToken(editRule.actions[i], i == 0, tokenRoot);
+            }
             actionTokens[i].Setup(editRule.actions[i], i == 0);
         }
         for (int i = actionTokens.Count; i < editRule.actions.Count; ++i)
