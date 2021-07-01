@@ -83,9 +83,9 @@ public class DiceManager : SingletonMonoBehaviour<DiceManager>
                 {
                     if (die.deviceId == 0)
                     {
-                        Debug.LogError("Die " + die.name + " was connected to but doesn't have a proper device Id");
+                        Debug.LogError("Die " + die.name + " was connected to but doesn't have a proper device id");
                         bool acknowledge = false;
-                        PixelsApp.Instance.ShowDialogBox("Identification Error", "Die " + die.name + " was connected to but doesn't have a proper device Id", "Ok", null, (_) => acknowledge = true);
+                        PixelsApp.Instance.ShowDialogBox("Identification Error", "Die " + die.name + " was connected to but doesn't have a proper device id", "Ok", null, (_) => acknowledge = true);
                         yield return new WaitUntil(() => acknowledge);
                     }
                     else
