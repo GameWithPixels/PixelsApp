@@ -185,7 +185,14 @@ namespace Dice
                         ret = FromByteArray<DieMessageDefaultAnimSetColor>(data);
                         break;
                     case DieMessageType.BatteryLevel:
+#if PLATFORM_ANDROID
+                        var modifiedData = new byte[13];
+                        modifiedData[0] = data[0];
+                        System.Array.Copy(data, 1, modifiedData, 4, 9);
+                        ret = FromByteArray<DieMessageBatteryLevel>(modifiedData);
+#else
                         ret = FromByteArray<DieMessageBatteryLevel>(data);
+#endif
                         break;
                     case DieMessageType.RequestBatteryLevel:
                         ret = FromByteArray<DieMessageRequestBatteryLevel>(data);
@@ -615,6 +622,10 @@ namespace Dice
     : DieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.BatteryLevel;
+#if PLATFORM_ANDROID
+        // We need padding on ARMv7 to have 4 bytes alignment for float types
+        private byte _padding1, _padding2, _padding3;
+#endif
         public float level;
         public float voltage;
         public byte charging;
