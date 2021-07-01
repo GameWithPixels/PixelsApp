@@ -19,9 +19,9 @@ namespace Animations
 		Simple,
 		[Name("Colorful Rainbow")]
 		Rainbow,
-		[Name("RGB Pattern")]
+		[Name("Color LED Pattern")]
 		Keyframed,
-		[Name("Gradient Pattern")]
+		[Name("Gradient LED Pattern")]
 		GradientPattern,
 		[Name("Simple Gradient")]
 		Gradient,
