@@ -172,7 +172,7 @@ public class UIRuleView
         }
         else
         {
-            PixelsApp.Instance.ShowDialogBox("Can't Delete last action", "You must have at least one action in a rule.", "Ok", null, null);
+            PixelsApp.Instance.ShowDialogBox("Can't Delete last action", "You must have at least one action in a rule.");
         }
         // Else can't delete last action
     }

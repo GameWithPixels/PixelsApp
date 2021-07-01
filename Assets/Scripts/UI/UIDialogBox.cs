@@ -23,9 +23,9 @@ public class UIDialogBox : MonoBehaviour
     /// <summary>
     /// Invoke the modal dialog box, passing in all the parameters to configure it and a callback
     /// </sumary>
-    public void Show(string title, string message, string okMessage, string cancelMessage, System.Action<bool> closeAction)
+    public void Show(string title, string message, string okMessage = "Ok", string cancelMessage = null, System.Action<bool> closeAction = null)
     {
-        Debug.Log($"Showing dialog: title={title}, message={message}, okMessage={okMessage}, cancelMessage={cancelMessage}");
+        Debug.Log($"Showing dialog: title={title}, message={message}, okMessage={okMessage}, cancelMessage={cancelMessage}, hasAction={closeAction != null}");
 
         if (isShown)
         {

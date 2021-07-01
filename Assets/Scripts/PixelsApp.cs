@@ -40,7 +40,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         mainMenu.Hide();
     }
 
-    public bool ShowDialogBox(string title, string message, string okMessage, string cancelMessage, System.Action<bool> closeAction)
+    public bool ShowDialogBox(string title, string message, string okMessage = "Ok", string cancelMessage = null, System.Action<bool> closeAction = null)
     {
         bool ret = !dialogBox.isShown;
         if (ret)
@@ -311,7 +311,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                                             HideProgrammingBox();
                                             if (hash != editDie.die.dataSetHash)
                                             {
-                                                ShowDialogBox("Error verifying data sent to " + editDie.name, message, "Ok", null, null);
+                                                ShowDialogBox("Error verifying data sent to " + editDie.name, message);
                                                 callback?.Invoke(false);
                                             }
                                             else
@@ -326,7 +326,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                                         else
                                         {
                                             HideProgrammingBox();
-                                            ShowDialogBox("Error fetching profile hash value from " + editDie.name, message, "Ok", null, null);
+                                            ShowDialogBox("Error fetching profile hash value from " + editDie.name, message);
                                             DiceManager.Instance.DisconnectDie(editDie, null);
                                             callback?.Invoke(false);
                                         }
@@ -335,7 +335,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                                 else
                                 {
                                     HideProgrammingBox();
-                                    ShowDialogBox("Error uploading data to " + editDie.name, errorMsg, "Ok", null, null);
+                                    ShowDialogBox("Error uploading data to " + editDie.name, errorMsg);
                                     DiceManager.Instance.DisconnectDie(editDie, null);
                                     callback?.Invoke(false);
                                 }
@@ -345,7 +345,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                         {
                             Debug.Log("Die " + editDie.name + " already has preset with hash 0x" + hash.ToString("X8") + " programmed.");
                             HideProgrammingBox();
-                            ShowDialogBox("Profile already Programmed", "Die " + editDie.name + " already has profile \"" + behavior.name + "\" programmed.", "Ok", null, null);
+                            ShowDialogBox("Profile already Programmed", "Die " + editDie.name + " already has profile \"" + behavior.name + "\" programmed.");
                             DiceManager.Instance.DisconnectDie(editDie, null);
                             callback?.Invoke(true);
                         }
@@ -353,7 +353,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                     else
                     {
                         HideProgrammingBox();
-                        ShowDialogBox("Error verifying profile hash on " + editDie.name, message, "Ok", null, null);
+                        ShowDialogBox("Error verifying profile hash on " + editDie.name, message);
                         DiceManager.Instance.DisconnectDie(editDie, null);
                         callback?.Invoke(false);
                     }
@@ -362,7 +362,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
             else
             {
                 HideProgrammingBox();
-                ShowDialogBox("Error connecting to " + editDie.name, message, "Ok", null, null);
+                ShowDialogBox("Error connecting to " + editDie.name, message);
                 callback(false);
             }
         });
