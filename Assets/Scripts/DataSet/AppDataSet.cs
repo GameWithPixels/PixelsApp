@@ -277,7 +277,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     public EditPreset AddNewDefaultPreset()
     {
         var newPreset = new EditPreset();
-        newPreset.name = "New Profile";
+        newPreset.name = "New Preset";
         newPreset.dieAssignments.Add(new EditDieAssignment()
         {
             die = null,
