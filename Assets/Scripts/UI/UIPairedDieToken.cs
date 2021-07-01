@@ -100,14 +100,12 @@ public class UIPairedDieToken : MonoBehaviour
                             if (res2)
                             {
                                 DiceManager.Instance.ForgetDie(die);
-                                AppDataSet.Instance.SaveData();
                             }
                         });
                     }
                     else
                     {
                         DiceManager.Instance.ForgetDie(die);
-                        AppDataSet.Instance.SaveData();
                     }
                 }
             });
