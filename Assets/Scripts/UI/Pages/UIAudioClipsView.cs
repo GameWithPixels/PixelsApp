@@ -97,6 +97,7 @@ public class UIAudioClipsView
         if (!string.IsNullOrEmpty(fileName))
         {
             AppDataSet.Instance.AddAudioClip(fileName);
+            AppDataSet.Instance.SaveData();
             RefreshView();
         }
     }
@@ -105,7 +106,15 @@ public class UIAudioClipsView
     {
         if (!string.IsNullOrEmpty(filePath))
         {
-            StartCoroutine(FileSelectedCr(filePath));
+            string name = System.IO.Path.GetFileNameWithoutExtension(filePath);
+            if (AudioClipManager.Instance.audioClips.Any(ac => ac.clip.name == name))
+            {
+                PixelsApp.Instance.ShowDialogBox("Duplicated Audio Clip!", "There is already an Audio Clip with the same name.", "Ok");
+            }
+            else
+            {
+                StartCoroutine(FileSelectedCr(filePath));
+            }
         }
     }
 
@@ -126,13 +135,14 @@ public class UIAudioClipsView
 		FileBrowser.SetDefaultFilter( ".wav" );
         FileBrowser.ShowLoadDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Select audio file", "Select");
 #else
-        NativeFilePicker.PickFile( FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType( "wav" ), NativeFilePicker.ConvertExtensionToFileType( "mp3" ) });
+        var supportedFormats = AudioClipManager.supportedExtensions.Select(ex => NativeFilePicker.ConvertExtensionToFileType(ex.TrimStart('.')));
+        NativeFilePicker.PickFile(FileSelected, supportedFormats.ToArray());
 #endif
     }
 
     void DeleteClip(AudioClipManager.AudioClipInfo clip)
     {
-        PixelsApp.Instance.ShowDialogBox("Delete AudioClip?", "Are you sure you want to delete " + clip.clip.name + "?", "Ok", "Cancel", res =>
+        PixelsApp.Instance.ShowDialogBox("Delete Audio Clip?", "Are you sure you want to delete " + clip.clip.name + "?", "Ok", "Cancel", res =>
         {
             if (res)
             {
@@ -161,7 +171,7 @@ public class UIAudioClipsView
                         }
                         builder.Append("Are you sure you want to delete it?");
 
-                        PixelsApp.Instance.ShowDialogBox("AudioClip In Use!", builder.ToString(), "Ok", "Cancel", res2 =>
+                        PixelsApp.Instance.ShowDialogBox("Audio Clip In Use!", builder.ToString(), "Ok", "Cancel", res2 =>
                         {
                             if (res2)
                             {

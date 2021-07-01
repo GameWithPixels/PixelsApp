@@ -85,7 +85,7 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
         bool isOgg = Path.GetExtension(filePath) == oggExtension;
         if (isWav || isMp3 || isOgg)
         {
-#if !UNITY_IOS
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             string streamingPath = filePath;
 #else
             string streamingPath = "file://" + filePath;
