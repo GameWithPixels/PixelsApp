@@ -2,31 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 using Animations;
-using Behaviors;
 
 public class DiceRendererDice : MonoBehaviour
 {
     public MeshRenderer[] FaceRenderers;
     public Light[] FaceLights;
-    public Color[] FaceColors;
     public float deceleration = 180.0f; // deg/s/s
-    MaterialPropertyBlock[] propertyBlocks;
 
     public float delay { get; set; } = 1.0f;
+
+    public float currentAngle => _currentAngle;
+
+    readonly Color _defaultColor = ColorUtils.reverseGamma(Color.black);
+
+    Color[] _faceReversedColors;
+    MaterialPropertyBlock[] _propertyBlocks;
     float rotationSpeedDeg;
-
     float _currentAngle = 0.0f;
-    public float currentAngle
-    {
-        get { return _currentAngle; }
-    }
-
     float _currentSpeed = 0.0f;
 
     DataSet dataSet;
@@ -77,7 +70,7 @@ public class DiceRendererDice : MonoBehaviour
         }
     }
 
-    public void SetAnimation(Animations.EditAnimation editAnimation)
+    public void SetAnimation(EditAnimation editAnimation)
     {
         if (editAnimation != null)
         {
@@ -107,7 +100,7 @@ public class DiceRendererDice : MonoBehaviour
         animations.Clear();
     }
 
-    public void Play(bool loop)
+    public void Play(bool _)
     {
         currentState = State.Waiting;
         timeLeft = 0.0f;
@@ -121,16 +114,18 @@ public class DiceRendererDice : MonoBehaviour
 
     void Awake()
     {
-        propertyBlocks = new MaterialPropertyBlock[20];
-        for (int i = 0; i < FaceColors.Length; ++i)
+        _faceReversedColors = new Color[FaceRenderers.Length];
+        _propertyBlocks = new MaterialPropertyBlock[FaceRenderers.Length];
+        for (int i = 0; i < _faceReversedColors.Length; ++i)
         {
-            FaceColors[i] = Color.black;
-            MaterialPropertyBlock block = new MaterialPropertyBlock();
-            block.SetColor("_GlowColor", FaceColors[i]);
+            Color color = _faceReversedColors[i] = _defaultColor;
 
-            propertyBlocks[i] = block;
+            MaterialPropertyBlock block = new MaterialPropertyBlock();
+            block.SetColor("_GlowColor", color);
+
+            _propertyBlocks[i] = block;
             FaceRenderers[i].SetPropertyBlock(block);
-            FaceLights[i].color = FaceColors[i];
+            FaceLights[i].color = color;
         }
         currentState = State.Idle;
         timeLeft = 0.0f;
@@ -168,11 +163,11 @@ public class DiceRendererDice : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (FaceColors.Length == 20)
+        if (_faceReversedColors.Length > 0)
         {
-            for (int i = 0; i < 20; ++i)
+            for (int i = 0; i < _faceReversedColors.Length; ++i)
             {
-                FaceColors[i] = Color.black;
+                _faceReversedColors[i] = _defaultColor;
             }
             switch (currentState)
             {
@@ -211,7 +206,7 @@ public class DiceRendererDice : MonoBehaviour
                         {
                             for (int i = 0; i < 20; ++i)
                             {
-                                FaceColors[i] = Color.black;
+                                _faceReversedColors[i] = _defaultColor;
                             }
                             currentInstance = null;
                             currentState = State.Waiting;
@@ -230,7 +225,7 @@ public class DiceRendererDice : MonoBehaviour
                                     ColorUtils.getGreen(color),
                                     ColorUtils.getBlue(color),
                                     255);
-                                FaceColors[retIndices[t]] = color32;
+                                _faceReversedColors[retIndices[t]] = ColorUtils.reverseGamma(color32);
                             }
                         }
                     }
@@ -276,31 +271,18 @@ public class DiceRendererDice : MonoBehaviour
             }
         }
 
-        var quat = Quaternion.AngleAxis(_currentAngle, Vector3.up);
-        transform.localRotation = quat;
+        transform.localRotation = Quaternion.AngleAxis(_currentAngle, Vector3.up);
     }
 
     void UpdateColors()
     {
-        if (FaceColors != null)
+        for (int i = 0; i < _faceReversedColors?.Length; ++i)
         {
-            if (propertyBlocks == null)
-            {
-                propertyBlocks = new MaterialPropertyBlock[20];
-                for (int i = 0; i < FaceColors.Length; ++i)
-                {
-                    propertyBlocks[i] = new MaterialPropertyBlock();
-                }
-            } 
-
-            for (int i = 0; i < FaceColors.Length; ++i)
-            {
-                var reverseGammaCorrectedColor = ColorUtils.reverseGamma(FaceColors[i]);
-                var block = propertyBlocks[i];
-                block.SetColor("_GlowColor", reverseGammaCorrectedColor);
-                FaceRenderers[i].SetPropertyBlock(block);
-                FaceLights[i].color = reverseGammaCorrectedColor;
-            }
+            var color = _faceReversedColors[i];
+            var block = _propertyBlocks[i];
+            block.SetColor("_GlowColor", color);
+            FaceRenderers[i].SetPropertyBlock(block);
+            FaceLights[i].color = color;
         }
     }
 
@@ -317,5 +299,4 @@ public class DiceRendererDice : MonoBehaviour
         currentInstance = dataSet.animations[0].CreateInstance(dataSet.animationBits);
         currentInstance.start(startTime, remapFace, false);
     }
-
 }
