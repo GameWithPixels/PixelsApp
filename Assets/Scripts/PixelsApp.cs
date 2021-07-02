@@ -459,14 +459,16 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
     public void ExportPattern(EditAnimation animation)
     {
-        void FileSelected(string filePath)
+        void FileSelected(string filePathname, System.Action onDone = null)
         {
+            Debug.Log("Archiving logs");
             // Save the pattern to JSON
-            AppDataSet.Instance.ExportAnimation(animation, filePath);
+            AppDataSet.Instance.ExportAnimation(animation, filePathname);
+            onDone?.Invoke();
         }
 
 #if UNITY_EDITOR
-        FileSelected(UnityEditor.EditorUtility.SaveFilePanel("Export pattern to json", "", animation.name, "json"));
+        FileSelected(UnityEditor.EditorUtility.SaveFilePanel("Export Pattern", "", animation.name, "json"));
 #elif UNITY_STANDALONE_WIN
         // Set filters (optional)
         // It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
@@ -479,7 +481,16 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 		FileBrowser.SetDefaultFilter( ".json" );
         FileBrowser.ShowSaveDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Save JSON", "Select");
 #else
-        //NativeFilePicker.PickFile(FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType("json") });
+        string jsonPathname = Path.Combine(Application.persistentDataPath, animation.name + ".json");
+        FileSelected(jsonPathname, () =>
+            NativeFilePicker.ExportFile(jsonPathname, res =>
+            {
+                if (!res)
+                {
+                    Debug.LogError("Error exporting animation to JSON");
+                }
+                File.Delete(jsonPathname);
+            }));
 #endif
     }
 
