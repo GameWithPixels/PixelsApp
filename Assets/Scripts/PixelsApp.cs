@@ -483,6 +483,27 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 #endif
     }
 
+    public void RestoreDefaultSettings()
+    {
+        ShowDialogBox("Restore Default Settings?", "All imported Audio Clips and LED Patterns will be lost. Presets, Lighting Patterns and Profiles will be restored to the app defaults. All Dice pairing information will be removed.", "Yes", "No", res =>
+        {
+            if (res)
+            {
+                ShowDialogBox("Last Chance!", "Restore default settings?\nNote: the app will close when done.", "Yes", "No", res2 =>
+                {
+                    if (res)
+                    {
+                        AppSettings.Instance.DeleteData();
+                        AppDataSet.Instance.DeleteData();
+                        AudioClipManager.Instance.DeleteAllUserClipFiles();
+                        Debug.LogWarning("Exiting!");
+                        Application.Quit();
+                    }
+                });
+            }
+        });
+    }
+
     // Start is called before the first frame update
     IEnumerator Start()
     {

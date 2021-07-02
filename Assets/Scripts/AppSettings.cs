@@ -24,6 +24,8 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
     }
     Data data = new Data();
 
+    string pathname => Path.Combine(Application.persistentDataPath, AppConstants.Instance.SettingsFilename);
+
     public bool displayWhatsNew => data.displayWhatsNew;
     public bool mainTutorialEnabled => data.mainTutorialEnabled;
     public bool homeTutorialEnabled => data.homeTutorialEnabled;
@@ -147,11 +149,10 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
     /// </sumary>
     public void LoadData()
     {
-        var path = System.IO.Path.Combine(Application.persistentDataPath, AppConstants.Instance.SettingsFilename);
-        if (System.IO.File.Exists(path))
+        if (File.Exists(pathname))
         {
             var serializer = CreateSerializer();
-            using (StreamReader sw = new StreamReader(path))
+            using (StreamReader sw = new StreamReader(pathname))
             using (JsonReader reader = new JsonTextReader(sw))
             {
                 FromJson(reader, serializer);
@@ -164,9 +165,8 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
     /// </sumary>
     public void SaveData()
     {
-        var path = System.IO.Path.Combine(Application.persistentDataPath, AppConstants.Instance.SettingsFilename);
         var serializer = CreateSerializer();
-        using (StreamWriter sw = new StreamWriter(path))
+        using (StreamWriter sw = new StreamWriter(pathname))
         using (JsonWriter writer = new JsonTextWriter(sw))
         {
             writer.Formatting = Formatting.Indented;
@@ -174,4 +174,19 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
         }
     }
 
+    public void DeleteData()
+    {
+        if (File.Exists(pathname))
+        {
+            Debug.LogWarning("Deleting app settings");
+            try
+            {
+                File.Delete(pathname);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+    }
 }

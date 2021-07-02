@@ -44,6 +44,8 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     }
 
     Data data = new Data();
+    string pathname => Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
+
     public List<EditDie> dice => data.dice;
     public List<EditAudioClip> audioClips => data.audioClips;
     public List<EditPattern> patterns => data.patterns;
@@ -366,12 +368,11 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     {
         var serializer = CreateSerializer();
 
-        var path = Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
-        if (File.Exists(path))
+        if (File.Exists(pathname))
         {
-            Debug.Log("AppDataSet: loading user's file " + path);
+            Debug.Log("AppDataSet: loading user's file " + pathname);
 
-            using StreamReader sw = new StreamReader(path);
+            using StreamReader sw = new StreamReader(pathname);
             using JsonReader reader = new JsonTextReader(sw);
             FromJson(reader, serializer);
         }
@@ -393,11 +394,10 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         var stopWatch = new System.Diagnostics.Stopwatch();
         stopWatch.Start();
 
-        var path = Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
-        Debug.Log("AppDataSet: saving to user's file " + path);
+        Debug.Log("AppDataSet: saving to user's file " + pathname);
 
         var serializer = CreateSerializer();
-        using (StreamWriter sw = new StreamWriter(path))
+        using (StreamWriter sw = new StreamWriter(pathname))
         using (JsonWriter writer = new JsonTextWriter(sw))
         {
             writer.Formatting = Formatting.Indented;
@@ -406,6 +406,22 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
         stopWatch.Stop();
         Debug.Log($"AppDataSet: it took {stopWatch.Elapsed.TotalMilliseconds} ms to serialize data to JSON file");
+    }
+
+    public void DeleteData()
+    {
+        if (File.Exists(pathname))
+        {
+            Debug.LogWarning("AppDataSet: deleting user's file");
+            try
+            {
+                File.Delete(pathname);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
     }
 
     public void ExportAnimation(EditAnimation animation, string jsonFilePath)

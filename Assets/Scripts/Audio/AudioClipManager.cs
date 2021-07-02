@@ -204,4 +204,21 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
         userClips.Remove(clip);
         audioClips.RemoveAll(c => c.clip == clip);
     }
+
+    public void DeleteAllUserClipFiles()
+    {
+        var di = new DirectoryInfo(userClipsRootPath);
+        if (di.Exists)
+        {
+            Debug.LogWarning("Deleting user clips folder");
+            try
+            {
+                di.Delete(true);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+    }
 }

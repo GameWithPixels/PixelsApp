@@ -18,6 +18,7 @@ public class UIMainMenu : MonoBehaviour
     public Button audioClipsButton;
     public Button disableOnDeviceButton;
     public Button importPatternButton;
+    public Button restoreSettingsButton;
 
     // Start is called before the first frame update
     void Awake()
@@ -41,6 +42,7 @@ public class UIMainMenu : MonoBehaviour
             GoToPage(UIPage.PageId.Behavior, AppDataSet.Instance.defaultBehavior);
         });
         importPatternButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.ImportPattern(); });
+        restoreSettingsButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.RestoreDefaultSettings(); });
     }
 
     public void Show()
