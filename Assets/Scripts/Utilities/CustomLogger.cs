@@ -28,13 +28,27 @@ public class CustomLogger : MonoBehaviour
 
     void OnEnable()
     {
+        string path = Path.Combine(Application.persistentDataPath, logsFolder);
+
+        // Delete older files, we keep the last 20 ones
+        if (Directory.Exists(path))
+        {
+            foreach (var fileInfo in Directory.GetFiles(path)
+                     .Select(f => new FileInfo(f))
+                     .OrderByDescending(f => f.LastWriteTimeUtc)
+                     .Skip(20))
+            {
+                fileInfo.Delete();
+            }
+        }
+
+        // Create new log file
         string now = $"{DateTime.Now:o}";
         string filename = $"log_{now}.txt";
         foreach (char c in Path.GetInvalidFileNameChars())
         {
             filename = filename.Replace(c.ToString(), "_");
         }
-        string path = Path.Combine(Application.persistentDataPath, logsFolder);
         if (!Directory.Exists(path))
         {
             Directory.CreateDirectory(path);
