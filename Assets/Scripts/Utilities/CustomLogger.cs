@@ -61,6 +61,33 @@ public class CustomLogger : MonoBehaviour
         streamWriter.WriteLine();
         streamWriter.WriteLine(lineSeparator);
         streamWriter.WriteLine();
+
+        streamWriter.WriteLine($"\tdeviceModel: {SystemInfo.deviceModel}");
+        streamWriter.WriteLine($"\tdeviceName: {SystemInfo.deviceName}");
+        streamWriter.WriteLine($"\tdeviceType: {SystemInfo.deviceType}");
+
+        streamWriter.WriteLine($"\tprocessorType: {SystemInfo.processorType}");
+        streamWriter.WriteLine($"\tprocessorFrequency: {SystemInfo.processorFrequency}");
+        streamWriter.WriteLine($"\tprocessorCount: {SystemInfo.processorCount}");
+        streamWriter.WriteLine($"\tsystemMemorySize: {SystemInfo.systemMemorySize}");
+
+        streamWriter.WriteLine($"\tgraphicsDeviceName: {SystemInfo.graphicsDeviceName}");
+        streamWriter.WriteLine($"\tgraphicsDeviceType: {SystemInfo.graphicsDeviceType}");
+        streamWriter.WriteLine($"\tgraphicsDeviceVendor: {SystemInfo.graphicsDeviceVendor}");
+        streamWriter.WriteLine($"\tgraphicsMemorySize: {SystemInfo.graphicsMemorySize}");
+
+        streamWriter.WriteLine($"\tbatteryLevel: {SystemInfo.batteryLevel}");
+        streamWriter.WriteLine($"\tbatteryStatus: {SystemInfo.batteryStatus}");
+        
+        streamWriter.WriteLine($"\toperatingSystem: {SystemInfo.operatingSystem}");
+        streamWriter.WriteLine($"\toperatingSystemFamily: {SystemInfo.operatingSystemFamily}");
+
+        streamWriter.WriteLine($"\tsupportsAudio: {SystemInfo.supportsAudio}");
+        streamWriter.WriteLine($"\tsupportsLocationService: {SystemInfo.supportsLocationService}");
+        
+        streamWriter.WriteLine();
+        streamWriter.WriteLine(lineSeparator);
+        streamWriter.WriteLine();
         Application.logMessageReceivedThreaded += Application_logMessageReceivedThreaded;
     }
 
