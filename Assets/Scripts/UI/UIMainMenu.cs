@@ -19,6 +19,7 @@ public class UIMainMenu : MonoBehaviour
     public Button disableOnDeviceButton;
     public Button importPatternButton;
     public Button restoreSettingsButton;
+    public Button exportLogsButton;
 
     // Start is called before the first frame update
     void Awake()
@@ -43,6 +44,7 @@ public class UIMainMenu : MonoBehaviour
         });
         importPatternButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.ImportPattern(); });
         restoreSettingsButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.RestoreDefaultSettings(); });
+        exportLogsButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.ExportLogFiles(); });
     }
 
     public void Show()

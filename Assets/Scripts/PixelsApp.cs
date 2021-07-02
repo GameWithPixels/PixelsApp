@@ -504,6 +504,61 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         });
     }
 
+    public void ExportLogFiles()
+    {
+
+        void FileSelected(string filePathname, System.Action onDone = null)
+        {
+            try
+            {
+                if (File.Exists(filePathname))
+                {
+                    File.Delete(filePathname);
+                }
+
+                // Suspend logger before reading the file because ZipFile.CreateFromDirectory
+                // throws and exception if the file is opened with "write" attribute
+                CustomLogger.Instance.Suspend(_ =>
+                {  
+                    Debug.Log("Archiving logs");
+                    // Archive all logs in zip file
+                    System.IO.Compression.ZipFile.CreateFromDirectory(CustomLogger.LogsDirectory, filePathname);
+                });
+                onDone?.Invoke();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+
+#if UNITY_EDITOR
+        FileSelected(UnityEditor.EditorUtility.SaveFilePanel("Export Log Files", "", "logs", "zip"));
+#elif UNITY_STANDALONE_WIN
+        // Set filters (optional)
+        // It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
+        // if all the dialogs will be using the same filters
+        FileBrowser.SetFilters( true, new FileBrowser.Filter( "Zip Archive", ".zip" ));
+
+		// Set default filter that is selected when the dialog is shown (optional)
+		// Returns true if the default filter is set successfully
+		// In this case, set Images filter as the default filter
+		FileBrowser.SetDefaultFilter( ".zip" );
+        FileBrowser.ShowSaveDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Export Log Files", "Select");
+#else
+        string archivePathname = Path.Combine(Application.persistentDataPath, "logs.zip");
+        FileSelected(archivePathname, () =>
+            NativeFilePicker.ExportFile(archivePathname, res =>
+            {
+                if (!res)
+                {
+                    Debug.LogError("Error exporting logs archive");
+                }
+                File.Delete(archivePathname);
+            }));
+#endif
+    }
+
     // Start is called before the first frame update
     IEnumerator Start()
     {
