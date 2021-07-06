@@ -573,6 +573,8 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
     // Start is called before the first frame update
     IEnumerator Start()
     {
+        Debug.Log($"Running app version {AppConstants.Instance.AppVersion}");
+
         while (Central.Instance.state != Central.State.Idle) yield return null;
 
         // Pretend to have updated the current preset on load
