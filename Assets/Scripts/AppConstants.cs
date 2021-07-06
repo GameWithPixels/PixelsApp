@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class AppConstants : SingletonMonoBehaviour<AppConstants>
 {
+    public System.Version AppVersion = new System.Version(1, 3);
     public TextAsset defaultDiceJson;
     public string DataSetFilename = "dice_data.json";
     public string SettingsFilename = "settings.json";

@@ -21,9 +21,14 @@ public class UIMainMenu : MonoBehaviour
     public Button restoreSettingsButton;
     public Button exportLogsButton;
 
+    [Header("Text")]
+    public Text versionText;
+
     // Start is called before the first frame update
     void Awake()
     {
+        versionText.text = $"Version {AppConstants.Instance.AppVersion}";
+
         menuButton.onClick.AddListener(Hide);
         outsideButton.onClick.AddListener(Hide);
         homeButton.onClick.AddListener(() => { Hide(); GoToRoot(UIPage.PageId.Home);});
