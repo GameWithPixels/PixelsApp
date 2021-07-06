@@ -431,9 +431,9 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
     {
         static void FileSelected(string filePath)
         {
-            Debug.Log("Selected JSON pattern file: " + filePath);
             if (!string.IsNullOrEmpty(filePath))
             {
+                Debug.Log("Selected JSON pattern file: " + filePath);
                 // Load the pattern from JSON
                 AppDataSet.Instance.ImportAnimation(filePath);
             }
@@ -461,10 +461,13 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
     {
         void FileSelected(string filePathname, System.Action onDone = null)
         {
-            Debug.Log("Archiving logs");
-            // Save the pattern to JSON
-            AppDataSet.Instance.ExportAnimation(animation, filePathname);
-            onDone?.Invoke();
+            if (!string.IsNullOrEmpty(filePathname))
+            {
+                Debug.Log("Archiving logs");
+                // Save the pattern to JSON
+                AppDataSet.Instance.ExportAnimation(animation, filePathname);
+                onDone?.Invoke();
+            }
         }
 
 #if UNITY_EDITOR
@@ -520,26 +523,29 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
         void FileSelected(string filePathname, System.Action onDone = null)
         {
-            try
+            if (!string.IsNullOrEmpty(filePathname))
             {
-                if (File.Exists(filePathname))
+                try
                 {
-                    File.Delete(filePathname);
-                }
+                    if (File.Exists(filePathname))
+                    {
+                        File.Delete(filePathname);
+                    }
 
-                // Suspend logger before reading the file because ZipFile.CreateFromDirectory
-                // throws and exception if the file is opened with "write" attribute
-                CustomLogger.Instance.Suspend(_ =>
-                {  
-                    Debug.Log("Archiving logs");
+                    // Suspend logger before reading the file because ZipFile.CreateFromDirectory
+                    // throws and exception if the file is opened with "write" attribute
+                    CustomLogger.Instance.Suspend(_ =>
+                    {
+                        Debug.Log("Archiving logs");
                     // Archive all logs in zip file
                     System.IO.Compression.ZipFile.CreateFromDirectory(CustomLogger.LogsDirectory, filePathname);
-                });
-                onDone?.Invoke();
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogException(e);
+                    });
+                    onDone?.Invoke();
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
         }
 
