@@ -73,8 +73,8 @@ namespace Animations
         [Name("Traveling Order")]
         public bool flowOrder = false;
 
-        [Slider, FloatRange(-0.5f, 0.5f), Name("Hue Adjustment")]
-        public float hueAdjust = 0.0f;
+        //[Slider, FloatRange(-0.5f, 0.5f), Name("Hue Adjustment")]
+        //public float hueAdjust = 0.0f;
 
         public override AnimationType type => AnimationType.Keyframed;
 
@@ -110,7 +110,7 @@ namespace Animations
             ret.flowOrder = this.flowOrder;
             ret.speedMultiplier = this.speedMultiplier;
 		    ret.duration = this.duration;
-            ret.hueAdjust = this.hueAdjust;
+            //ret.hueAdjust = this.hueAdjust;
             return ret;
         }
 
@@ -152,8 +152,8 @@ namespace Animations
                     serializer.Serialize(writer, value.speedMultiplier);
                     writer.WritePropertyName("duration");
                     serializer.Serialize(writer, value.duration);
-                    writer.WritePropertyName("hueAdjust");
-                    serializer.Serialize(writer, value.hueAdjust);
+                    //writer.WritePropertyName("hueAdjust");
+                    //serializer.Serialize(writer, value.hueAdjust);
                     writer.WriteEndObject();
                 }
             }
@@ -175,7 +175,7 @@ namespace Animations
                         ret.pattern = AppDataSet.Instance.AddNewDefaultPattern();
                     ret.speedMultiplier = jsonObject["speedMultiplier"].Value<float>();
                     ret.duration = jsonObject["duration"].Value<float>();
-                    ret.hueAdjust = jsonObject["hueAdjust"].Value<float>();
+                    //ret.hueAdjust = jsonObject["hueAdjust"].Value<float>();
                     return ret;
                 }
             }
