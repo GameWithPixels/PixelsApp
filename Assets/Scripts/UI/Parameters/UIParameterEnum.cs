@@ -55,6 +55,14 @@ public class UIParameterEnum : UIParameter
         return false;
     }
 
+    public static int? GetValueDisplayOrder(object enumVal)
+    {
+        var type = enumVal.GetType();
+        var memInfo = type.GetMember(enumVal.ToString());
+        var orderAttribute = memInfo[0].GetCustomAttributes(typeof(DisplayOrderAttribute), false);
+        return (orderAttribute.FirstOrDefault() as DisplayOrderAttribute)?.Order;
+    }
+
     public override bool CanEdit(System.Type parameterType, IEnumerable<object> attributes = null)
     {
         return typeof(System.Enum).IsAssignableFrom(parameterType) && attributes.Any(a => a.GetType() == typeof(DropdowndAttribute));
@@ -75,6 +83,11 @@ public class UIParameterEnum : UIParameter
                 validValues.Add(val as System.Enum);
             }
         }
+
+        // Order values
+        validValues = validValues.Select((v, i) => new { i, v })
+            .OrderBy(kv => GetValueDisplayOrder(kv.v) ?? kv.i)
+            .Select(kv => kv.v).ToList();
 
         // Set name
         nameText.text = name;

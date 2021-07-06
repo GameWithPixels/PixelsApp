@@ -15,6 +15,13 @@ public class NameAttribute
     }
 }
 
+public class DisplayOrderAttribute
+    : System.Attribute
+{
+    public DisplayOrderAttribute(int order) => Order = order;
+    public int Order { get; }
+}
+
 public abstract class UIParameter : MonoBehaviour
 {
     public abstract bool CanEdit(System.Type parameterType, IEnumerable<object> attributes);

@@ -15,15 +15,15 @@ namespace Animations
 	{
 		[SkipEnumValue]
 		Unknown = 0,
-		[Name("Simple Flashes")]
+		[Name("Simple Flashes")][DisplayOrder(0)]
 		Simple,
-		[Name("Colorful Rainbow")]
+		[Name("Colorful Rainbow")][DisplayOrder(1)]
 		Rainbow,
-		[Name("Color LED Pattern")]
+		[Name("Color LED Pattern")][DisplayOrder(3)]
 		Keyframed,
-		[Name("Gradient LED Pattern")]
+		[Name("Gradient LED Pattern")][DisplayOrder(4)]
 		GradientPattern,
-		[Name("Simple Gradient")]
+		[Name("Simple Gradient")][DisplayOrder(2)]
 		Gradient,
 	};
 
