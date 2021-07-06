@@ -353,6 +353,10 @@ public class Central : SingletonMonoBehaviour<Central>
 #else
         OnBluetoothInitComplete();
 #endif
+#if UNITY_IOS || UNITY_TVOS
+        // Weird implementation of MTU in iOS plugin that just takes the given value as its global "MTU" (not per device)
+        BluetoothLEHardwareInterface.RequestMtu("Pixel", 180, null);
+#endif
     }
 
     protected override void OnDestroy()
