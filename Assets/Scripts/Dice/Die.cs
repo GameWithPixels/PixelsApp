@@ -28,11 +28,6 @@ namespace Dice
     public partial class Die
         : MonoBehaviour
     {
-        const float SCALE_2G = 2.0f;
-        const float SCALE_4G = 4.0f;
-        const float SCALE_8G = 8.0f;
-        const float scale = SCALE_8G;
-
         public enum RollState : byte
         {
             Unknown = 0,
@@ -41,15 +36,6 @@ namespace Dice
             Rolling,
             Crooked
         };
-
-        [System.Serializable]
-        public struct Settings
-        {
-            string name;
-            float sigmaDecayFast;
-            float sigmaDecaySlow;
-            int minRollTime; // ms
-        }
 
         public enum ConnectionState
         {
@@ -138,7 +124,7 @@ namespace Dice
                 {
                     if (connectionState == ConnectionState.Ready)
                     {
-                        // Deregister from the die telemetry
+                        // Unregister from the die telemetry
                         RequestTelemetry(false);
                     }
                     // Otherwise we can't send bluetooth packets to the die, can we?
@@ -172,7 +158,7 @@ namespace Dice
         bool bluetoothOperationInProgress = false;
 
         // Internal delegate per message type
-        delegate void MessageReceivedDelegate(DieMessage msg);
+        delegate void MessageReceivedDelegate(IDieMessage msg);
         Dictionary<DieMessageType, MessageReceivedDelegate> messageDelegates;
 
         void Awake()
@@ -287,8 +273,7 @@ namespace Dice
             {
                 Debug.Log("Got message of type " + message.GetType());
 
-                MessageReceivedDelegate del;
-                if (messageDelegates.TryGetValue(message.type, out del))
+                if (messageDelegates.TryGetValue(message.type, out MessageReceivedDelegate del))
                 {
                     del.Invoke(message);
                 }

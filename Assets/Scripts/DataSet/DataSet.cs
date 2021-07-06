@@ -127,8 +127,8 @@ public class DataSet
 
     public AnimationBits animationBits = new AnimationBits();
     public List<Animations.IAnimation> animations = new List<Animations.IAnimation>();
-    public List<Behaviors.Condition> conditions = new List<Behaviors.Condition>();
-    public List<Behaviors.Action> actions = new List<Behaviors.Action>();
+    public List<Behaviors.ICondition> conditions = new List<Behaviors.ICondition>();
+    public List<Behaviors.IAction> actions = new List<Behaviors.IAction>();
     public List<Behaviors.Rule> rules = new List<Behaviors.Rule>();
     public Behaviors.Behavior behavior = null;
     public ushort padding;
@@ -168,9 +168,9 @@ public class DataSet
 
     public Animations.IAnimation getAnimation(ushort animIndex) => animations[animIndex];
     public ushort getAnimationCount() => (ushort)animations.Count;
-	public Behaviors.Condition getCondition(int conditionIndex) => conditions[conditionIndex];
+	public Behaviors.ICondition getCondition(int conditionIndex) => conditions[conditionIndex];
 	public ushort getConditionCount() => (ushort)conditions.Count;
-	public Behaviors.Action getAction(int actionIndex) => actions[actionIndex];
+	public Behaviors.IAction getAction(int actionIndex) => actions[actionIndex];
 	public ushort getActionCount() => (ushort)actions.Count;
 	public Behaviors.Rule getRule(int ruleIndex) => rules[ruleIndex];
 	public ushort getRuleCount() => (ushort)rules.Count;

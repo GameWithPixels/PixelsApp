@@ -34,7 +34,7 @@ namespace Behaviors
     /// The base struct for all conditions, stores a type identifier so we can tell the actual
     /// type of the condition and fetch the condition parameters correctly.
     /// </summary>
-	public interface Condition
+	public interface ICondition
 	{
 		ConditionType type { get; set; }
     };
@@ -45,7 +45,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionIdle
-        : Condition
+        : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.Idle;
         public byte padding1;
@@ -58,7 +58,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionHandling
-        : Condition
+        : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.Handling;
         public byte padding1;
@@ -72,7 +72,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionRolling
-        : Condition
+        : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.Rolling;
         public byte padding1;
@@ -85,7 +85,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionCrooked
-        : Condition
+        : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.Crooked;
         public byte padding1;
@@ -111,7 +111,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionFaceCompare
-        : Condition
+        : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.FaceCompare;
         public byte faceIndex;
@@ -135,7 +135,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionHelloGoodbye
-        : Condition
+        : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.HelloGoodbye;
         public ConditionHelloGoodbye_Flags flags;
@@ -159,7 +159,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionConnectionState
-        : Condition
+        : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.ConnectionState;
         public ConditionConnectionState_Flags flags;
@@ -185,7 +185,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionBatteryState
-        : Condition
+        : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.BatteryState;
         public ConditionBatteryState_Flags flags;

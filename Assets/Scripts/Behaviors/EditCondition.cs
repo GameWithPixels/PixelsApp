@@ -13,7 +13,7 @@ namespace Behaviors
     {
         [JsonIgnore]
         public abstract ConditionType type { get; }
-        public abstract Condition ToCondition(EditDataSet editSet, DataSet set);
+        public abstract ICondition ToCondition(EditDataSet editSet, DataSet set);
         public abstract EditCondition Duplicate();
         public abstract bool IsSame(EditCondition editCondition); // Don't want to override Equals
 
@@ -109,7 +109,7 @@ namespace Behaviors
         public override ConditionType type { get { return ConditionType.Idle; } }
         [Slider, FloatRange(0.5f, 30.0f, 0.5f), Units("sec")]
         public float period = 10.0f;
-        public override Condition ToCondition(EditDataSet editSet, DataSet set)
+        public override ICondition ToCondition(EditDataSet editSet, DataSet set)
         {
             return new ConditionIdle() { repeatPeriodMs = (ushort)Mathf.RoundToInt(period * 1000.0f) };
         }
@@ -135,7 +135,7 @@ namespace Behaviors
         : EditCondition
     {
         public override ConditionType type { get { return ConditionType.Handling; } }
-        public override Condition ToCondition(EditDataSet editSet, DataSet set)
+        public override ICondition ToCondition(EditDataSet editSet, DataSet set)
         {
             return new ConditionHandling();
         }
@@ -163,7 +163,7 @@ namespace Behaviors
         public override ConditionType type { get { return ConditionType.Rolling; } }
         [Slider, FloatRange(0.5f, 5.0f, 0.1f), Units("sec")]
         public float recheckAfter = 1.0f;
-        public override Condition ToCondition(EditDataSet editSet, DataSet set)
+        public override ICondition ToCondition(EditDataSet editSet, DataSet set)
         {
             return new ConditionRolling { repeatPeriodMs = (ushort)Mathf.RoundToInt(recheckAfter * 1000.0f) };
         }
@@ -189,7 +189,7 @@ namespace Behaviors
         : EditCondition
     {
         public override ConditionType type { get { return ConditionType.Crooked; } }
-        public override Condition ToCondition(EditDataSet editSet, DataSet set)
+        public override ICondition ToCondition(EditDataSet editSet, DataSet set)
         {
             return new ConditionCrooked();
         }
@@ -220,7 +220,7 @@ namespace Behaviors
         public int faceIndex;
 
         public override ConditionType type { get { return ConditionType.FaceCompare; } }
-        public override Condition ToCondition(EditDataSet editSet, DataSet set)
+        public override ICondition ToCondition(EditDataSet editSet, DataSet set)
         {
             return new ConditionFaceCompare()
             {
@@ -300,7 +300,7 @@ namespace Behaviors
         public ConditionHelloGoodbye_Flags flags;
 
         public override ConditionType type { get { return ConditionType.HelloGoodbye; } }
-        public override Condition ToCondition(EditDataSet editSet, DataSet set)
+        public override ICondition ToCondition(EditDataSet editSet, DataSet set)
         {
             return new ConditionHelloGoodbye()
             {
@@ -354,7 +354,7 @@ namespace Behaviors
         public ConditionConnectionState_Flags flags;
 
         public override ConditionType type { get { return ConditionType.ConnectionState; } }
-        public override Condition ToCondition(EditDataSet editSet, DataSet set)
+        public override ICondition ToCondition(EditDataSet editSet, DataSet set)
         {
             return new ConditionConnectionState()
             {
@@ -410,7 +410,7 @@ namespace Behaviors
         public float recheckAfter = 1.0f;
 
         public override ConditionType type { get { return ConditionType.BatteryState; } }
-        public override Condition ToCondition(EditDataSet editSet, DataSet set)
+        public override ICondition ToCondition(EditDataSet editSet, DataSet set)
         {
             return new ConditionBatteryState()
             {

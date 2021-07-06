@@ -17,7 +17,7 @@ namespace Behaviors
     {
         [JsonIgnore]
         public abstract ActionType type { get; }
-        public abstract Action ToAction(EditDataSet editSet, DataSet set);
+        public abstract IAction ToAction(EditDataSet editSet, DataSet set);
         public abstract EditAction Duplicate();
         public abstract bool IsSame(EditAction editAction); // Don't want to override Equals
 
@@ -123,7 +123,7 @@ namespace Behaviors
         public int loopCount = 1;
 
         public override ActionType type { get { return ActionType.PlayAnimation; } }
-        public override Action ToAction(EditDataSet editSet, DataSet set)
+        public override IAction ToAction(EditDataSet editSet, DataSet set)
         {
             return new ActionPlayAnimation()
             {
@@ -262,7 +262,7 @@ namespace Behaviors
         [Name("Audio Clip")]
         public AudioClips.EditAudioClip clip;
         public override ActionType type { get { return ActionType.PlayAudioClip; } }
-        public override Action ToAction(EditDataSet editSet, DataSet set)
+        public override IAction ToAction(EditDataSet editSet, DataSet set)
         {
             return new ActionPlayAudioClip()
             {

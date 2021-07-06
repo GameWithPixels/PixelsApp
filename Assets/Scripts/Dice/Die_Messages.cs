@@ -10,8 +10,7 @@ public partial class Die
     #region Message Infrastructure
     void AddMessageHandler(DieMessageType msgType, MessageReceivedDelegate newDel)
     {
-        MessageReceivedDelegate del;
-        if (messageDelegates.TryGetValue(msgType, out del))
+        if (messageDelegates.TryGetValue(msgType, out MessageReceivedDelegate del))
         {
             del += newDel;
             messageDelegates[msgType] = del;
@@ -24,8 +23,7 @@ public partial class Die
 
     void RemoveMessageHandler(DieMessageType msgType, MessageReceivedDelegate newDel)
     {
-        MessageReceivedDelegate del;
-        if (messageDelegates.TryGetValue(msgType, out del))
+        if (messageDelegates.TryGetValue(msgType, out MessageReceivedDelegate del))
         {
             del -= newDel;
             if (del == null)
@@ -40,7 +38,7 @@ public partial class Die
     }
 
     void PostMessage<T>(T message)
-        where T : DieMessage
+        where T : IDieMessage
     {
         Debug.Log($"Posting message of type {message.GetType()}");
 
@@ -48,15 +46,15 @@ public partial class Die
         DicePool.Instance.WriteDie(this, msgBytes, msgBytes.Length, null);
     }
 
-    IEnumerator WaitForMessageCr(DieMessageType msgType, System.Action<DieMessage> msgReceivedCallback)
+    IEnumerator WaitForMessageCr(DieMessageType msgType, System.Action<IDieMessage> msgReceivedCallback)
     {
         bool msgReceived = false; 
-        DieMessage msg = default(DieMessage);
-        MessageReceivedDelegate callback = (ackMsg) =>
+        IDieMessage msg = default;
+        void callback(IDieMessage ackMsg)
         {
             msgReceived = true;
             msg = ackMsg;
-        };
+        }
 
         AddMessageHandler(msgType, callback);
         yield return new WaitUntil(() => msgReceived);
@@ -67,17 +65,14 @@ public partial class Die
         }
     }
 
-    IEnumerator SendMessageWithAckOrTimeoutCr<T>(T message, DieMessageType ackType, float timeOut, System.Action<DieMessage> ackAction, System.Action timeoutAction, System.Action errorAction)
-        where T : DieMessage
+    IEnumerator SendMessageWithAckOrTimeoutCr<T>(T message, DieMessageType ackType, float timeOut, System.Action<IDieMessage> ackAction, System.Action timeoutAction)
+        where T : IDieMessage
     {
         Debug.Log($"Sending message with ack of type {message.GetType()}");
 
-        DieMessage ackMessage = null;
+        IDieMessage ackMessage = null;
         float startTime = Time.time;
-        MessageReceivedDelegate callback = (ackMsg) =>
-        {
-            ackMessage = ackMsg;
-        };
+        void callback(IDieMessage ackMsg) => ackMessage = ackMsg;
 
         AddMessageHandler(ackType, callback);
         byte[] msgBytes = DieMessages.ToByteArray(message);
@@ -87,6 +82,7 @@ public partial class Die
             yield return null;
         }
         RemoveMessageHandler(ackType, callback);
+
         if (ackMessage != null)
         {
             ackAction?.Invoke(ackMessage);
@@ -98,20 +94,21 @@ public partial class Die
         }
     }
 
-    IEnumerator SendMessageWithAckRetryCr<T>(T message, DieMessageType ackType, int retryCount, System.Action<DieMessage> ackAction, System.Action timeoutAction, System.Action errorAction)
-        where T : DieMessage
+    IEnumerator SendMessageWithAckRetryCr<T>(T message, DieMessageType ackType, int retryCount, System.Action<IDieMessage> ackAction, System.Action timeoutAction)
+        where T : IDieMessage
     {
         bool msgReceived = false;
-        System.Action<DieMessage> msgAction = (msg) =>
+        void msgAction(IDieMessage msg)
         {
             msgReceived = true;
             ackAction?.Invoke(msg);
-        };
+        }
+
         int count = 0;
         while (!msgReceived && count < retryCount)
         {
             // Retry every half second if necessary
-            yield return StartCoroutine(SendMessageWithAckOrTimeoutCr(message, ackType, 10.0f, msgAction, timeoutAction, errorAction));
+            yield return StartCoroutine(SendMessageWithAckOrTimeoutCr(message, ackType, 10.0f, msgAction, timeoutAction));
             count++;
         }
     }
@@ -199,7 +196,7 @@ public partial class Die
 
     IEnumerator GetDieInfoCr(System.Action<bool> callback)
     {
-        void updateDieInfo(DieMessage msg)
+        void updateDieInfo(IDieMessage msg)
         {
             var idMsg = (DieMessageIAmADie)msg;
 	        bool appearanceChanged = faceCount != idMsg.faceCount || designAndColor != idMsg.designAndColor;
@@ -218,7 +215,7 @@ public partial class Die
         }
 
         var whoAreYouMsg = new DieMessageWhoAreYou();
-        yield return StartCoroutine(SendMessageWithAckOrTimeoutCr(whoAreYouMsg, DieMessageType.IAmADie, 5, updateDieInfo, () => callback?.Invoke(false), () => callback?.Invoke(false)));
+        yield return StartCoroutine(SendMessageWithAckOrTimeoutCr(whoAreYouMsg, DieMessageType.IAmADie, 5, updateDieInfo, () => callback?.Invoke(false)));
     }
 
     public Coroutine RequestTelemetry(bool on)
@@ -273,14 +270,7 @@ public partial class Die
                 OnBatteryLevelChanged?.Invoke(this, lvlMsg.level, lvlMsg.charging != 0);
                 outLevelAction?.Invoke(this, lvlMsg.level);
             },
-            () =>
-            {
-                outLevelAction?.Invoke(this, null);
-            },
-            () =>
-            {
-                outLevelAction?.Invoke(this, null);
-            }));
+            () => outLevelAction?.Invoke(this, null)));
     }
 
     public Coroutine GetRssi(System.Action<Die, int?> outRssiAction)
@@ -301,14 +291,7 @@ public partial class Die
                 OnRssiChanged?.Invoke(this, rssiMsg.rssi);
                 outRssiAction?.Invoke(this, rssiMsg.rssi);
             },
-            () =>
-            {
-                outRssiAction?.Invoke(this, null);
-            },
-            () =>
-            {
-                outRssiAction?.Invoke(this, null);
-            }));
+            () => outRssiAction?.Invoke(this, null)));
     }
 
     public Coroutine SetCurrentDesignAndColor(DesignAndColor design, System.Action<bool> callback)
@@ -323,7 +306,6 @@ public partial class Die
                OnAppearanceChanged?.Invoke(this, faceCount, designAndColor);
                callback?.Invoke(true);
            },
-           () => callback?.Invoke(false),
            () => callback?.Invoke(false)));
     }
 
@@ -339,22 +321,22 @@ public partial class Die
             DieMessageType.SetNameAck,
             3,
             (ignore) => callback?.Invoke(true),
-            () => callback?.Invoke(false),
             () => callback?.Invoke(false)));
     }
 
     public Coroutine Flash(Color color, int count, System.Action<bool> callback)
     {
         Color32 color32 = color;
-        var msg = new DieMessageFlash();
-        msg.color = (uint)((color32.r << 16) + (color32.g << 8) + color32.b);
-        msg.flashCount = (byte)count;
+        var msg = new DieMessageFlash
+        {
+            color = (uint)((color32.r << 16) + (color32.g << 8) + color32.b),
+            flashCount = (byte)count,
+        };
         return StartCoroutine(SendMessageWithAckOrTimeoutCr(
             msg,
             DieMessageType.FlashFinished,
             3,
             (ignore) => callback?.Invoke(true),
-            () => callback?.Invoke(false),
             () => callback?.Invoke(false)));
     }
 
@@ -402,8 +384,7 @@ public partial class Die
     {
         for (int i = 0; i < 20; ++i)
         {
-            var msg = new DieMessagePrintNormals();
-            msg.face = (byte)i;
+            var msg = new DieMessagePrintNormals { face = (byte)i };
             PostMessage(msg);
             yield return new WaitForSeconds(0.5f);
         }
@@ -416,7 +397,8 @@ public partial class Die
 
 
     #region MessageHandlers
-    void OnStateMessage(DieMessage message)
+
+    void OnStateMessage(IDieMessage message)
     {
         // Handle the message
         var stateMsg = (DieMessageState)message;
@@ -434,7 +416,7 @@ public partial class Die
         }
     }
 
-    void OnTelemetryMessage(DieMessage message)
+    void OnTelemetryMessage(IDieMessage message)
     {
         // Don't bother doing anything with the message if we don't have
         // anybody interested in telemetry data.
@@ -446,14 +428,14 @@ public partial class Die
         }
     }
 
-    void OnDebugLogMessage(DieMessage message)
+    void OnDebugLogMessage(IDieMessage message)
     {
         var dlm = (DieMessageDebugLog)message;
         string text = System.Text.Encoding.UTF8.GetString(dlm.data, 0, dlm.data.Length);
         Debug.Log(name + ": " + text);
     }
 
-    void OnNotifyUserMessage(DieMessage message)
+    void OnNotifyUserMessage(IDieMessage message)
     {
         var notifyUserMsg = (DieMessageNotifyUser)message;
         bool ok = notifyUserMsg.ok != 0;
@@ -466,11 +448,12 @@ public partial class Die
         });
     }
 
-    void OnPlayAudioClip(DieMessage message)
+    void OnPlayAudioClip(IDieMessage message)
     {
         var playClipMessage = (DieMessagePlaySound)message;
         AudioClipManager.Instance.PlayAudioClip((uint)playClipMessage.clipId);
     }
+
     #endregion
 }
 }

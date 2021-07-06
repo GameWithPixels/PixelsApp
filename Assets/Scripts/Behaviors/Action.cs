@@ -22,7 +22,7 @@ namespace Behaviors
     /// Base interface for Actions. Stores the actual type so that we can cast the data
     /// to the proper derived type and access the parameters.
     /// </summary>
-    public interface Action
+    public interface IAction
     {
         ActionType type {get; set; }
     };
@@ -33,7 +33,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ActionPlayAnimation
-        : Action
+        : IAction
     {
         public ActionType type { get; set; } = ActionType.PlayAnimation;
         public byte animIndex;
@@ -48,7 +48,7 @@ namespace Behaviors
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ActionPlayAudioClip
-        : Action
+        : IAction
     {
         public ActionType type { get; set; } = ActionType.PlayAudioClip;
         public byte paddingType;

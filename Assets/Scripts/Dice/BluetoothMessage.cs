@@ -79,7 +79,7 @@ namespace Dice
         DebugAnimController,
     }
 
-    public interface DieMessage
+    public interface IDieMessage
     {
         DieMessageType type { get; set; }
     }
@@ -89,9 +89,9 @@ namespace Dice
         public const int maxDataSize = 100;
         public const int VERSION_INFO_SIZE = 6;
 
-        public static DieMessage FromByteArray(byte[] data)
+        public static IDieMessage FromByteArray(byte[] data)
         {
-            DieMessage ret = null;
+            IDieMessage ret = null;
             if (data.Length > 0)
             {
                 DieMessageType type = (DieMessageType)data[0];
@@ -261,14 +261,14 @@ namespace Dice
                         ret = FromByteArray<DieMessageDebugAnimController>(data);
                         break;
                     default:
-                        throw new System.Exception("Unhandled Message type " + type.ToString() + " for marshalling");
+                        throw new System.Exception("Unhandled DieMessage type " + type.ToString() + " for marshaling");
                 }
             }
             return ret;
         }
 
-        static DieMessage FromByteArray<T>(byte[] data)
-            where T : DieMessage
+        static IDieMessage FromByteArray<T>(byte[] data)
+            where T : IDieMessage
         {
             int size = Marshal.SizeOf<T>();
             if (data.Length == size)
@@ -288,7 +288,7 @@ namespace Dice
 
         // For virtual dice!
         public static byte[] ToByteArray<T>(T message)
-            where T : DieMessage
+            where T : IDieMessage
         {
             int size = Marshal.SizeOf(typeof(T));
             System.IntPtr ptr = Marshal.AllocHGlobal(size);
@@ -302,14 +302,14 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageWhoAreYou
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.WhoAreYou;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageIAmADie
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.IAmADie;
 
@@ -325,7 +325,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageState
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.State;
         public Die.RollState state;
@@ -334,7 +334,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageAcc
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.Telemetry;
 
@@ -343,7 +343,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageBulkSetup
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.BulkSetup;
         public short size;
@@ -351,14 +351,14 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageBulkSetupAck
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.BulkSetupAck;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageBulkData
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.BulkData;
         public byte size;
@@ -369,7 +369,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageBulkDataAck
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.BulkDataAck;
         public ushort offset;
@@ -377,7 +377,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTransferAnimSet
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TransferAnimSet;
         public ushort paletteSize;
@@ -396,7 +396,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTransferAnimSetAck
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TransferAnimSetAck;
         public byte result;
@@ -404,14 +404,14 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTransferAnimSetFinished
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TransferAnimSetFinished;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTransferTestAnimSet
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TransferTestAnimSet;
 
@@ -433,7 +433,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTransferTestAnimSetAck
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TransferTestAnimSetAck;
         public TransferTestAnimSetAckType ackType;
@@ -441,21 +441,21 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTransferTestAnimSetFinished
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TransferTestAnimSetFinished;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageRequestAnimSet
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.RequestAnimSet;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTransferSettings
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TransferSettings;
         public byte count;
@@ -464,21 +464,21 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTransferSettingsAck
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TransferSettingsAck;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTransferSettingsFinished
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TransferSettingsFinished;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageRequestSettings
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.RequestSettings;
     }
@@ -486,7 +486,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageRequestTelemetry
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.RequestTelemetry;
         public byte telemetry;
@@ -494,7 +494,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageDebugLog
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.DebugLog;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = DieMessages.maxDataSize)]
@@ -503,7 +503,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessagePlayAnim
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.PlayAnim;
         public byte index;
@@ -513,7 +513,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessagePlayAnimEvent
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.PlayAnimEvent;
         public byte evt;
@@ -523,7 +523,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageStopAnim
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.StopAnim;
         public byte index;
@@ -532,7 +532,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessagePlaySound
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.PlaySound;
         public ushort clipId;
@@ -540,7 +540,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageRequestState
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.RequestState;
     }
@@ -548,7 +548,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageProgramDefaultAnimSet
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.ProgramDefaultAnimSet;
         public uint color;
@@ -556,14 +556,14 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageProgramDefaultAnimSetFinished
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.ProgramDefaultAnimSetFinished;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageFlash
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.Flash;
         public byte flashCount;
@@ -573,14 +573,14 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageFlashFinished
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.FlashFinished;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageRequestDefaultAnimSetColor
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.RequestDefaultAnimSetColor;
     }
@@ -588,7 +588,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageDefaultAnimSetColor
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.DefaultAnimSetColor;
         public uint color;
@@ -596,7 +596,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTestBulkSend
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TestBulkSend;
     }
@@ -604,14 +604,14 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTestBulkReceive
-        : DieMessage
+        : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TestBulkReceive;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetAllLEDsToColor
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetAllLEDsToColor;
         public uint color;
@@ -619,7 +619,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageBatteryLevel
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.BatteryLevel;
 #if PLATFORM_ANDROID
@@ -633,14 +633,14 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageRequestBatteryLevel
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.RequestBatteryLevel;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageRssi
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.Rssi;
         public short rssi;
@@ -648,21 +648,21 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageRequestRssi
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.RequestRssi;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageCalibrate
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.Calibrate;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageCalibrateFace
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.CalibrateFace;
         public byte face;
@@ -670,7 +670,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageNotifyUser
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.NotifyUser;
         public byte timeout_s;
@@ -682,7 +682,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageNotifyUserAck
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.NotifyUserAck;
         public byte okCancel; // Boolean
@@ -690,56 +690,56 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageTestHardware
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.TestHardware;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetStandardState
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetStandardState;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetLEDAnimState
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetLEDAnimState;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetBattleState
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetBattleState;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageProgramDefaultParameters
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.ProgramDefaultParameters;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageProgramDefaultParametersFinished
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.ProgramDefaultParametersFinished;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageAttractMode
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.AttractMode;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessagePrintNormals
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.PrintNormals;
         public byte face;
@@ -747,7 +747,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetDesignAndColor
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetDesignAndColor;
         public DesignAndColor designAndColor;
@@ -755,14 +755,14 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetDesignAndColorAck
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetDesignAndColorAck;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetCurrentBehavior
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetCurrentBehavior;
         public byte currentBehaviorIndex;
@@ -770,14 +770,14 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetCurrentBehaviorAck
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetCurrentBehaviorAck;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetName
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetName;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
@@ -786,7 +786,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageSetNameAck
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.SetNameAck;
     }
@@ -794,7 +794,7 @@ namespace Dice
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class DieMessageDebugAnimController
-    : DieMessage
+    : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.DebugAnimController;
     }

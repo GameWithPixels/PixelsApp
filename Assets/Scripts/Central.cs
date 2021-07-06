@@ -154,7 +154,7 @@ public class Central : SingletonMonoBehaviour<Central>
         }
     }
 
-    Queue<Operation> operations = new Queue<Operation>();
+    readonly Queue<Operation> operations = new Queue<Operation>();
 
     /// <summary>
     /// Initiates a bluetooth scan
@@ -327,6 +327,8 @@ public class Central : SingletonMonoBehaviour<Central>
                 Debug.LogError("Die " + die.name + " in invalid state " + ddie.state);
                 return;
             }
+
+            Debug.Log($"Writing data of size = {length} ({bytes.Length}) with first byte = {bytes.FirstOrDefault()}");
 
             // Write the data!
             BluetoothLEHardwareInterface.WriteCharacteristic(die.address, serviceGUID, writeCharacteristic, bytes, length, false, null);

@@ -21,8 +21,7 @@ public partial class Die
 
         Debug.Log("Sending " + remainingSize + " bulk data");
         // Send setup message
-        var setup = new DieMessageBulkSetup();
-        setup.size = remainingSize;
+        var setup = new DieMessageBulkSetup { size = remainingSize };
         bool acknowledged = false;
         yield return StartCoroutine(SendMessageWithAckRetryCr(
             setup,
@@ -32,7 +31,6 @@ public partial class Die
             {
                 acknowledged = true;
             },
-            null,
             null));
 
         if (acknowledged)
@@ -43,10 +41,12 @@ public partial class Die
             ushort offset = 0;
             while (remainingSize > 0)
             {
-                var data = new DieMessageBulkData();
-                data.offset = offset;
-                data.size = (byte)Mathf.Min(remainingSize, DieMessages.maxDataSize);
-                data.data = new byte[DieMessages.maxDataSize];
+                var data = new DieMessageBulkData()
+                {
+                    offset = offset,
+                    size = (byte)Mathf.Min(remainingSize, DieMessages.maxDataSize),
+                    data = new byte[DieMessages.maxDataSize],
+                };
 
                 System.Array.Copy(bytes, offset, data.data, 0, data.size);
 
@@ -67,21 +67,14 @@ public partial class Die
                     data,
                     DieMessageType.BulkDataAck,
                     3,
-                    (ignore) =>
-                    {
-                        acknowledged = true;
-                    },
-                    null,
+                    (ignore) => acknowledged = true,
                     null));
 
                 if (acknowledged)
                 {
                     remainingSize -= data.size;
                     offset += data.size;
-                    if (uploadPctCallback != null)
-                    {
-                        uploadPctCallback((float)offset/bytes.Length);
-                    }
+                    uploadPctCallback?.Invoke((float)offset/bytes.Length);
                 }
                 else
                 {
@@ -122,24 +115,23 @@ public partial class Die
         ushort totalDataReceived = 0;
 
         // Setup bulk receive handler
-        MessageReceivedDelegate bulkReceived = (msg) =>
+        void bulkReceived(IDieMessage msg)
         {
             var bulkMsg = (DieMessageBulkData)msg;
             System.Array.Copy(bulkMsg.data, 0, buffer, bulkMsg.offset, bulkMsg.size);
 
             // Create acknowledge message now
-            var msgAck = new DieMessageBulkDataAck();
-            msgAck.offset = totalDataReceived;
+            var msgAck = new DieMessageBulkDataAck { offset = totalDataReceived };
 
             // Sum data receive before sending any other message
             totalDataReceived += bulkMsg.size;
 
             // Send acknowledgment (no need to do it synchronously)
             PostMessage(msgAck);
-        };
+        }
         AddMessageHandler(DieMessageType.BulkData, bulkReceived);
 
-        // Send acknowledgement to the die, so it may transfer bulk data immediately
+        // Send acknowledgment to the die, so it may transfer bulk data immediately
         PostMessage(new DieMessageBulkSetupAck());
 
         // Wait for all the bulk data to be received
@@ -162,19 +154,21 @@ public partial class Die
         try
         {
             // Prepare the die
-            var prepareDie = new DieMessageTransferAnimSet();
-            prepareDie.paletteSize = set.animationBits.getPaletteSize();;
-            prepareDie.rgbKeyFrameCount = set.animationBits.getRGBKeyframeCount();
-            prepareDie.rgbTrackCount = set.animationBits.getRGBTrackCount();
-            prepareDie.keyFrameCount = set.animationBits.getKeyframeCount();
-            prepareDie.trackCount = set.animationBits.getTrackCount();
-            prepareDie.animationCount = set.getAnimationCount();
-            prepareDie.animationSize = (ushort)set.animations.Sum((anim) => Marshal.SizeOf(anim.GetType()));
-            prepareDie.conditionCount = set.getConditionCount();
-            prepareDie.conditionSize = (ushort)set.conditions.Sum((cond) => Marshal.SizeOf(cond.GetType()));
-            prepareDie.actionCount = set.getActionCount();
-            prepareDie.actionSize = (ushort)set.actions.Sum((action) => Marshal.SizeOf(action.GetType()));
-            prepareDie.ruleCount = set.getRuleCount();
+            var prepareDie = new DieMessageTransferAnimSet
+            {
+                paletteSize = set.animationBits.getPaletteSize(),
+                rgbKeyFrameCount = set.animationBits.getRGBKeyframeCount(),
+                rgbTrackCount = set.animationBits.getRGBTrackCount(),
+                keyFrameCount = set.animationBits.getKeyframeCount(),
+                trackCount = set.animationBits.getTrackCount(),
+                animationCount = set.getAnimationCount(),
+                animationSize = (ushort)set.animations.Sum((anim) => Marshal.SizeOf(anim.GetType())),
+                conditionCount = set.getConditionCount(),
+                conditionSize = (ushort)set.conditions.Sum((cond) => Marshal.SizeOf(cond.GetType())),
+                actionCount = set.getActionCount(),
+                actionSize = (ushort)set.actions.Sum((action) => Marshal.SizeOf(action.GetType())),
+                ruleCount = set.getRuleCount(),
+            };
             //StringBuilder builder = new StringBuilder();
             //builder.AppendLine("Animation Data to be sent:");
             //builder.AppendLine("palette: " + prepareDie.paletteSize * Marshal.SizeOf<byte>());
@@ -195,8 +189,7 @@ public partial class Die
                 prepareDie,
                 DieMessageType.TransferAnimSetAck,
                 3.0f,
-                (msg) => acceptTransfer = (msg as DieMessageTransferAnimSetAck).result == 0 ? false : true,
-                null,
+                (msg) => acceptTransfer = (msg as DieMessageTransferAnimSetAck).result != 0,
                 null));
             if (acceptTransfer.HasValue)
             {
@@ -218,10 +211,7 @@ public partial class Die
                     Debug.Log("Die is ready to receive dataset, byte array should be: " + set.ComputeDataSetDataSize() + " bytes and hash 0x" + hash.ToString("X8"));
 
                     bool programmingFinished = false;
-                    MessageReceivedDelegate programmingFinishedCallback = (finishedMsg) =>
-                    {
-                        programmingFinished = true;
-                    };
+                    void programmingFinishedCallback(IDieMessage finishedMsg) => programmingFinished = true;
 
                     AddMessageHandler(DieMessageType.TransferAnimSetFinished, programmingFinishedCallback);
 
@@ -275,13 +265,15 @@ public partial class Die
             PixelsApp.Instance.ShowProgrammingBox("Uploading animation to " + name);
 
             // Prepare the die
-            var prepareDie = new DieMessageTransferTestAnimSet();
-            prepareDie.paletteSize = testAnimSet.animationBits.getPaletteSize();;
-            prepareDie.rgbKeyFrameCount = testAnimSet.animationBits.getRGBKeyframeCount();
-            prepareDie.rgbTrackCount = testAnimSet.animationBits.getRGBTrackCount();
-            prepareDie.keyFrameCount = testAnimSet.animationBits.getKeyframeCount();
-            prepareDie.trackCount = testAnimSet.animationBits.getTrackCount();
-            prepareDie.animationSize = (ushort)Marshal.SizeOf(testAnimSet.animations[0].GetType());
+            var prepareDie = new DieMessageTransferTestAnimSet
+            {
+                paletteSize = testAnimSet.animationBits.getPaletteSize(),
+                rgbKeyFrameCount = testAnimSet.animationBits.getRGBKeyframeCount(),
+                rgbTrackCount = testAnimSet.animationBits.getRGBTrackCount(),
+                keyFrameCount = testAnimSet.animationBits.getKeyframeCount(),
+                trackCount = testAnimSet.animationBits.getTrackCount(),
+                animationSize = (ushort)Marshal.SizeOf(testAnimSet.animations[0].GetType()),
+            };
 
             var setData = testAnimSet.ToTestAnimationByteArray();
             var hash = Utils.computeHash(setData);
@@ -299,7 +291,6 @@ public partial class Die
                 DieMessageType.TransferTestAnimSetAck,
                 3.0f,
                 (ack) => acknowledge = ((DieMessageTransferTestAnimSetAck)ack).ackType,
-                null,
                 null));
 
             switch (acknowledge)
@@ -309,10 +300,7 @@ public partial class Die
                         Debug.Log("Die is ready to receive test dataset, byte array should be: " + setData.Length + " bytes and hash 0x" + hash.ToString("X8"));
 
                         bool programmingFinished = false; 
-                        MessageReceivedDelegate programmingFinishedCallback = (finishedMsg) =>
-                        {
-                            programmingFinished = true;
-                        };
+                        void programmingFinishedCallback(IDieMessage finishedMsg) => programmingFinished = true;
 
                         AddMessageHandler(DieMessageType.TransferTestAnimSetFinished, programmingFinishedCallback);
 
