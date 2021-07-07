@@ -5,6 +5,8 @@ Please note that the Windows app is a rendering the UI as it would on a phone, i
 
 With this app you may create and preview LED's patterns, activate profiles and manage presets.
 
+Find our online guide [here](https://github.com/GameWithPixels/PixelsApp/wiki/Pixels-App-Guide).
+
 ## Patterns
 
 Lighting patterns let you customize how a dice will light up.
