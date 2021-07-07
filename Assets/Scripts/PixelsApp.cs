@@ -429,13 +429,13 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
     public void ImportPattern()
     {
-        static void FileSelected(string filePath)
+        static void FileSelected(string filePathname)
         {
-            if (!string.IsNullOrEmpty(filePath))
+            if (!string.IsNullOrEmpty(filePathname))
             {
-                Debug.Log("Selected JSON pattern file: " + filePath);
+                Debug.Log("Selected JSON pattern file: " + filePathname);
                 // Load the pattern from JSON
-                AppDataSet.Instance.ImportAnimation(filePath);
+                AppDataSet.Instance.ImportAnimation(filePathname);
             }
         }
 
@@ -463,7 +463,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         {
             if (!string.IsNullOrEmpty(filePathname))
             {
-                Debug.Log("Archiving logs");
+                Debug.Log("Exporting pattern " + animation.name);
                 // Save the pattern to JSON
                 AppDataSet.Instance.ExportAnimation(animation, filePathname);
                 onDone?.Invoke();
@@ -497,18 +497,124 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 #endif
     }
 
+    public void ImportUserData()
+    {
+        void FileSelected(string filePathname)
+        {
+            if (!string.IsNullOrEmpty(filePathname))
+            {
+                ShowDialogBox("Replace Settings?", "Presets, Lighting Patterns, LED Patterns and Profiles will be replaced. Imported Audio Clips will be kept.", "Yes", "No", res =>
+                {
+                    if (res)
+                    {
+                        ShowDialogBox("Last Chance!", "Replace settings?\nThe app will close when done.", "Yes", "No", res2 =>
+                        {
+                            if (res)
+                            {
+                                Debug.Log("Replacing user data with contents from file: " + filePathname);
+                                if (File.Exists(AppDataSet.Instance.pathname))
+                                {
+                                    File.Delete(AppDataSet.Instance.pathname);
+                                }
+                                File.Copy(filePathname, AppDataSet.Instance.pathname);
+                                Debug.LogWarning("Exiting!");
+                                Application.Quit();
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+#if UNITY_EDITOR
+        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select JSON settings", "", "json"));
+#elif UNITY_STANDALONE_WIN
+        // Set filters (optional)
+		// It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
+		// if all the dialogs will be using the same filters
+		FileBrowser.SetFilters( true, new FileBrowser.Filter( "JSON", ".json" ));
+
+		// Set default filter that is selected when the dialog is shown (optional)
+		// Returns true if the default filter is set successfully
+		// In this case, set Images filter as the default filter
+		FileBrowser.SetDefaultFilter( ".json" );
+        FileBrowser.ShowLoadDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Select JSON", "Select");
+#else
+        NativeFilePicker.PickFile(FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType("json") });
+#endif
+    }
+
+    public void ExportUserData()
+    {
+        static void FileSelected(string filePathname, System.Action onDone = null)
+        {
+            if (!string.IsNullOrEmpty(filePathname))
+            {
+                Debug.Log("Copying user data file to: " + filePathname);
+                if (File.Exists(filePathname))
+                {
+                    File.Delete(filePathname);
+                }
+                File.Copy(AppDataSet.Instance.pathname, filePathname);
+                onDone?.Invoke();
+            }
+        }
+
+#if UNITY_EDITOR
+        FileSelected(UnityEditor.EditorUtility.SaveFilePanel("Export settings", "", "PixelsSettingsBackup", "json"));
+#elif UNITY_STANDALONE_WIN
+        // Set filters (optional)
+        // It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
+        // if all the dialogs will be using the same filters
+        FileBrowser.SetFilters( true, new FileBrowser.Filter( "JSON", ".json" ));
+
+		// Set default filter that is selected when the dialog is shown (optional)
+		// Returns true if the default filter is set successfully
+		// In this case, set Images filter as the default filter
+		FileBrowser.SetDefaultFilter( ".json" );
+        FileBrowser.ShowSaveDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Save JSON", "Select");
+#else
+        string jsonPathname = Path.Combine(Application.persistentDataPath, "PixelsSettingsBackup.json");
+        FileSelected(jsonPathname, () =>
+            NativeFilePicker.ExportFile(jsonPathname, res =>
+            {
+                if (!res)
+                {
+                    Debug.LogError("Error exporting settings to JSON");
+                }
+                File.Delete(jsonPathname);
+            }));
+#endif
+    }
+
     public void RestoreDefaultSettings()
     {
         ShowDialogBox("Restore Default Settings?", "All imported Audio Clips and LED Patterns will be lost. Presets, Lighting Patterns and Profiles will be restored to the app defaults. All Dice pairing information will be removed.", "Yes", "No", res =>
         {
             if (res)
             {
-                ShowDialogBox("Last Chance!", "Restore default settings?\nNote: the app will close when done.", "Yes", "No", res2 =>
+                ShowDialogBox("Last Chance!", "Restore default settings?\nThe app will close when done.", "Yes", "No", res2 =>
                 {
                     if (res)
                     {
-                        AppSettings.Instance.DeleteData();
-                        AppDataSet.Instance.DeleteData();
+                        static void DeleteFile(string pathname)
+                        {
+                            if (File.Exists(pathname))
+                            {
+                                Debug.LogWarning("Deleting " + pathname);
+                                try
+                                {
+                                    File.Delete(pathname);
+                                }
+                                catch (System.Exception e)
+                                {
+                                    Debug.LogException(e);
+                                }
+                            }
+                        }
+
+                        DeleteFile(AppSettings.Instance.pathname);
+                        DeleteFile(AppDataSet.Instance.pathname);
                         AudioClipManager.Instance.DeleteAllUserClipFiles();
                         Debug.LogWarning("Exiting!");
                         Application.Quit();
@@ -521,7 +627,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
     public void ExportLogFiles()
     {
 
-        void FileSelected(string filePathname, System.Action onDone = null)
+        static void FileSelected(string filePathname, System.Action onDone = null)
         {
             if (!string.IsNullOrEmpty(filePathname))
             {
@@ -537,8 +643,8 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                     CustomLogger.Instance.Suspend(_ =>
                     {
                         Debug.Log("Archiving logs");
-                    // Archive all logs in zip file
-                    System.IO.Compression.ZipFile.CreateFromDirectory(CustomLogger.LogsDirectory, filePathname);
+                        // Archive all logs in zip file
+                        System.IO.Compression.ZipFile.CreateFromDirectory(CustomLogger.LogsDirectory, filePathname);
                     });
                     onDone?.Invoke();
                 }

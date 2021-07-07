@@ -40,11 +40,14 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             animations.Clear();
             behaviors.Clear();
             presets.Clear();
+            defaultBehavior = null;
+            nextAudioClipUniqueId = 0;
         }
     }
 
-    Data data = new Data();
-    string pathname => Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
+    readonly Data data = new Data();
+    
+    public string pathname => Path.Combine(Application.persistentDataPath, AppConstants.Instance.DataSetFilename);
 
     public List<EditDie> dice => data.dice;
     public List<EditAudioClip> audioClips => data.audioClips;
@@ -94,8 +97,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
         foreach (var pattern in patterns)
         {
-            bool asRGB = false;
-            if (animation.DependsOnPattern(pattern, out asRGB))
+            if (animation.DependsOnPattern(pattern, out bool asRGB))
             {
                 if (asRGB)
                 {
@@ -406,22 +408,6 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
         stopWatch.Stop();
         Debug.Log($"AppDataSet: it took {stopWatch.Elapsed.TotalMilliseconds} ms to serialize data to JSON file");
-    }
-
-    public void DeleteData()
-    {
-        if (File.Exists(pathname))
-        {
-            Debug.LogWarning("AppDataSet: deleting user's file");
-            try
-            {
-                File.Delete(pathname);
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
     }
 
     public void ExportAnimation(EditAnimation animation, string jsonFilePath)

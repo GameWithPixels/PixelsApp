@@ -20,6 +20,8 @@ public class UIMainMenu : MonoBehaviour
     public Button importPatternButton;
     public Button restoreSettingsButton;
     public Button exportLogsButton;
+    public Button exportSettingsButton;
+    public Button importSettingsButton;
 
     [Header("Text")]
     public Text versionText;
@@ -50,6 +52,8 @@ public class UIMainMenu : MonoBehaviour
         importPatternButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.ImportPattern(); });
         restoreSettingsButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.RestoreDefaultSettings(); });
         exportLogsButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.ExportLogFiles(); });
+        exportSettingsButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.ExportUserData(); });
+        importSettingsButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.ImportUserData(); });
     }
 
     public void Show()

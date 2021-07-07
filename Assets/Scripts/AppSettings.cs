@@ -24,9 +24,10 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
         public bool animationsTutorialEnabled = false;
         public bool animationTutorialEnabled = false;
     }
-    Data data = new Data();
+    
+    readonly Data data = new Data();
 
-    string pathname => Path.Combine(Application.persistentDataPath, AppConstants.Instance.SettingsFilename);
+    public string pathname => Path.Combine(Application.persistentDataPath, AppConstants.Instance.SettingsFilename);
 
     public bool displayWhatsNew => data.displayWhatsNew;
     public bool mainTutorialEnabled => data.mainTutorialEnabled;
@@ -173,22 +174,6 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
         {
             writer.Formatting = Formatting.Indented;
             ToJson(writer, serializer);
-        }
-    }
-
-    public void DeleteData()
-    {
-        if (File.Exists(pathname))
-        {
-            Debug.LogWarning("Deleting app settings");
-            try
-            {
-                File.Delete(pathname);
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogException(e);
-            }
         }
     }
 }
