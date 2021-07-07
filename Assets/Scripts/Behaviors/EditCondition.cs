@@ -260,9 +260,12 @@ namespace Behaviors
                     builder.Append("less");
                     if ((flags & ConditionFaceCompare_Flags.Equal) != 0)
                     {
-                        builder.Append(" or equal");
+                        builder.Append(" or equal to ");
                     }
-                    builder.Append(" to ");
+                    else
+                    {
+                        builder.Append(" than ");
+                    }
                     builder.Append(faceIndex + 1);
                 }
                 else if ((flags & ConditionFaceCompare_Flags.Greater) != 0)
@@ -270,9 +273,12 @@ namespace Behaviors
                     builder.Append("greater");
                     if ((flags & ConditionFaceCompare_Flags.Equal) != 0)
                     {
-                        builder.Append(" or equal");
+                        builder.Append(" or equal to ");
                     }
-                    builder.Append(" to ");
+                    else
+                    {
+                        builder.Append(" than ");
+                    }
                     builder.Append(faceIndex + 1);
                 }
                 else if (flags == ConditionFaceCompare_Flags.Equal)
