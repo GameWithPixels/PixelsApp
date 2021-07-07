@@ -9577,7 +9577,6 @@ GameObject:
   - component: {fileID: 530059461}
   - component: {fileID: 530059460}
   - component: {fileID: 530059463}
-  - component: {fileID: 530059462}
   m_Layer: 5
   m_Name: Feature 1
   m_TagString: Untagged
@@ -9646,20 +9645,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 530059458}
   m_CullTransparentMesh: 0
---- !u!114 &530059462
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 530059458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8bf537038a04484c94da5e2a85aceb6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  button: {fileID: 530059463}
-  url: https://gamewithpixels.com/start
 --- !u!114 &530059463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37273,6 +37258,7 @@ GameObject:
   - component: {fileID: 2128317200}
   - component: {fileID: 2128317199}
   - component: {fileID: 2128317198}
+  - component: {fileID: 2128317201}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -37307,7 +37293,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2128317196}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -37382,6 +37368,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2128317196}
   m_CullTransparentMesh: 1
+--- !u!114 &2128317201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128317196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8bf537038a04484c94da5e2a85aceb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  url: https://gamewithpixels.com/start
 --- !u!1 &2128976631
 GameObject:
   m_ObjectHideFlags: 0
