@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using AudioClips;
 
 public class UIAudioClipPicker : MonoBehaviour
 {
@@ -113,7 +112,9 @@ public class UIAudioClipPicker : MonoBehaviour
 
     void PlayClip(AudioClipManager.AudioClipInfo clip)
     {
+        // Stop any playing clip so they don't overlap
+        audioSource.Stop();
+        // Play given clip
         audioSource.PlayOneShot(clip.clip);
     }
-
 }

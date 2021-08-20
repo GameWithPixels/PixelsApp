@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using AudioClips;
-using SimpleFileBrowser;
 using System.Linq;
 using System.Text;
 
@@ -209,6 +207,9 @@ public class UIAudioClipsView
 
     void PlayClip(AudioClipManager.AudioClipInfo clip)
     {
+        // Stop any playing clip so they don't overlap
+        audioSource.Stop();
+        // Play given clip
         audioSource.PlayOneShot(clip.clip);
     }
 }
