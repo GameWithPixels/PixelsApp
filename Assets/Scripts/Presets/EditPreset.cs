@@ -70,16 +70,12 @@ namespace Presets
 
         public EditPreset Duplicate()
         {
-            var ret = new EditPreset();
-            ret.name = name;
-            ret.description = description;
-            ret.dieAssignments = new List<EditDieAssignment>();
-            foreach (var a in dieAssignments)
+            return new EditPreset
             {
-                var behaviorCopy = AppDataSet.Instance.DuplicateBehavior(a.behavior);
-                ret.dieAssignments.Add(new EditDieAssignment() { die = a.die, behavior = behaviorCopy });
-            }
-            return ret;
+                name = name,
+                description = description,
+                dieAssignments = dieAssignments.Select(a => new EditDieAssignment { die = a.die, behavior = a.behavior }).ToList()
+            };
         }
 
         public void DeleteBehavior(Behaviors.EditBehavior behavior)
