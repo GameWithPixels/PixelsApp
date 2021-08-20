@@ -335,7 +335,7 @@ public class DicePool : SingletonMonoBehaviour<DicePool>
     /// </sumary>
     void OnDieAdvertisingData(Central.IDie die, int rssi, byte[] data)
     {
-        // Find the die by its address, in both lists of dice we expect to know and new dice
+        // Find the die by its address, in both lists of dice we expect to know any new dice
         var ourDie = dice.FirstOrDefault(d => d.die.address == die.address);
         if (ourDie != null)
         {

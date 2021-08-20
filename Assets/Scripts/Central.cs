@@ -350,6 +350,7 @@ public class Central : SingletonMonoBehaviour<Central>
 
     void Start()
     {
+        state = State.Initializing;
 #if !UNITY_EDITOR_OSX
         BluetoothLEHardwareInterface.Initialize(true, false, OnBluetoothInitComplete, OnError);
 #else
