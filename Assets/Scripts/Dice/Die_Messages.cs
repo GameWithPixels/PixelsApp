@@ -205,8 +205,8 @@ public partial class Die
 	        deviceId = idMsg.deviceId;
             dataSetHash = idMsg.dataSetHash;
             flashSize = idMsg.flashSize;
-            firmwareVersionId = System.Text.Encoding.UTF8.GetString(idMsg.versionInfo, 0, DieMessages.VERSION_INFO_SIZE);
-            Debug.Log("Die " + name + " has " + flashSize + " bytes available for data, current dataset hash " + dataSetHash.ToString("X08"));
+            firmwareVersionId = idMsg.versionInfo;
+            Debug.Log($"Die {name} has {flashSize} bytes available for data, current dataset hash {dataSetHash:X08}, firmware version is {firmwareVersionId}");
             if (appearanceChanged)
             {
                 OnAppearanceChanged?.Invoke(this, faceCount, designAndColor);

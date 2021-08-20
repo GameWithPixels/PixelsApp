@@ -87,7 +87,6 @@ namespace Dice
     public static class DieMessages
     {
         public const int maxDataSize = 100;
-        public const int VERSION_INFO_SIZE = 6;
 
         public static IDieMessage FromByteArray(byte[] data)
         {
@@ -104,7 +103,30 @@ namespace Dice
                         ret = FromByteArray<DieMessageWhoAreYou>(data);
                         break;
                     case DieMessageType.IAmADie:
-                        ret = FromByteArray<DieMessageIAmADie>(data);
+                        {
+                            var baseData = new byte[Marshal.SizeOf<DieMessageIAmADieMarshalledData>()];
+                            if (data.Length > baseData.Length)
+                            {
+                                System.Array.Copy(data, baseData, baseData.Length);
+                                var baseMsg = FromByteArray<DieMessageIAmADieMarshalledData>(baseData);
+                                if (baseMsg != null)
+                                {
+                                    var strData = new byte[data.Length - baseData.Length - 1]; // It's ok if size is zero
+                                    System.Array.Copy(data, baseData.Length, strData, 0, strData.Length);
+                                    var str = Encoding.UTF8.GetString(strData);
+                                    ret = new DieMessageIAmADie
+                                    {
+                                        faceCount = baseMsg.faceCount,
+                                        designAndColor = baseMsg.designAndColor,
+                                        padding = baseMsg.padding,
+                                        dataSetHash = baseMsg.dataSetHash,
+                                        deviceId = baseMsg.deviceId,
+                                        flashSize = baseMsg.flashSize,
+                                        versionInfo = str,
+                                    };
+                                }
+                            }
+                        }
                         break;
                     case DieMessageType.Telemetry:
                         ret = FromByteArray<DieMessageAcc>(data);
@@ -267,17 +289,22 @@ namespace Dice
             return ret;
         }
 
-        static IDieMessage FromByteArray<T>(byte[] data)
-            where T : IDieMessage
+        static T FromByteArray<T>(byte[] data)
+            where T : class, IDieMessage
         {
             int size = Marshal.SizeOf<T>();
             if (data.Length == size)
             {
                 System.IntPtr ptr = Marshal.AllocHGlobal(size);
-                Marshal.Copy(data, 0, ptr, size);
-                var retMessage = (T)Marshal.PtrToStructure(ptr, typeof(T));
-                Marshal.FreeHGlobal(ptr);
-                return retMessage;
+                try
+                {
+                    Marshal.Copy(data, 0, ptr, size);
+                    return (T)Marshal.PtrToStructure(ptr, typeof(T));
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(ptr);
+                }
             }
             else
             {
@@ -308,7 +335,7 @@ namespace Dice
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class DieMessageIAmADie
+    public class DieMessageIAmADieMarshalledData
         : IDieMessage
     {
         public DieMessageType type { get; set; } = DieMessageType.IAmADie;
@@ -319,8 +346,12 @@ namespace Dice
         public uint dataSetHash;
         public uint deviceId; // A unique identifier
         public ushort flashSize;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = DieMessages.VERSION_INFO_SIZE)]
-        public byte[] versionInfo; // Firmware version string, i.e. "10_05"
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class DieMessageIAmADie : DieMessageIAmADieMarshalledData
+    {
+        public string versionInfo; // Firmware version string, i.e. "10_05_21", variable size
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
