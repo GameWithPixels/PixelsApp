@@ -246,14 +246,20 @@ public class UIBehaviorView
 
     void SetName(string newName)
     {
-        editBehavior.name = newName;
-        pageDirty = true;
+        if (editBehavior.name != newName)
+        {
+            editBehavior.name = newName;
+            pageDirty = true;
+        }
     }
 
     void SetDescription(string newDescription)
     {
-        editBehavior.description = newDescription;
-        pageDirty = true;
+        if (editBehavior.description != newDescription)
+        {
+            editBehavior.description = newDescription;
+            pageDirty = true;
+        }
     }
 
     void ActivateBehavior()

@@ -193,13 +193,19 @@ public class UIPresetView : UIPage
 
     void SetName(string newName)
     {
-        editPreset.name = newName;
-        base.pageDirty = true;
+        if (editPreset.name != newName)
+        {
+            editPreset.name = newName;
+            base.pageDirty = true;
+        }
     }
 
     void SetDescription(string newDescription)
     {
-        editPreset.description = newDescription;
-        base.pageDirty = true;
+        if (editPreset.description != newDescription)
+        {
+            editPreset.description = newDescription;
+            base.pageDirty = true;
+        }
     }
 }
