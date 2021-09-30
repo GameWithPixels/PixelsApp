@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Animations;
+using Systemic.Unity.Pixels.Animations;
 
 public class UIGradientEditor : MonoBehaviour
 {

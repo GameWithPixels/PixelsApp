@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using Systemic.Unity.Pixels.Profiles;
 
 public class UIRuleConditionToken : MonoBehaviour
 {
@@ -10,12 +11,12 @@ public class UIRuleConditionToken : MonoBehaviour
     public UIParameterEnum conditionSelector;
     public RectTransform parametersRoot;
 
-    public Behaviors.EditRule parentRule { get; private set; }
-    public Behaviors.EditCondition editCondition { get; private set; }
+    public EditRule parentRule { get; private set; }
+    public EditCondition editCondition { get; private set; }
 
     UIParameterManager.ObjectParameterList parameters;
 
-    public delegate void ConditionChangedEvent(Behaviors.EditRule rule, Behaviors.EditCondition condition);
+    public delegate void ConditionChangedEvent(EditRule rule, EditCondition condition);
     public ConditionChangedEvent onConditionChanged;
 
     void OnDestroy()
@@ -28,14 +29,14 @@ public class UIRuleConditionToken : MonoBehaviour
         parameters = null;
     }
 
-    public void Setup(Behaviors.EditRule rule, Behaviors.EditCondition condition)
+    public void Setup(EditRule rule, EditCondition condition)
     {
         parentRule = rule;
         editCondition = condition;
         conditionSelector.Setup(
             "Condition Type",
             () => editCondition.type,
-            (t) => SetConditionType((Behaviors.ConditionType)t),
+            (t) => SetConditionType((ConditionType)t),
             null);
 
         // Setup all other parameters
@@ -43,14 +44,14 @@ public class UIRuleConditionToken : MonoBehaviour
         parameters.onParameterChanged += OnConditionChanged;
     }
 
-    void SetConditionType(Behaviors.ConditionType newType)
+    void SetConditionType(ConditionType newType)
     {
         if (newType != editCondition.type)
         {
             onConditionChanged?.Invoke(parentRule, editCondition);
 
             // Change the type, which really means create a new condition and replace the old one
-            var newCondition = Behaviors.EditCondition.Create(newType);
+            var newCondition = EditCondition.Create(newType);
 
             // Replace the condition
             parentRule.condition = newCondition;

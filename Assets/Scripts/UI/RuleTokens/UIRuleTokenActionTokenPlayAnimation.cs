@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Behaviors;
+using Systemic.Unity.Pixels.Profiles;
 using Dice;
+using Systemic.Unity.Pixels;
 
 public class UIRuleTokenActionTokenPlayAnimation
     : UIRuleTokenActionToken
@@ -44,7 +45,7 @@ public class UIRuleTokenActionTokenPlayAnimation
 
         if (dieRenderer == null)
         {
-            var design = DesignAndColor.V5_Grey;
+            var design = PixelDesignAndColor.V5_Grey;
             if (playAnimAction.animation != null)
             {
                 design = playAnimAction.animation.defaultPreviewSettings.design;

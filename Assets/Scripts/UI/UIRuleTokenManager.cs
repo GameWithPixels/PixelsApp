@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Behaviors;
+using Systemic.Unity.Pixels.Profiles;
 
 public class UIRuleTokenManager : SingletonMonoBehaviour<UIRuleTokenManager>
 {

@@ -1,0 +1,103 @@
+/**
+ * @file
+ * @brief Definition of SGBleConnectionEvent and SGBleConnectionEventReason enumerations.
+ */
+
+/**
+ * @defgroup Apple_Objective-C
+ * @brief A collection of Objective-C classes that provides a simplified access to
+ *        Bluetooth Low Energy peripherals.
+ *
+ * @note Some knowledge with Bluetooth Low Energy semantics is recommended for reading
+ *       this documentation.
+ *
+ * The Systemic BluetoohLE library for Apple devices provides classes for scanning
+ * Bluetooth Low Energy (BLE) peripherals, connecting to and communicating with them.
+ * Those classes are based on the Apple's Core Bluetooth framework.
+ * 
+ * The SGBleCentralManagerDelegate class implements the Apple
+ * <a href="https://developer.apple.com/documentation/corebluetooth/cbcentralmanagerdelegate">
+ * CBCentralManagerDelegate</a> protocol.
+ * It stores and notifies of discovered BLE peripherals, also notifies of peripherals
+ * connection events and of the host device Bluetooth radio state changes.
+ * 
+ * The SGBlePeripheralQueue class implements the Apple
+ * <a href="https://developer.apple.com/documentation/corebluetooth/cbperipheraldelegate">
+ * CBPeripheralDelegate</a> protocol.
+ * It queues BLE operations to be performed with a BLE
+ * <a href="https://developer.apple.com/documentation/corebluetooth/cbperipheral">
+ * peripheral</a>, run them sequentially and notify of their outcome.
+ * The next request is run one the current one completes (whether successfully or not).
+ *
+ * This library also includes a set of C functions to be called from Unity for acessing
+ * Bluetooth devices.
+ *
+ * @image html native-apple.svg "Classes diagram"
+ */
+
+#import <Foundation/Foundation.h>
+
+/**
+ * @brief Peripheral connection events.
+ * @ingroup Apple_Objective-C
+ */
+typedef NS_ENUM(NSInteger, SGBleConnectionEvent)
+{
+    /// Raised at the beginning of the connect sequence and is followed either by Connected or FailedToConnect.
+    SGBleConnectionEventConnecting,
+
+    /// Raised once the peripheral is connected, just before services are being discovered.
+    SGBleConnectionEventConnected,
+
+    /// Raised when the peripheral fails to connect, the reason of failure is also given.
+    SGBleConnectionEventFailedToConnect,
+
+    /// Raised after a Connected event, once the required services have been discovered.
+    SGBleConnectionEventReady,
+
+    /// Raised at the beginning of a user initiated disconnect.
+    SGBleConnectionEventDisconnecting,
+
+    /// Raised when the peripheral is disconnected, the reason for the disconnection is also given.
+    SGBleConnectionEventDisconnected,
+};
+
+/**
+ * @brief Peripheral connection events reasons.
+ * @ingroup Apple_Objective-C
+ */
+typedef NS_ENUM(NSInteger, SGBleConnectionEventReason)
+{
+    /// The disconnect happened for an unknown reason.
+    SGBleConnectionEventReasonUnknown = -1,
+
+    /// The disconnect was initiated by user.
+    SGBleConnectionEventReasonSuccess = 0,
+
+    /// Connection attempt canceled by user.
+    SGBleConnectionEventReasonCanceled,
+
+    /// Peripheral doesn't have all required services.
+    SGBleConnectionEventReasonNotSupported,
+
+    /// Peripheral didn't responded in time.
+    SGBleConnectionEventReasonTimeout,
+
+    /// Peripheral was disconnected while in "auto connect" mode.
+    SGBleConnectionEventReasonLinkLoss,
+
+    /// The local device Bluetooth adapter is off.
+    SGBleConnectionEventReasonAdapterOff,
+};
+
+/**
+ * @brief Peripheral discovery handler.
+ * @ingroup Apple_Objective-C
+ */
+typedef void (^SGBlePeripheralDiscoveryHandler)(CBPeripheral *peripheral, NSDictionary<NSString *,id> *advertisementData, NSNumber *RSSI);
+
+/**
+ * @brief Peripheral connection event handler.
+ * @ingroup Apple_Objective-C
+ */
+typedef void (^SGBleConnectionEventHandler)(CBPeripheral *peripheral, SGBleConnectionEvent connectionEvent, NSError *error);

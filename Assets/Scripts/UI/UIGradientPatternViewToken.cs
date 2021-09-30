@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Animations;
+using Systemic.Unity.Pixels.Animations;
 using System.Linq;
+using Systemic.Unity.Pixels;
 
 public class UIGradientPatternViewToken : MonoBehaviour
 {
@@ -45,7 +46,7 @@ public class UIGradientPatternViewToken : MonoBehaviour
     public void Setup(EditPattern pattern)
     {
         editPattern = pattern;
-        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(Dice.DesignAndColor.V5_Black);
+        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(PixelDesignAndColor.V5_Black);
         if (dieRenderer != null)
         {
             animRenderImage.texture = dieRenderer.renderTexture;

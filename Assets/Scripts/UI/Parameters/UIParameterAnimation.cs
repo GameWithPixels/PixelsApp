@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Animations;
+using Systemic.Unity.Pixels.Animations;
 using Dice;
+using Systemic.Unity.Pixels;
 
 public class UIParameterAnimation
     : UIParameter
@@ -18,7 +19,7 @@ public class UIParameterAnimation
 
     public override bool CanEdit(System.Type parameterType, IEnumerable<object> attributes = null)
     {
-        return parameterType == typeof(Animations.EditAnimation);
+        return parameterType == typeof(EditAnimation);
     }
 
     void OnDestroy()
@@ -37,7 +38,7 @@ public class UIParameterAnimation
         // Set name
         nameText.text = name;
 
-        var design = DesignAndColor.V5_Grey;
+        var design = PixelDesignAndColor.V5_Grey;
         if (initialAnim != null)
         {
             design = initialAnim.defaultPreviewSettings.design;

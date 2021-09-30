@@ -1,9 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Systemic.Unity.Pixels;
 using UnityEngine;
-using UnityEngine.UI;
-using System.Text;
-using System.Linq;
 
 public class UILiveView
     : UIPage
@@ -15,23 +13,22 @@ public class UILiveView
     public UILiveDieEntry dieEntryPrefab;
 
     // The list of entries we have created to display behaviors
-    List<UILiveDieEntry> entries = new List<UILiveDieEntry>();
+    readonly List<UILiveDieEntry> entries = new List<UILiveDieEntry>();
 
     // Dice list
-    List<Dice.EditDie> watchedDice = new List<Dice.EditDie>();
+    readonly List<Pixel> watchedDice = new List<Pixel>();
 
     public override void Enter(object context)
     {
         base.Enter(context);
         watchedDice.Clear();
-        watchedDice.AddRange(DiceManager.Instance.allDice);
-        DiceManager.Instance.ConnectDiceList(watchedDice, null);
+        PixelsApp.Instance.ConnectAllDice(gameObject, editDie => watchedDice.Add(editDie.die));
     }
 
     public override void Leave()
     {
         base.Leave();
-        watchedDice.ForEach(d => DiceManager.Instance.DisconnectDie(d, null));
+        watchedDice.ForEach(d => DiceBag.Instance.DisconnectPixel(d));
         watchedDice.Clear();
     }
 
@@ -52,13 +49,13 @@ public class UILiveView
         }
     }
 
-    UILiveDieEntry CreateEntry(Dice.EditDie die, int roll)
+    UILiveDieEntry CreateEntry(EditDie die, int roll)
     {
         // Create the gameObject
         var ret = GameObject.Instantiate<UILiveDieEntry>(dieEntryPrefab, Vector3.zero, Quaternion.identity, contentRoot.transform);
 
         // Initialize it
-        ret.Setup(die, roll, Time.time);
+        ret.Setup(die, roll);
         return ret;
     }
 

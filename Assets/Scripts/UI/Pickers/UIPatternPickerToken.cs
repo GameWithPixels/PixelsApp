@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Systemic.Unity.Pixels;
 using UnityEngine;
 using UnityEngine.UI;
-using Animations;
 
 public class UIPatternPickerToken : MonoBehaviour
 {
@@ -22,7 +20,7 @@ public class UIPatternPickerToken : MonoBehaviour
     public void Setup(EditPattern pattern)
     {
         this.editPattern = pattern;
-        this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(Dice.DesignAndColor.V5_Black);
+        this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(PixelDesignAndColor.V5_Black);
         if (dieRenderer != null)
         {
             animRenderImage.texture = dieRenderer.renderTexture;

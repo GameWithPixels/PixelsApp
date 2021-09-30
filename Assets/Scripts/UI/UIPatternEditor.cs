@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Animations;
+using Systemic.Unity.Pixels.Animations;
 using System.IO;
 using SimpleFileBrowser;
+using Systemic.Unity.Pixels;
 
 public class UIPatternEditor : MonoBehaviour
 {
@@ -40,7 +41,7 @@ public class UIPatternEditor : MonoBehaviour
             ForceHide();
         }
 
-        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(Dice.DesignAndColor.V5_Black);
+        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(PixelDesignAndColor.V5_Black);
         if (dieRenderer != null)
         {
             diePreviewImage.texture = dieRenderer.renderTexture;

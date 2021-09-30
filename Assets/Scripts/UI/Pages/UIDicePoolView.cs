@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using Dice;
+using Systemic.Unity.Pixels;
 
 public class UIDicePoolView
     : UIPage
@@ -48,7 +49,7 @@ public class UIDicePoolView
         }
         foreach (var editDie in connectedDice)
         {
-            DiceManager.Instance.DisconnectDie(editDie, null);
+            DiceBag.Instance.DisconnectPixel(editDie.die);
         }
         connectedDice.Clear();
     }
@@ -57,17 +58,16 @@ public class UIDicePoolView
     {
         base.SetupHeader(true, false, "Dice Bag", null);
         RefreshView();
-        DiceManager.Instance.onDieAdded += OnDieAdded;
-        DiceManager.Instance.onWillRemoveDie += OnWillRemoveDie;
+
+        PixelsApp.Instance.onDieAdded += OnDieAdded;
+        PixelsApp.Instance.onWillRemoveDie += OnWillRemoveDie;
     }
 
     void OnDisable()
     {
-        if (DiceManager.Instance != null)
-        {
-            DiceManager.Instance.onDieAdded -= OnDieAdded;
-            DiceManager.Instance.onWillRemoveDie -= OnWillRemoveDie;
-        }
+        PixelsApp.Instance.onDieAdded -= OnDieAdded;
+        PixelsApp.Instance.onWillRemoveDie -= OnWillRemoveDie;
+
         foreach (var uidie in pairedDice)
         {
             DestroyPairedDie(uidie);
@@ -95,18 +95,17 @@ public class UIDicePoolView
         NavigationManager.Instance.GoToPage(UIPage.PageId.DicePoolScanning, null);
     }
 
-
     void RefreshView()
     {
         // Assume all pool dice will be destroyed
         var toDestroy = new List<UIPairedDieToken>(pairedDice);
-        foreach (var die in DiceManager.Instance.allDice)
+        foreach (var editDie in AppDataSet.Instance.dice)
         {
-            int prevIndex = toDestroy.FindIndex(uid => uid.die == die);
+            int prevIndex = toDestroy.FindIndex(uid => uid.die == editDie);
             if (prevIndex == -1)
             {
                 // New scanned die
-                var newUIDie = CreatePairedDie(die);
+                var newUIDie = CreatePairedDie(editDie);
                 pairedDice.Add(newUIDie);
             }
             else
@@ -129,7 +128,7 @@ public class UIDicePoolView
         if (!connectedDice.Contains(editDie))
         {
             connectedDice.Add(editDie);
-            DiceManager.Instance.ConnectDie(editDie, null);
+            PixelsApp.Instance.ConnectDie(editDie, gameObject);
         }
         RefreshView();
     }
@@ -152,24 +151,11 @@ public class UIDicePoolView
 
     IEnumerator ConnectAllDice()
     {
-        DicePool.Instance.ResetDiceErrors();
-        var allDiceCopy = new List<EditDie>();
         try
         {
             OnBeginRefreshPool();
-            allDiceCopy.Clear();
-            allDiceCopy.AddRange(DiceManager.Instance.allDice.Where(d => d.die == null || d.die.connectionState == Die.ConnectionState.Available));
-            bool connected = false;
-            DiceManager.Instance.ConnectDiceList(allDiceCopy, () => connected = true);
-            yield return new WaitUntil(() => connected);
-            foreach (var editDie in allDiceCopy)
-            {
-                if (editDie.die != null && editDie.die.connectionState == Die.ConnectionState.Ready)
-                {
-                    connectedDice.Add(editDie);
-                    RefreshView();
-                }
-            }
+            yield return PixelsApp.Instance.ConnectAllDice(gameObject, editDie => connectedDice.Add(editDie));
+            RefreshView();
         }
         finally
         {

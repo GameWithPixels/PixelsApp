@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using System.Text;
+#if UNITY_STANDALONE_WIN
+using SimpleFileBrowser;
+#endif
 
 public class UIAudioClipsView
     : UIPage
@@ -125,7 +128,7 @@ public class UIAudioClipsView
         // Set filters (optional)
 		// It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
 		// if all the dialogs will be using the same filters
-		FileBrowser.SetFilters( true, new FileBrowser.Filter( "Audio files", ".wav" ));
+		SimpleFileBrowser.FileBrowser.SetFilters( true, new FileBrowser.Filter( "Audio files", ".wav" ));
 
 		// Set default filter that is selected when the dialog is shown (optional)
 		// Returns true if the default filter is set successfully

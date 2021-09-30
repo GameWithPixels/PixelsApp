@@ -21,11 +21,11 @@ public class UIProgrammingBox : MonoBehaviour
 
     public void Show(string text)
     {
-        this.gameObject.SetActive(true);
+        gameObject.SetActive(true);
         currentProgress = 0.0f;
         currentDisplayProgress = 0.0f;
         currentProgressSpeed = defaultProgressSpeed;
-        lastUpdateTime = Time.time;
+        lastUpdateTime = Time.realtimeSinceStartup;
         SetProgress(0, text);
         var offsetMax = progressBar.rectTransform.offsetMax;
         offsetMax.x = prograssBarBackground.rectTransform.rect.width * currentDisplayProgress;
@@ -34,13 +34,13 @@ public class UIProgrammingBox : MonoBehaviour
 
     public void SetProgress(float newProgress, string text = null)
     {
-        float deltaTime = Time.time - lastUpdateTime;
+        float deltaTime = Time.realtimeSinceStartup - lastUpdateTime;
         if (deltaTime > 0.001f)
         {
             float deltaProgress = newProgress - currentDisplayProgress;
             currentProgressSpeed = Mathf.Clamp(deltaProgress / deltaTime, progressSpeedMin, progressMaxSpeed);
 
-            lastUpdateTime = Time.time;
+            lastUpdateTime = Time.realtimeSinceStartup;
         }
         currentProgress = newProgress;
         if (text != null)
@@ -51,7 +51,7 @@ public class UIProgrammingBox : MonoBehaviour
 
     void Update()
     {
-        float maxDelta = currentProgressSpeed * Time.deltaTime;
+        float maxDelta = currentProgressSpeed * Time.unscaledDeltaTime;
         currentDisplayProgress = Mathf.MoveTowards(currentDisplayProgress, currentProgress, maxDelta);
         var offsetMax = progressBar.rectTransform.offsetMax;
         offsetMax.x = prograssBarBackground.rectTransform.rect.width * currentDisplayProgress;
@@ -60,7 +60,7 @@ public class UIProgrammingBox : MonoBehaviour
 
     public void Hide()
     {
-        this.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 
 }

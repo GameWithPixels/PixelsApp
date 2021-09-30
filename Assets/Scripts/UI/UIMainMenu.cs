@@ -45,7 +45,7 @@ public class UIMainMenu : MonoBehaviour
             Hide();
             if (AppDataSet.Instance.defaultBehavior == null)
             {
-                AppDataSet.Instance.defaultBehavior = new Behaviors.EditBehavior();
+                AppDataSet.Instance.defaultBehavior = new EditBehavior();
             }
             GoToPage(UIPage.PageId.Behavior, AppDataSet.Instance.defaultBehavior);
         });

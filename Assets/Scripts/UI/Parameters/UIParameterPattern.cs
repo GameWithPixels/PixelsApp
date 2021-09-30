@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-using Animations;
+using Systemic.Unity.Pixels.Animations;
 
 public class RGBPatternAttribute
     : System.Attribute

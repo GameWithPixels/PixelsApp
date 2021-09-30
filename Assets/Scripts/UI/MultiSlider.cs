@@ -71,15 +71,15 @@ public class MultiSlider : MonoBehaviour, IFocusable
 		}
 	}
 
-	public Animations.EditRGBGradient ToGradient()
+	public EditRGBGradient ToGradient()
 	{
-		return new Animations.EditRGBGradient()
+		return new EditRGBGradient()
 		{
 			keyframes = GetColorAndPos()
 		};
 	}
 
-	public void FromGradient(Animations.EditRGBGradient gradient)
+	public void FromGradient(EditRGBGradient gradient)
 	{
 		_suspendRepaint = true;
 
@@ -213,20 +213,20 @@ public class MultiSlider : MonoBehaviour, IFocusable
 		}
 	}
 
-	List<Animations.EditRGBKeyframe> GetColorAndPos()
+	List<EditRGBKeyframe> GetColorAndPos()
 	{
 		float width = (transform as RectTransform).rect.width;
 		var list = AllHandles
 			.OrderBy(h => h.transform.localPosition.x)
-			.Select(h => new Animations.EditRGBKeyframe()
+			.Select(h => new EditRGBKeyframe()
 			{
 				color = h.Color,
 				time = h.transform.localPosition.x / width
 			}).ToList();
-		// Insert key at beginning and end to transion from black color
+		// Insert key at beginning and end to transition from black color
 		if (list[0].time > 0)
 		{
-			list.Insert(0, new Animations.EditRGBKeyframe()
+			list.Insert(0, new EditRGBKeyframe()
 			{
 				color = Color.black,
 				time = 0
@@ -234,7 +234,7 @@ public class MultiSlider : MonoBehaviour, IFocusable
 		}
 		if (list.Last().time < 1)
 		{
-			list.Add(new Animations.EditRGBKeyframe()
+			list.Add(new EditRGBKeyframe()
 			{
 				color = Color.black,
 				time = 1

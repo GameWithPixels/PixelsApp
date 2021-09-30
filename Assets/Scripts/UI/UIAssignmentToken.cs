@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Dice;
 using Presets;
+using Systemic.Unity.Pixels;
 
 public class UIAssignmentToken : MonoBehaviour
 {
@@ -72,7 +73,7 @@ public class UIAssignmentToken : MonoBehaviour
         }
     }
 
-    void OnBehaviorSelected(bool result, Behaviors.EditBehavior newBehavior)
+    void OnBehaviorSelected(bool result, EditBehavior newBehavior)
     {
         if (result && newBehavior != editAssignment.behavior)
         {
@@ -90,7 +91,7 @@ public class UIAssignmentToken : MonoBehaviour
             this.dieRenderer = null;
         }
 
-        var design = DesignAndColor.Unknown;
+        var design = PixelDesignAndColor.Unknown;
         var dName = "Missing Die";
         if (editAssignment.die != null)
         {

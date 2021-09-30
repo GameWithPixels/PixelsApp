@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Behaviors;
+using Systemic.Unity.Pixels.Profiles;
 
 public class UIRuleTokenConditionTokenSimple
     : UIRuleTokenConditionToken

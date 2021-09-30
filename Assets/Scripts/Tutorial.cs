@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using Systemic.Unity.Pixels;
 
 public class Tutorial : SingletonMonoBehaviour<Tutorial>
 {
@@ -121,7 +122,7 @@ public class Tutorial : SingletonMonoBehaviour<Tutorial>
                         // Now we wait until the user connects their dice
                         void checkCanGoToPage(UIPage page, object context, System.Action goToPage)
                         {
-                            if (page != poolPage || (DiceManager.Instance.allDice.Count() == 0 && DiceManager.Instance.state != DiceManager.State.AddingDiscoveredDie))
+                            if (page != poolPage || AppDataSet.Instance.dice.Count == 0)
                             {
                                 PixelsApp.Instance.ShowDialogBox("Are you sure?", "You have not paired any die, are you sure you want to leave the tutorial?", "Yes", "Cancel", res =>
                                 {
@@ -141,67 +142,62 @@ public class Tutorial : SingletonMonoBehaviour<Tutorial>
 
                         void onPageChanged(UIPage newPage, object context)
                         {
-                            IEnumerator waitUntilIdleAgainAndContinue()
-                            {
-                                while (DiceManager.Instance.state != DiceManager.State.Idle) yield return null;
-
-                                // Check that we DO in fact have dice in the list
-                                if (DiceManager.Instance.allDice.Count() > 0)
-                                {
-                                    // Automatically assign dice!
-                                    var basicPreset = AppDataSet.Instance.presets.FirstOrDefault(p => p.name == "All dice basic");
-                                    if (basicPreset == null)
-                                    {
-                                        basicPreset = new Presets.EditPreset
-                                        {
-                                            name = "All dice basic",
-                                            description = "Sets all dice to the basic profile.",
-                                        };
-                                        AppDataSet.Instance.presets.Insert(0, basicPreset);
-                                    }
-                                    basicPreset.dieAssignments = DiceManager.Instance.allDice.Select(
-                                        d => new Presets.EditDieAssignment
-                                        {
-                                            die = d,
-                                            behavior = AppDataSet.Instance.behaviors?.FirstOrDefault(),
-                                        }).ToList();
-
-                                    poolTutorialRoot.gameObject.SetActive(true);
-                                    poolTutorialNext.onClick.RemoveAllListeners();
-                                    poolTutorialNext.onClick.AddListener(() =>
-                                    {
-                                        poolTutorialRoot.gameObject.SetActive(false);
-                                        pool2TutorialRoot.gameObject.SetActive(true);
-                                        pool2TutorialNext.onClick.RemoveAllListeners();
-                                        pool2TutorialNext.onClick.AddListener(() =>
-                                        {
-                                            pool2TutorialRoot.gameObject.SetActive(false);
-                                            AppSettings.Instance.SetMainTutorialEnabled(false);
-
-                                            // Now we wait until the user connects their dice
-                                            void checkCanGoToPage2(UIPage page2, object context2, System.Action goToPage2)
-                                            {
-                                                if (page2 == homePage)
-                                                {
-                                                    goToPage2?.Invoke();
-                                                }
-                                            }
-
-                                            void onPageChanged2(UIPage newPage2, object context2)
-                                            {
-                                                NavigationManager.Instance.onPageEntered -= onPageChanged2;
-                                                NavigationManager.Instance.checkCanGoToPage = null;
-                                            }
-
-                                            NavigationManager.Instance.onPageEntered += onPageChanged2;
-                                            NavigationManager.Instance.checkCanGoToPage = checkCanGoToPage2;
-                                        });
-                                    });
-                                }
-                            }
                             NavigationManager.Instance.onPageEntered -= onPageChanged;
                             NavigationManager.Instance.checkCanGoToPage = null;
-                            StartCoroutine(waitUntilIdleAgainAndContinue());
+
+                            // Check that we DO in fact have dice in the list
+                            if (AppDataSet.Instance.dice.Count > 0)
+                            {
+                                // Automatically assign dice!
+                                var basicPreset = AppDataSet.Instance.presets.FirstOrDefault(p => p.name == "All dice basic");
+                                if (basicPreset == null)
+                                {
+                                    basicPreset = new Presets.EditPreset
+                                    {
+                                        name = "All dice basic",
+                                        description = "Sets all dice to the basic profile.",
+                                    };
+                                    AppDataSet.Instance.presets.Insert(0, basicPreset);
+                                }
+                                basicPreset.dieAssignments = AppDataSet.Instance.dice.Select(
+                                    d => new Presets.EditDieAssignment
+                                    {
+                                        die = d,
+                                        behavior = AppDataSet.Instance.behaviors?.FirstOrDefault(),
+                                    }).ToList();
+
+                                poolTutorialRoot.gameObject.SetActive(true);
+                                poolTutorialNext.onClick.RemoveAllListeners();
+                                poolTutorialNext.onClick.AddListener(() =>
+                                {
+                                    poolTutorialRoot.gameObject.SetActive(false);
+                                    pool2TutorialRoot.gameObject.SetActive(true);
+                                    pool2TutorialNext.onClick.RemoveAllListeners();
+                                    pool2TutorialNext.onClick.AddListener(() =>
+                                    {
+                                        pool2TutorialRoot.gameObject.SetActive(false);
+                                        AppSettings.Instance.SetMainTutorialEnabled(false);
+
+                                        // Now we wait until the user connects their dice
+                                        void checkCanGoToPage2(UIPage page2, object context2, System.Action goToPage2)
+                                        {
+                                            if (page2 == homePage)
+                                            {
+                                                goToPage2?.Invoke();
+                                            }
+                                        }
+
+                                        void onPageChanged2(UIPage newPage2, object context2)
+                                        {
+                                            NavigationManager.Instance.onPageEntered -= onPageChanged2;
+                                            NavigationManager.Instance.checkCanGoToPage = null;
+                                        }
+
+                                        NavigationManager.Instance.onPageEntered += onPageChanged2;
+                                        NavigationManager.Instance.checkCanGoToPage = checkCanGoToPage2;
+                                    });
+                                });
+                            }
                         }
 
                         NavigationManager.Instance.onPageEntered += onPageChanged;

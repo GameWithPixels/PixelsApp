@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Behaviors;
+using Systemic.Unity.Pixels.Profiles;
 using Presets;
 using System.Linq;
 using Dice;
@@ -68,7 +68,7 @@ public class UIHomePage
         dismissMessagesButton.onClick.AddListener(CloseWhatsNew);
         editPresetsButton.onClick.AddListener(() => NavigationManager.Instance.GoToRoot(UIPage.PageId.Presets));
         editProfilesButton.onClick.AddListener(() => NavigationManager.Instance.GoToRoot(UIPage.PageId.Behaviors));
-        PixelsApp.Instance.onDieBehaviorUpdatedEvent += OnDieUpdatedEvent;
+        PixelsApp.Instance.onDieBehaviorUpdatedEvent += (_, __) => UpdatePresetAndBehaviorStatuses();
     }
 
     UIHomePresetToken CreatePresetToken(EditPreset preset)
@@ -191,7 +191,7 @@ public class UIHomePage
             });
     }
 
-    void ActivateBehavior(Behaviors.EditBehavior behavior)
+    void ActivateBehavior(EditBehavior behavior)
     {
         PixelsApp.Instance.ActivateBehavior(behavior, (die, res) =>
         {
@@ -218,10 +218,5 @@ public class UIHomePage
         {
             uibehaviorToken.RefreshState();
         }
-    }
-
-    void OnDieUpdatedEvent(Dice.EditDie die, Behaviors.EditBehavior behavior)
-    {
-        UpdatePresetAndBehaviorStatuses();
     }
 }

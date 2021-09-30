@@ -8601,13 +8601,11 @@ GameObject:
   - component: {fileID: 443970145}
   - component: {fileID: 443970142}
   - component: {fileID: 443970138}
-  - component: {fileID: 443970137}
   - component: {fileID: 443970136}
   - component: {fileID: 443970140}
   - component: {fileID: 443970141}
   - component: {fileID: 443970143}
   - component: {fileID: 443970144}
-  - component: {fileID: 443970147}
   - component: {fileID: 443970146}
   - component: {fileID: 443970148}
   - component: {fileID: 443970149}
@@ -8645,18 +8643,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a602d7a587392348b2480e640a9a64d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &443970137
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443970134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7758f1b9d9976748a20ba831f1702e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &443970138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8688,15 +8674,12 @@ MonoBehaviour:
   defaultDiceJson: {fileID: 4900000, guid: 2adfcb6c011c28840890c7d8071652c6, type: 3}
   DataSetFilename: dice_data.json
   SettingsFilename: settings.json
-  ScanTimeout: 3
+  ScanTimeout: 5
   DiceRotationSpeedAvg: 10
   DiceRotationSpeedVar: 1
   DieUnavailableColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  DicePoolViewFirstScanDelay: 0.5
-  DicePoolViewScanDelay: 10
   MultiDiceRootRotationSpeedAvg: 10
   MultiDiceRootRotationSpeedVar: 1
-  DicePoolDisconnectDelay: 5
   AudioClipsFolderName: AudioClips
   AudioClipsWaveformColor: {r: 0.4156863, g: 0.47058827, b: 1, a: 1}
 --- !u!114 &443970140
@@ -8886,18 +8869,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 67a062e2d0db811478cf690fb9528d51, type: 3}
   - {fileID: 8300000, guid: a7b274508441b3c479b4e094181e2a82, type: 3}
   userClips: []
---- !u!114 &443970147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443970134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 109cde3d489caef4f86831862b3a3acb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!82 &443970148
 AudioSource:
   m_ObjectHideFlags: 0
@@ -19254,7 +19225,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00024414062}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1057913594

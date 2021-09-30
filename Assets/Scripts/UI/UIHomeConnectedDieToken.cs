@@ -9,12 +9,12 @@ public class UIHomeConnectedDieToken : MonoBehaviour
     public RawImage dieRenderImage;
     public Text dieNameText;
 
-    public Dice.EditDie editDie { get; private set; }
+    public EditDie editDie { get; private set; }
     public SingleDiceRenderer dieRenderer { get; private set; }
 
     bool visible = true;
 
-    public void Setup(Dice.EditDie die)
+    public void Setup(EditDie die)
     {
         editDie = die;
         this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(die.designAndColor);

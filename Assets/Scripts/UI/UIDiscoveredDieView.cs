@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Dice;
+using Systemic.Unity.Pixels;
 
 public class UIDiscoveredDieView : MonoBehaviour
 {
@@ -11,7 +12,6 @@ public class UIDiscoveredDieView : MonoBehaviour
     public Image backgroundImage;
     public RawImage dieRenderImage;
     public Text dieNameText;
-    public Text dieIDText;
     public UIDieLargeBatteryView batteryView;
     public UIDieLargeSignalView signalView;
     public Button selectButton;
@@ -21,14 +21,14 @@ public class UIDiscoveredDieView : MonoBehaviour
     public Sprite backgroundSelectedSprite;
     public Sprite backgroundUnselectedSprite;
 
-    public Die die { get; private set; }
+    public Pixel die { get; private set; }
     public SingleDiceRenderer dieRenderer { get; private set; }
     public bool selected { get; private set; }
 
     public delegate void SelectedEvent(UIDiscoveredDieView uidie, bool selected);
     public SelectedEvent onSelected;
 
-    public void Setup(Die die)
+    public void Setup(Pixel die)
     {
         this.die = die;
         this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(die.designAndColor);
@@ -38,18 +38,11 @@ public class UIDiscoveredDieView : MonoBehaviour
             dieRenderImage.texture = dieRenderer.renderTexture;
         }
         dieNameText.text = die.name;
-        if (die.deviceId != 0)
-        {
-            dieIDText.text = "ID: " + die.deviceId.ToString("X08");
-        }
-        else
-        {
-            dieIDText.text = "ID: Unavailable";
-        }
-        batteryView.SetLevel(die.batteryLevel, die.charging);
+
+        batteryView.SetLevel(die.batteryLevel, die.isCharging);
         signalView.SetRssi(die.rssi);
-        die.OnBatteryLevelChanged += OnBatteryLevelChanged;
-        die.OnRssiChanged += OnRssiChanged;
+        die.BatteryLevelChanged += OnBatteryLevelChanged;
+        die.RssiChanged += OnRssiChanged;
         SetSelected(false);
     }
 
@@ -74,8 +67,8 @@ public class UIDiscoveredDieView : MonoBehaviour
 
     void OnDestroy()
     {
-        die.OnBatteryLevelChanged -= OnBatteryLevelChanged;
-        die.OnRssiChanged -= OnRssiChanged;
+        die.BatteryLevelChanged -= OnBatteryLevelChanged;
+        die.RssiChanged -= OnRssiChanged;
         if (this.dieRenderer != null)
         {
             DiceRendererManager.Instance.DestroyDiceRenderer(this.dieRenderer);
@@ -83,14 +76,14 @@ public class UIDiscoveredDieView : MonoBehaviour
         }
     }
     
-    void OnBatteryLevelChanged(Die die, float? level, bool? charging)
+    void OnBatteryLevelChanged(Pixel die, float level, bool charging)
     {
-        batteryView.SetLevel(die.batteryLevel, charging);
+        batteryView.SetLevel(level, charging);
     }
 
-    void OnRssiChanged(Die die, int? rssi)
+    void OnRssiChanged(Pixel die, int rssi)
     {
-        signalView.SetRssi(die.rssi);
+        signalView.SetRssi(rssi);
     }
 
 }

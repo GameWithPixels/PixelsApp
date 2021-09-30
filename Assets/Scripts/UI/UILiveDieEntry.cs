@@ -11,24 +11,12 @@ public class UILiveDieEntry : MonoBehaviour
     public Text rollText;
     public Text timestamp;
 
-    public void Setup(EditDie die, int faceIndex, float time)
+    public void Setup(EditDie die, int faceIndex)
     {
         //var dieTexture = DiceRendererManager.Instance.GetTextureForDie(die.die);
         //dieImage.texture = dieTexture;
 
         rollText.text = die.name + " rolled a " + (faceIndex + 1).ToString();
         timestamp.text = "";
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

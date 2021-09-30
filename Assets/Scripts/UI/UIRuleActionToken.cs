@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using Systemic.Unity.Pixels.Profiles;
 
 public class UIRuleActionToken : MonoBehaviour
 {
@@ -12,13 +13,13 @@ public class UIRuleActionToken : MonoBehaviour
     public Text labelText;
     public Button deleteButton;
 
-    public Behaviors.EditRule parentRule { get; private set; }
-    public Behaviors.EditAction editAction { get; private set; }
+    public EditRule parentRule { get; private set; }
+    public EditAction editAction { get; private set; }
     public Button.ButtonClickedEvent onDelete => deleteButton.onClick;
 
     UIParameterManager.ObjectParameterList parameters;
 
-    public delegate void ActionChangedEvent(Behaviors.EditRule rule, Behaviors.EditAction action);
+    public delegate void ActionChangedEvent(EditRule rule, EditAction action);
     public ActionChangedEvent onActionChanged;
 
     void OnDestroy()
@@ -31,7 +32,7 @@ public class UIRuleActionToken : MonoBehaviour
         parameters = null;
     }
 
-    public void Setup(Behaviors.EditRule rule, Behaviors.EditAction action, bool first)
+    public void Setup(EditRule rule, EditAction action, bool first)
     {
         parentRule = rule;
         editAction = action;
@@ -39,7 +40,7 @@ public class UIRuleActionToken : MonoBehaviour
         actionSelector.Setup(
             "Action Type",
             () => editAction.type,
-            (t) => SetActionType((Behaviors.ActionType)t),
+            (t) => SetActionType((ActionType)t),
             null);
 
         // Setup all other parameters
@@ -47,14 +48,14 @@ public class UIRuleActionToken : MonoBehaviour
         parameters.onParameterChanged += OnActionChanged;
     }
 
-    void SetActionType(Behaviors.ActionType newType)
+    void SetActionType(ActionType newType)
     {
         if (newType != editAction.type)
         {
             onActionChanged?.Invoke(parentRule, editAction);
     
             // Change the type, which really means create a new action and replace the old one
-            var newAction = Behaviors.EditAction.Create(newType);
+            var newAction = EditAction.Create(newType);
 
             // Replace the action
             parentRule.ReplaceAction(editAction, newAction);

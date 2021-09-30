@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Behaviors;
+using Systemic.Unity.Pixels.Profiles;
 using System.Linq;
 using Dice;
 
@@ -73,7 +73,7 @@ public class UIHomeBehaviorToken : MonoBehaviour
         //}
     }
 
-    UIHomeConnectedDieToken CreateConnectedDieToken(Dice.EditDie die)
+    UIHomeConnectedDieToken CreateConnectedDieToken(EditDie die)
     {
         var ret = GameObject.Instantiate<UIHomeConnectedDieToken>(connectedDiePrefab, Vector3.zero, Quaternion.identity, connectedDieRoot.transform);
         ret.Setup(die);

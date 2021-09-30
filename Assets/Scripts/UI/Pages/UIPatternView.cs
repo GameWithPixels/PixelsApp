@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Presets;
 using Dice;
-using System.Linq;
+using Systemic.Unity.Pixels;
+using Systemic.Unity.Pixels.Animations;
 
 public class UIPatternView
     : UIPage
@@ -17,7 +17,7 @@ public class UIPatternView
     public Button playOnDieButton;
     public UIRotationControl rotationControl;
 
-    public Animations.EditAnimation editAnimation { get; private set; }
+    public EditAnimation editAnimation { get; private set; }
     public SingleDiceRenderer dieRenderer { get; private set; }
     
     UIParameterManager.ObjectParameterList parameters;
@@ -27,7 +27,7 @@ public class UIPatternView
     public override void Enter(object context)
     {
         base.Enter(context);
-        var anim = context as Animations.EditAnimation;
+        var anim = context as EditAnimation;
         if (anim != null)
         {
             Setup(anim);
@@ -56,13 +56,13 @@ public class UIPatternView
         if (previewDie != null)
         {
             previewDie.die.SetStandardMode();
-            DiceManager.Instance.DisconnectDie(previewDie, null);
+            DiceBag.Instance.DisconnectPixel(previewDie.die);
             previewDie = null;
             previewDieConnected = false;
         }
     }
 
-    void Setup(Animations.EditAnimation anim)
+    void Setup(EditAnimation anim)
     {
         base.SetupHeader(false, false, anim.name, SetName);
         editAnimation = anim;
@@ -78,7 +78,7 @@ public class UIPatternView
         animationSelector.Setup(
             "Lighting Pattern Type",
             () => editAnimation.type,
-            (t) => SetAnimationType((Animations.AnimationType)t),
+            (t) => SetAnimationType((AnimationType)t),
             null);
 
         // Setup all other parameters
@@ -97,18 +97,18 @@ public class UIPatternView
 
     void OnAnimParameterChanged(EditObject animObject, UIParameter parameter, object newValue)
     {
-        var theEditAnim = (Animations.EditAnimation)animObject;
+        var theEditAnim = (EditAnimation)animObject;
         Debug.Assert(theEditAnim == editAnimation);
         dieRenderer.SetAnimation(theEditAnim);
         base.pageDirty = true;
     }
 
-    void SetAnimationType(Animations.AnimationType newType)
+    void SetAnimationType(AnimationType newType)
     {
         if (newType != editAnimation.type)
         {
             // Change the type, which really means create a new animation and replace the old one
-            var newEditAnimation = Animations.EditAnimation.Create(newType);
+            var newEditAnimation = EditAnimation.Create(newType);
 
             // Copy over the few things we can
             newEditAnimation.duration = editAnimation.duration;
@@ -162,11 +162,9 @@ public class UIPatternView
             if (!previewDieConnected)
             {
                 string error = null;
-                yield return DiceManager.Instance.ConnectDie(previewDie, (_, res, errorMsg) =>
-                {
-                    previewDieConnected = res;
-                    error = errorMsg;
-                });
+                yield return PixelsApp.Instance.ConnectDie(previewDie, gameObject,
+                    onConnected: _ => previewDieConnected = true,
+                    onFailed: (_, err) => error = err);
 
                 if (!previewDieConnected)
                 {
@@ -180,16 +178,31 @@ public class UIPatternView
             if (previewDie != null && previewDieConnected)
             {
                 previewDie.die.SetLEDAnimatorMode();
-                yield return new WaitForSeconds(0.5f); // Fixme!!! add acknowledge from die instead
+                yield return new WaitForSeconds(0.5f); //TODO add acknowledge from die instead
 
-                var editSet = AppDataSet.Instance.ExtractEditSetForAnimation(editAnimation);
-                var dataSet = editSet.ToDataSet();
-                bool playResult = false;
-                yield return previewDie.die.PlayTestAnimation(dataSet, (res) => playResult = res);
-                if (!playResult)
+                PixelsApp.Instance.ShowProgrammingBox("Uploading animation to " + name);
+
+                string error = null;
+                try
+                {
+                    bool success = false;
+                    var editSet = AppDataSet.Instance.ExtractEditSetForAnimation(editAnimation);
+                    StartCoroutine(previewDie.die.PlayTestAnimationAsync(
+                        editSet.ToDataSet(),
+                        (res, err) => (success, error) = (res, err),
+                        (_, progress) => PixelsApp.Instance.UpdateProgrammingBox(progress)));
+
+                    yield return new WaitUntil(() => success || (error != null));
+                }
+                finally
+                {
+                    PixelsApp.Instance.HideProgrammingBox();
+                }
+
+                if (error != null)
                 {
                     bool acknowledged = false;
-                    PixelsApp.Instance.ShowDialogBox("Transfer Error", "Could not play animation on " + previewDie.name + ", Transfer error", "Ok", null, _ => acknowledged = true);
+                    PixelsApp.Instance.ShowDialogBox($"Transfer Error", $"Could not play animation on {previewDie.name}: transfer error", "Ok", null, _ => acknowledged = true);
                     previewDie = null;
                     yield return new WaitUntil(() => acknowledged);
                 }

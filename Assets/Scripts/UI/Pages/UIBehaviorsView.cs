@@ -37,7 +37,7 @@ public class UIBehaviorsView
         }
     }
 
-    UIBehaviorToken CreateBehaviorToken(Behaviors.EditBehavior behavior)
+    UIBehaviorToken CreateBehaviorToken(EditBehavior behavior)
     {
         // Create the gameObject
         var ret = GameObject.Instantiate<UIBehaviorToken>(behaviorTokenPrefab, Vector3.zero, Quaternion.identity, contentRoot.transform);
@@ -101,7 +101,7 @@ public class UIBehaviorsView
         NavigationManager.Instance.GoToPage(UIPage.PageId.Behavior, newBehavior);
     }
 
-    void DuplicateBehavior(Behaviors.EditBehavior behavior)
+    void DuplicateBehavior(EditBehavior behavior)
     {
         AppDataSet.Instance.DuplicateBehavior(behavior);
         behaviors.Find(p => p.editBehavior == behavior).Expand(false);
@@ -109,7 +109,7 @@ public class UIBehaviorsView
         RefreshView();
     }
 
-    void DeleteBehavior(Behaviors.EditBehavior behavior)
+    void DeleteBehavior(EditBehavior behavior)
     {
         PixelsApp.Instance.ShowDialogBox("Delete Profile?", "Are you sure you want to delete " + behavior.name + "?", "Ok", "Cancel", res =>
         {
@@ -149,7 +149,7 @@ public class UIBehaviorsView
         });
     }
 
-    void ExpandBehavior(Behaviors.EditBehavior behavior)
+    void ExpandBehavior(EditBehavior behavior)
     {
         foreach (var uip in behaviors)
         {

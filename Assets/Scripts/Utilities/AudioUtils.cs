@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine.Networking;
 using System.Runtime.InteropServices;
 using System.Linq;
+using Systemic.Unity.Pixels.Animations;
 
 public static class AudioUtils
 {
@@ -45,6 +46,6 @@ public static class AudioUtils
         audio.GetData(samples, 0);
         var byteArray = new byte[samples.Length * 4];
         System.Buffer.BlockCopy(samples, 0, byteArray, 0, byteArray.Length);
-        return Utils.computeHash(byteArray);
+        return DataSet.ComputeHash(byteArray);
     }
 }

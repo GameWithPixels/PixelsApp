@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Presets;
 using System.Linq;
 using Dice;
+using Systemic.Unity.Pixels;
 
 public class UIDiePicker : MonoBehaviour
 {
@@ -22,19 +23,11 @@ public class UIDiePicker : MonoBehaviour
     System.Action<bool, EditDie> closeAction;
 
     // The list of controls we have created to display dice
-    List<UIDiePickerDieToken> dice = new List<UIDiePickerDieToken>();
+    readonly List<UIDiePickerDieToken> dice = new List<UIDiePickerDieToken>();
 
-    // When refreshing the pool, this keeps track of the dice we *think* may not be there any more
-    // but don't want to update the status of until *after* we've finished re-scanning for them.
-    // That is simply for visual purposes, otherwise the status will flicker to "unknown" and it might
-    // confise the user. So instead we tell these dice UIs to stop updating their status, and then tell
-    // to return to normal after the refresh (updating at that time).
-    List<UIDiePickerDieToken> doubtedDice = new List<UIDiePickerDieToken>();
-
-    DicePoolRefresher poolRefresher;
+    System.Func<EditDie, bool> dieSelector;
 
     public bool isShown => gameObject.activeSelf;
-    System.Func<EditDie, bool> dieSelector;
 
     /// <summary>
     /// Invoke the die picker
@@ -53,7 +46,7 @@ public class UIDiePicker : MonoBehaviour
             dieSelector = d => true;
         }
 
-        var allDice = DiceManager.Instance.allDice.Where(dieSelector);
+        var allDice = AppDataSet.Instance.dice.Where(dieSelector);
         if (allDice.Count() > 0)
         {
             noPairedDice.gameObject.SetActive(false);
@@ -68,7 +61,7 @@ public class UIDiePicker : MonoBehaviour
         }
         else
         {
-            if (DiceManager.Instance.allDice.Count() > 0)
+            if (AppDataSet.Instance.dice.Count > 0)
             {
                 noPairedDice.gameObject.SetActive(false);
                 notEnoughPairedDice.gameObject.SetActive(true);
@@ -113,7 +106,6 @@ public class UIDiePicker : MonoBehaviour
     void Awake()
     {
         backButton.onClick.AddListener(Back);
-        poolRefresher = GetComponent<DicePoolRefresher>();
     }
 
     void Hide(bool result, EditDie die)

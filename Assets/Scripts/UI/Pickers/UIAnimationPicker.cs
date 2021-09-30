@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Animations;
+using Systemic.Unity.Pixels.Animations;
 
 public class UIAnimationPicker : MonoBehaviour
 {
@@ -50,7 +50,7 @@ public class UIAnimationPicker : MonoBehaviour
         this.closeAction = closeAction;
     }
 
-    UIAnimationSelectorPatternToken CreatePatternToken(Animations.EditAnimation anim)
+    UIAnimationSelectorPatternToken CreatePatternToken(EditAnimation anim)
     {
         // Create the gameObject
         var ret = GameObject.Instantiate<UIAnimationSelectorPatternToken>(patternTokenPrefab, Vector3.zero, Quaternion.identity, contentRoot.transform);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Dice;
+using Systemic.Unity.Pixels;
 
 public class SpeakNumber : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class SpeakNumber : MonoBehaviour
     public AudioClip[] numbers;
     AudioSource source;
 
-    Die die;
+    //Pixel die;
 
     private void Awake()
     {
@@ -49,10 +50,10 @@ public class SpeakNumber : MonoBehaviour
 
 
 
-    void OnDieStateChanged(Die die, Die.RollState newState, int newFace)
+    void OnDieStateChanged(Pixel die, PixelRollState newState, int newFace)
     {
         numberText.text = (newFace + 1).ToString();
-        if (newState == Die.RollState.OnFace)
+        if (newState == PixelRollState.OnFace)
         {
             Debug.Log("New Face: " + newFace);
             source.PlayOneShot(numbers[newFace]);

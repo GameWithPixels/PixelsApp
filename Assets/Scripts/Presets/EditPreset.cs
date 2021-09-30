@@ -11,8 +11,8 @@ namespace Presets
     public class EditDieAssignment
         : EditObject
     {
-        public Dice.EditDie die;
-        public Behaviors.EditBehavior behavior;
+        public EditDie die;
+        public EditBehavior behavior;
     }
 
     class EditDieAssignmentConverter
@@ -27,9 +27,9 @@ namespace Presets
         public override void WriteJson(JsonWriter writer, EditDieAssignment value, JsonSerializer serializer)
         {
             writer.WriteStartObject();
-            writer.WritePropertyName("deviceId");
+            writer.WritePropertyName("systemId");
             if (value.die != null)
-                serializer.Serialize(writer, value.die.deviceId);
+                serializer.Serialize(writer, value.die.systemId);
             else
                 serializer.Serialize(writer, (ulong)0);
             writer.WritePropertyName("behaviorIndex");
@@ -44,8 +44,8 @@ namespace Presets
 
             var ret = new EditDieAssignment();    
             JObject jsonObject = JObject.Load(reader);
-            System.UInt64 deviceId = jsonObject["deviceId"].ToObject<System.UInt64>();
-            ret.die = dataSet.dice.Find(d => d.deviceId == deviceId);
+            var systemId = jsonObject["systemId"]?.ToObject<string>();
+            ret.die = dataSet.GetEditDie(systemId);
             int behaviorIndex = jsonObject["behaviorIndex"].Value<int>();
             if (behaviorIndex >= 0 && behaviorIndex < dataSet.behaviors.Count)
                 ret.behavior = dataSet.behaviors[behaviorIndex];
@@ -63,7 +63,7 @@ namespace Presets
         public string description;
         public List<EditDieAssignment> dieAssignments = new List<EditDieAssignment>();
 
-        public bool CheckDependency(Dice.EditDie die)
+        public bool CheckDependency(EditDie die)
         {
             return dieAssignments.Any(ass => ass.die == die);
         }
@@ -78,7 +78,7 @@ namespace Presets
             };
         }
 
-        public void DeleteBehavior(Behaviors.EditBehavior behavior)
+        public void DeleteBehavior(EditBehavior behavior)
         {
             foreach (var ass in dieAssignments)
             {
@@ -89,12 +89,12 @@ namespace Presets
             }
         }
 
-        public bool DependsOnBehavior(Behaviors.EditBehavior behavior)
+        public bool DependsOnBehavior(EditBehavior behavior)
         {
             return dieAssignments.Any(d => d.behavior == behavior);
         }
 
-        public void DeleteDie(Dice.EditDie die)
+        public void DeleteDie(EditDie die)
         {
             foreach (var ass in dieAssignments)
             {
@@ -105,7 +105,7 @@ namespace Presets
             }
         }
 
-        public bool DependsOnDie(Dice.EditDie die)
+        public bool DependsOnDie(EditDie die)
         {
             return dieAssignments.Any(d => d.die == die);
         }

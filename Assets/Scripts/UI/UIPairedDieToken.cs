@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Dice;
 using System.Linq;
 using System.Text;
+using Systemic.Unity.Pixels;
 
 public class UIPairedDieToken : MonoBehaviour
 {
@@ -34,17 +35,15 @@ public class UIPairedDieToken : MonoBehaviour
     public Sprite buttonExpandedSprite;
 
     public bool expanded => expandGroup.activeSelf;
-    public EditDie die => dieView.die;
 
-    IEnumerator refreshInfoCoroutine;
+    public EditDie die => dieView.die;
 
     public void Setup(EditDie die)
     {
         dieView.Setup(die);
 
         // Connect to all the dice in the pool if possible
-        refreshInfoCoroutine = RefreshInfo();
-        StartCoroutine(refreshInfoCoroutine);
+        StartCoroutine(RefreshInfo());
     }
 
     void Awake()
@@ -57,7 +56,7 @@ public class UIPairedDieToken : MonoBehaviour
         calibrateButton.onClick.AddListener(OnCalibrate);
         setDesignButton.onClick.AddListener(OnSetDesign);
         pingButton.onClick.AddListener(OnPing);
-        resetButton.onClick.AddListener(() => die.die.DebugAnimController());
+        resetButton.onClick.AddListener(OnReset);
         disconnectButton.onClick.AddListener(OnDisconnect);
     }
 
@@ -99,13 +98,13 @@ public class UIPairedDieToken : MonoBehaviour
                         {
                             if (res2)
                             {
-                                DiceManager.Instance.ForgetDie(die);
+                                PixelsApp.Instance.ForgetDie(die);
                             }
                         });
                     }
                     else
                     {
-                        DiceManager.Instance.ForgetDie(die);
+                        PixelsApp.Instance.ForgetDie(die);
                     }
                 }
             });
@@ -114,16 +113,19 @@ public class UIPairedDieToken : MonoBehaviour
     void OnRename()
     {
         OnToggle();
-        if (die.die != null && die.die.connectionState == Die.ConnectionState.Ready)
+        if (die.die?.isReady ?? false)
         {
             var newName = Names.GetRandomName();
-            die.die.RenameDie(newName, (res) =>
+            StartCoroutine(die.die.RenameAsync(newName, (res, _) =>
             {
-                die.die.name = newName;
-                die.name = newName;
-                AppDataSet.Instance.SaveData();
-                dieView.UpdateState();
-            });
+                if (res && die.die != null)
+                {
+                    die.die.name = newName;
+                    die.name = newName;
+                    AppDataSet.Instance.SaveData();
+                    dieView.UpdateState();
+                }
+            }));
         }
     }
 
@@ -139,19 +141,25 @@ public class UIPairedDieToken : MonoBehaviour
     void OnSetDesign()
     {
         OnToggle();
-        if (die.die != null && die.die.connectionState == Die.ConnectionState.Ready)
+        if (die.die?.isReady ?? false)
         {
             PixelsApp.Instance.ShowEnumPicker("Select Design", die.designAndColor, (res, newDesign) =>
             {
-                die.designAndColor = (Dice.DesignAndColor)newDesign;
-                die.die.SetCurrentDesignAndColor((Dice.DesignAndColor)newDesign, (res2) =>
+                StartCoroutine(SetDesignCr());
+                
+                IEnumerator SetDesignCr()
                 {
-                    if (res2)
+                    var designAndColor = (PixelDesignAndColor)newDesign;
+                    bool success = false;
+                    yield return die.die.SetDesignAndColorAsync(designAndColor, (res, _) => success = res);
+
+                    if (success)
                     {
+                        die.designAndColor = designAndColor;
                         AppDataSet.Instance.SaveData();
                         dieView.UpdateState();
                     }
-                });
+                }
             },
             null);
         }
@@ -160,21 +168,27 @@ public class UIPairedDieToken : MonoBehaviour
     void OnPing()
     {
         OnToggle();
-        if (die.die != null && die.die.connectionState == Die.ConnectionState.Ready)
+        if (die.die?.isReady ?? false)
         {
-            die.die.Flash(Color.yellow, 3, null);
+            StartCoroutine(die.die.BlinkLEDsAsync(Color.yellow, 3, null));
+        }
+    }
+
+    void OnReset()
+    {
+        OnToggle();
+        if (die.die?.isReady ?? false)
+        {
+            die.die.ResetParameters();
         }
     }
 
     void OnDisconnect()
     {
         OnToggle();
-        if (die.die != null &&
-            (die.die.connectionState == Die.ConnectionState.Ready ||
-             die.die.connectionState == Die.ConnectionState.Connecting ||
-             die.die.connectionState == Die.ConnectionState.Identifying))
+        if (die.die != null && !die.die.isAvailable)
         {
-            DicePool.Instance.DisconnectDie(die.die, null);
+            DiceBag.Instance.DisconnectPixel(die.die, forceDisconnect: true);
         }
     }
 
@@ -182,19 +196,21 @@ public class UIPairedDieToken : MonoBehaviour
     {
         while (true)
         {
-            if (die.die != null && die.die.connectionState == Die.ConnectionState.Ready)
+            // Die might be destroyed (-> null) or change state at any time
+            while (die.die?.isReady ?? false)
             {
                 // Fetch battery level
-                bool battLevelReceived = false;
-                die.die.GetBatteryLevel((d, f) => battLevelReceived = true);
-                yield return new WaitUntil(() => battLevelReceived == true);
+                yield return die.die.UpdateBatteryLevelAsync();
 
-                // Fetch rssi
-                bool rssiReceived = false;
-                die.die.GetRssi((d, i) => rssiReceived = true);
-                yield return new WaitUntil(() => rssiReceived == true);
+                // Fetch RSSI
+                if (die.die)
+                {
+                    yield return die.die.UpdateRssiAsync();
+                    yield return new WaitForSeconds(3.0f);
+                }
             }
-            yield return new WaitForSeconds(3.0f);
+
+            yield return null;
         }
     }
 }

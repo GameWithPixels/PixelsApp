@@ -45,7 +45,7 @@ public class UIPatternsView
         }
     }
 
-    UIPatternToken CreatePatternToken(Animations.EditAnimation anim)
+    UIPatternToken CreatePatternToken(EditAnimation anim)
     {
         // Create the gameObject
         var ret = GameObject.Instantiate<UIPatternToken>(patternTokenPrefab, Vector3.zero, Quaternion.identity, contentRoot.transform);
@@ -108,7 +108,7 @@ public class UIPatternsView
         NavigationManager.Instance.GoToPage(UIPage.PageId.Pattern, newAnim);
     }
 
-    void DuplicateAnimation(Animations.EditAnimation anim)
+    void DuplicateAnimation(EditAnimation anim)
     {
         AppDataSet.Instance.DuplicateAnimation(anim);
         patterns.Find(p => p.editAnimation == anim).Expand(false);
@@ -116,7 +116,7 @@ public class UIPatternsView
         RefreshView();
     }
 
-    void DeleteAnimation(Animations.EditAnimation anim)
+    void DeleteAnimation(EditAnimation anim)
     {
         PixelsApp.Instance.ShowDialogBox("Delete Lighting Pattern?", "Are you sure you want to delete " + anim.name + "?", "Ok", "Cancel", res =>
         {
@@ -156,7 +156,7 @@ public class UIPatternsView
         });
     }
 
-    void ExpandAnimation(Animations.EditAnimation anim)
+    void ExpandAnimation(EditAnimation anim)
     {
         foreach (var uip in patterns)
         {
