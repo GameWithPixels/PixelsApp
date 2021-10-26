@@ -2194,7 +2194,6 @@ GameObject:
   - component: {fileID: 6405598940851332368}
   - component: {fileID: 4482904995127032853}
   - component: {fileID: 5624350541735828742}
-  - component: {fileID: 2013384719}
   m_Layer: 5
   m_Name: Stats
   m_TagString: Untagged
@@ -2331,21 +2330,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2013384719
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6405598940851332374}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  disabledColor: {r: 0.3064935, g: 0.3220779, b: 0.4, a: 0.69803923}
-  menuText: {fileID: 5741875876068866163}
-  menuIcon: {fileID: 2497900179723474648}
 --- !u!1 &6405598941077064071
 GameObject:
   m_ObjectHideFlags: 0
@@ -2359,7 +2343,6 @@ GameObject:
   - component: {fileID: 6405598941077064065}
   - component: {fileID: 1581094002711961520}
   - component: {fileID: 4738251246093967865}
-  - component: {fileID: 2037131034}
   m_Layer: 5
   m_Name: Reset Dice
   m_TagString: Untagged
@@ -2496,21 +2479,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2037131034
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6405598941077064071}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  disabledColor: {r: 0.3064935, g: 0.3220779, b: 0.4, a: 0.69803923}
-  menuText: {fileID: 5741875877027927075}
-  menuIcon: {fileID: 5741875876527426430}
 --- !u!1 &6405598941288236727
 GameObject:
   m_ObjectHideFlags: 0
@@ -3232,7 +3200,6 @@ GameObject:
   - component: {fileID: 5266434360045921904}
   - component: {fileID: 1518508979305247612}
   - component: {fileID: 3097179105573300052}
-  - component: {fileID: 378080915}
   m_Layer: 5
   m_Name: Set Design
   m_TagString: Untagged
@@ -3369,21 +3336,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &378080915
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9155582381126098599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  disabledColor: {r: 0.3064935, g: 0.3220779, b: 0.4, a: 0.69803923}
-  menuText: {fileID: 2264161738472583019}
-  menuIcon: {fileID: 1165921487035154988}
 --- !u!1001 &2233001690032342453
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3543,6 +3495,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a14c6d8f3f981264cb42856d87de375c, type: 3}
+--- !u!224 &8951353383244302989 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7117006056642645816, guid: a14c6d8f3f981264cb42856d87de375c,
+    type: 3}
+  m_PrefabInstance: {fileID: 2233001690032342453}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &4700466228045308790 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6901306925903111875, guid: a14c6d8f3f981264cb42856d87de375c,
@@ -3555,9 +3513,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35fe3f8759a2c6245b91fc051464f303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!224 &8951353383244302989 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 7117006056642645816, guid: a14c6d8f3f981264cb42856d87de375c,
-    type: 3}
-  m_PrefabInstance: {fileID: 2233001690032342453}
-  m_PrefabAsset: {fileID: 0}
