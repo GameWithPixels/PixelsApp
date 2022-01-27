@@ -38,7 +38,7 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
 
     string userClipsRootPath => Path.Combine(Application.persistentDataPath, AppConstants.Instance.AudioClipsFolderName);
 
-    void Start()
+    IEnumerator Start()
     {
         audioSource = GetComponent<AudioSource>();
         if (!Directory.Exists(userClipsRootPath))
@@ -46,7 +46,7 @@ public class AudioClipManager : SingletonMonoBehaviour<AudioClipManager>
             Directory.CreateDirectory(userClipsRootPath);
         }
 
-        StartCoroutine(LoadUserFiles());
+        yield return LoadUserFiles();
     }
 
     IEnumerator LoadUserFiles()

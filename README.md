@@ -10,7 +10,7 @@ Find our online guide [here](https://github.com/GameWithPixels/PixelsApp/wiki/Pi
 ## Patterns
 
 Lighting patterns let you customize how a dice will light up.
-There's a wide spectrum of possiblities, from a simple flash of colors to a rainbow effect, or more advanced effects such as waterfall, rotating rings, etc.
+There's a wide spectrum of possibilities, from a simple flash of colors to a rainbow effect, or more advanced effects such as waterfall, rotating rings, etc.
 
 ## Profiles
 
@@ -23,7 +23,7 @@ such as playing a luminous pattern on the die or an audio clip in the app.
 A preset associate any number of dice with specific profiles to activate.
 It's quick way to switch all or a subset of your dice to different profiles at once.
 
-# External ressources
+# External resources
 
 ## Unity packages
 
@@ -31,7 +31,6 @@ It's quick way to switch all or a subset of your dice to different profiles at o
 
 To build this app, you will need to purchase several Unity packages:
 
-* [Bluetooth LE for iOS, tvOS and Android](https://assetstore.unity.com/packages/tools/network/bluetooth-le-for-ios-tvos-and-android-26661)
 * [Loading Icons](https://assetstore.unity.com/packages/2d/gui/loading-icons-89411)
 * [InfiniWheel for uGUI](https://assetstore.unity.com/packages/tools/gui/infiniwheel-for-ugui-unity-4-6-28660)
 
@@ -84,7 +83,7 @@ Free [Basic UI Icons](https://www.flaticon.com/packs/basic-ui-5?word=basic) - Ic
 ## iOS (iPhone)
 
 You'll probably need to change the bundle identifier, sign the device with your own certificates
-and remove manual provisionning profile setup by Unity in Build Settings.
+and remove manual provisioning profile setup by Unity in Build Settings.
 
 If you get a `MapFileParser.sh: Permission denied` error, check this [link](https://issuetracker.unity3d.com/issues/ios-mapfileparser-dot-sh-permission-denied-when-building-xcode-project-built-from-windows-directly-to-a-macos-shared-folder).
 

@@ -187,12 +187,10 @@ public class UIPatternView
                 {
                     bool success = false;
                     var editSet = AppDataSet.Instance.ExtractEditSetForAnimation(editAnimation);
-                    StartCoroutine(previewDie.die.PlayTestAnimationAsync(
+                    yield return previewDie.die.PlayTestAnimationAsync(
                         editSet.ToDataSet(),
                         (res, err) => (success, error) = (res, err),
-                        (_, progress) => PixelsApp.Instance.UpdateProgrammingBox(progress)));
-
-                    yield return new WaitUntil(() => success || (error != null));
+                        (_, progress) => PixelsApp.Instance.UpdateProgrammingBox(progress));
                 }
                 finally
                 {

@@ -375,12 +375,10 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                                 // Upload dataset
                                 success = false;
                                 error = null;
-                                StartCoroutine(editDie.die.UploadDataSetAsync(
+                                yield return editDie.die.UploadDataSetAsync(
                                     dataSet,
                                     (res, err) => (success, error) = (res, err),
-                                    (_, progress) => UpdateProgrammingBox(progress, $"Uploading data to {editDie.name}...")));
-
-                                yield return new WaitUntil(() => success || (error != null));
+                                    (_, progress) => UpdateProgrammingBox(progress, $"Uploading data to {editDie.name}..."));
 
                                 if (success)
                                 {
