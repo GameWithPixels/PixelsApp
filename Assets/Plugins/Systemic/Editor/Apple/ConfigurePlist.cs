@@ -1,3 +1,5 @@
+#if UNITY_IOS_EXPORT
+
 using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
@@ -33,3 +35,5 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
         }
     }
 }
+
+#endif
