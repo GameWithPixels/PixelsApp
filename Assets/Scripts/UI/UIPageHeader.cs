@@ -61,4 +61,9 @@ public class UIPageHeader : MonoBehaviour
     {
         saveButton.gameObject.SetActive(enable);
     }
+
+    public void UpdateTitle(string title)
+    {
+        titleField.text = title;
+    }
 }

@@ -8675,6 +8675,7 @@ MonoBehaviour:
   DataSetFilename: dice_data.json
   SettingsFilename: settings.json
   ScanTimeout: 5
+  ConnectionTimeout: 10
   DiceRotationSpeedAvg: 10
   DiceRotationSpeedVar: 1
   DieUnavailableColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
@@ -20767,7 +20768,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1201767526528032, guid: 437dccd719a56d144bc7f8301d0fcd88, type: 3}
       propertyPath: m_Name
-      value: L11
+      value: LoaderAnim
       objectReference: {fileID: 0}
     - target: {fileID: 114434298490527826, guid: 437dccd719a56d144bc7f8301d0fcd88,
         type: 3}
@@ -20802,7 +20803,7 @@ PrefabInstance:
     - target: {fileID: 224445144408345888, guid: 437dccd719a56d144bc7f8301d0fcd88,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224445144408345888, guid: 437dccd719a56d144bc7f8301d0fcd88,
         type: 3}
@@ -20812,7 +20813,7 @@ PrefabInstance:
     - target: {fileID: 224445144408345888, guid: 437dccd719a56d144bc7f8301d0fcd88,
         type: 3}
       propertyPath: m_AnchorMin.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224445144408345888, guid: 437dccd719a56d144bc7f8301d0fcd88,
         type: 3}
@@ -20867,7 +20868,7 @@ PrefabInstance:
     - target: {fileID: 224445144408345888, guid: 437dccd719a56d144bc7f8301d0fcd88,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -239
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 224445144408345888, guid: 437dccd719a56d144bc7f8301d0fcd88,
         type: 3}

@@ -98,6 +98,12 @@ public class UIPage
     {
         NavigationManager.Instance.header.Setup(root, home, pageDirty, title, onTitleChanged);
     }
+
+    protected void UpdateTitle(string title)
+    {
+        NavigationManager.Instance?.header.UpdateTitle(title);
+    }
+
     protected void EnableSaveButton()
     {
         NavigationManager.Instance.header.EnableSaveButton(true);

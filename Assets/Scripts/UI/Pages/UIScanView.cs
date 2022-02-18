@@ -93,6 +93,8 @@ public class UIScanView
             discoveredDice.Remove(uidie);
             DestroyDiscoveredDie(uidie);
         }
+
+        UpdateTitle(discoveredDice.Count == 0 ? "Scanning" : $"Scanning ({discoveredDice.Count} found)");
     }
 
     public override void OnBack()
