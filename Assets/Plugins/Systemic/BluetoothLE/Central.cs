@@ -7,6 +7,7 @@ using UnityEngine;
 //! \defgroup Unity_CSharp
 //! @brief A collection of C# classes for the Unity game engine that provides a simplified access
 //!        to Bluetooth Low Energy peripherals.
+//! @see Systemic.Unity.BluetoothLE and Systemic.Unity.Pixels namespaces.
 
 /// <summary>
 /// Systemic Games base namespace.
@@ -86,110 +87,6 @@ namespace Systemic.Unity.BluetoothLE
     /// </example>
     public static class Central
     {
-        #region MonoBehaviour
-
-        /// <summary>
-        /// Internal <see cref="MonoBehaviour"/> that runs queued <see cref="Action"/> on each Unity's call to <see cref="Update"/>.
-        /// </summary>
-        sealed class CentralBehaviour : MonoBehaviour
-        {
-            // Our action queue
-            ConcurrentQueue<Action> _actionQueue = new ConcurrentQueue<Action>();
-
-            /// <summary>
-            /// Queues an action to be invoked on the next frame update.
-            /// </summary>
-            /// <param name="action">The action to be invoked on the next update.</param>
-            public void EnqueueAction(Action action)
-            {
-                _actionQueue.Enqueue(action);
-            }
-
-            void OnEnable()
-            {
-                // Safeguard
-                if ((_instance != null) && (_instance != this))
-                {
-                    Debug.LogError($"A second instance of {typeof(CentralBehaviour)} got spawned, now destroying it");
-                    Destroy(this);
-                }
-            }
-
-            void OnDisable()
-            {
-                if (_instance == this)
-                {
-                    _instance = null;
-                }
-            }
-
-            void Update()
-            {
-                while (_actionQueue.TryDequeue(out Action act))
-                {
-                    act?.Invoke();
-                }
-                if (_autoDestroy)
-                {
-                    Destroy(_instance);
-                    _instance = null;
-                }
-            }
-
-            void OnDestroy()
-            {
-                if (!_autoDestroy)
-                {
-                    Central.Shutdown();
-                }
-            }
-        }
-
-        // Keeps a reference to the behaviour instance
-        static CentralBehaviour _instance;
-
-        // When set to true, the behaviour destroys itself on the next frame update
-        static bool _autoDestroy;
-
-        // Queues an action to be invoked on the next frame update
-        static void EnqueueAction(Action action)
-        {
-            _instance?.EnqueueAction(action);
-        }
-
-        // Queues an action to be invoked on the next frame update but only if the peripheral is still in our list
-        static void EnqueuePeripheralAction(PeripheralInfo pinf, Action action)
-        {
-            _instance?.EnqueueAction(() =>
-            {
-                Debug.Assert(pinf.ScannedPeripheral != null);
-                if (_peripherals.ContainsKey(pinf.ScannedPeripheral?.SystemId))
-                {
-                    action();
-                }
-            });
-        }
-
-        // Creates the internal behaviour
-        static void CreateBehaviour()
-        {
-            _autoDestroy = false;
-            if (!_instance)
-            {
-                var go = new GameObject("SystemicBleCentral");
-                UnityEngine.Object.DontDestroyOnLoad(go);
-                _instance = go.AddComponent<CentralBehaviour>();
-            }
-        }
-
-        // Schedule the internal behaviour to be destroyed on the next frame update
-        static void ScheduleDestroy()
-        {
-            _autoDestroy = true;
-        }
-
-        #endregion
-
         // Internal peripheral states
         enum PeripheralState
         {
@@ -275,7 +172,7 @@ namespace Systemic.Unity.BluetoothLE
 
         /// <summary>
         /// Initializes the static class.
-        /// The <see cref="IsReady"/> property is set to <c>true</c> once <see cref="Central"/> is ready
+        /// The <see cref="IsReady"/> property is set to <c>true</c> once the instance is ready
         /// to scan for and connect to BLE peripherals.
         /// </summary>
         /// <returns>
@@ -289,7 +186,7 @@ namespace Systemic.Unity.BluetoothLE
 
             Debug.Log("[BLE] Initializing");
 
-            CreateBehaviour();
+            InternalBehaviour.Create();
 
             // Initialize NativeInterface and subscribe to get notified when the Bluetooth radio status changes
             bool success = NativeInterface.Initialize(status =>
@@ -322,9 +219,9 @@ namespace Systemic.Unity.BluetoothLE
             _peripherals.Clear();
             IsScanning = IsReady = false;
 
-            // Shutdown native interface and destroy companion mono behavior
+            // Shutdown native interface and destroy companion mono behaviour
             NativeInterface.Shutdown();
-            ScheduleDestroy();
+            InternalBehaviour.ScheduleDestroy();
         }
 
         //! @}
@@ -529,9 +426,7 @@ namespace Systemic.Unity.BluetoothLE
 
                 if (ready)
                 {
-                    //Debug.Log($"[BLE:{pinf.Name}] Peripheral ready, setting MTU");
-
-                    if (pinf.NativeHandle.IsValid && (NativeInterface.GetPeripheralMtu(pinf.NativeHandle) == 21)) //TODO check value on Android
+                    if (pinf.NativeHandle.IsValid && (NativeInterface.GetPeripheralMtu(pinf.NativeHandle) == NativeInterface.MinMtu))
                     {
                         // Change MTU to maximum (note: MTU can only be set once)
                         NativeInterface.RequestPeripheralMtu(pinf.NativeHandle, NativeInterface.MaxMtu,
@@ -963,5 +858,79 @@ namespace Systemic.Unity.BluetoothLE
                 }
             };
         }
+
+        #region PersistentMonoBehaviourSingleton
+
+        /// <summary>
+        /// Internal <see cref="MonoBehaviour"/> that runs queued <see cref="Action"/> on each
+        /// Unity's call to <see cref="Update"/>.
+        /// </summary>
+        sealed class InternalBehaviour :
+            Internal.PersistentMonoBehaviourSingleton<InternalBehaviour>,
+            Internal.IPersistentMonoBehaviourSingleton
+        {
+            // Our action queue
+            ConcurrentQueue<Action> _actionQueue = new ConcurrentQueue<Action>();
+
+            // Instance name
+            string Internal.IPersistentMonoBehaviourSingleton.GameObjectName => "SystemicBleCentral";
+
+            /// <summary>
+            /// Queues an action to be invoked on the next frame update.
+            /// </summary>
+            /// <param name="action">The action to be invoked on the next update.</param>
+            public void EnqueueAction(Action action)
+            {
+                _actionQueue.Enqueue(action);
+            }
+
+            // Update is called once per frame
+            protected override void Update()
+            {
+                while (_actionQueue.TryDequeue(out Action act))
+                {
+                    try
+                    {
+                        act?.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+
+                base.Update();
+            }
+
+            // Called when the instance will be destroyed
+            void OnDestroy()
+            {
+                if (!AutoDestroy)
+                {
+                    Central.Shutdown();
+                }
+            }
+        }
+
+        // Queues an action to be invoked on the next frame update
+        static void EnqueueAction(Action action)
+        {
+            InternalBehaviour.Instance?.EnqueueAction(action);
+        }
+
+        // Queues an action to be invoked on the next frame update but only if the peripheral is still in our list
+        static void EnqueuePeripheralAction(PeripheralInfo pinf, Action action)
+        {
+            InternalBehaviour.Instance?.EnqueueAction(() =>
+            {
+                Debug.Assert(pinf.ScannedPeripheral != null);
+                if (_peripherals.ContainsKey(pinf.ScannedPeripheral?.SystemId))
+                {
+                    action();
+                }
+            });
+        }
+
+        #endregion
     }
 }

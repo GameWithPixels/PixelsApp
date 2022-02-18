@@ -339,8 +339,16 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
         {
             _onDiscoveredPeripheral = jsonStr =>
             {
-                var adv = JsonUtility.FromJson<NativeAdvertisementDataJson>(jsonStr);
-                onScannedPeripheral(new NativeCBPeripheral(adv.systemId), adv);
+                //Debug.Log($"[BLE] Scan ==> onScanResult: {jsonStr}");
+                try
+                {
+                    var adv = JsonUtility.FromJson<NativeAdvertisementDataJson>(jsonStr);
+                    onScannedPeripheral(new NativeCBPeripheral(adv.systemId), adv);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             };
 
             bool allowDuplicates = true; //TODO not good for battery life

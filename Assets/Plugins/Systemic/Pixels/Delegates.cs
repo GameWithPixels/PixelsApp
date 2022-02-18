@@ -69,7 +69,7 @@ namespace Systemic.Unity.Pixels
     /// <param name="pixel">The source of the event.</param>
     /// <param name="batteryLevel">The latest battery level reported by the die, normalized between 0 and 1 included.</param>
     /// <param name="isCharging">Whether or not the battery is reported as charging.</param>
-    public delegate void BatteryLevelChangedEventHandler(Pixel pixel, float batteryLevel, bool isCharging);
+    public delegate void BatteryLevelChangedEventHandler(Pixel pixel, float batteryLevel, bool? isCharging);
 
     /// <summary>
     /// Delegate for Pixel RSSI changes.

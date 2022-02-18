@@ -3,7 +3,9 @@ using Systemic.Unity.Pixels.Messages;
 using UnityEngine;
 
 /// <summary>
-/// A collection of C# classes for the Unity game engine that enables communications with Pixel dice.
+/// A collection of C# classes for the Unity game engine that enables communications with Pixels dice.
+/// The <see cref="Pixel"/> class represents a die peripheral and the <see cref="DiceBag"/> static class
+/// implements methods for scanning for and connecting to Pixels.
 /// </summary>
 //! @ingroup Unity_CSharp
 namespace Systemic.Unity.Pixels
@@ -79,52 +81,75 @@ namespace Systemic.Unity.Pixels
 
         /// <summary>
         /// Gets the number of faces for the Pixel.
+        ///
+        /// This value is set when the Pixel is being scanned or once when connected.
         /// </summary>
         public int faceCount { get; protected set; }
 
         /// <summary>
         /// Gets the Pixel combination of design and color.
+        ///
+        /// This value is set when the Pixel is being scanned or once when connected.
         /// </summary>
         public PixelDesignAndColor designAndColor { get; protected set; } = PixelDesignAndColor.Unknown;
 
         /// <summary>
         /// Get the version id of the firmware running on the Pixel.
+        ///
+        /// This value is set once when the Pixel is being connected.
         /// </summary>
         public string firmwareVersionId { get; protected set; } = "Unknown";
 
         /// <summary>
         /// Get the hash value of the animation data loaded on the Pixel.
+        ///
+        /// This value is set once when the Pixel is being connected.
         /// </summary>
         public uint dataSetHash { get; protected set; }
 
         /// <summary>
         /// Get the size of memory that can be used to store animation data on the Pixel.
+        ///
+        /// This value is set once when the Pixel is being connected.
         /// </summary>
         public uint flashSize { get; protected set; }
 
         /// <summary>
         /// Gets the Pixel current roll state.
+        ///
+        /// This value is set when the Pixel is being scanned or when connected.
         /// </summary>
         public PixelRollState rollState { get; protected set; } = PixelRollState.Unknown;
 
         /// <summary>
         /// Gets Pixel the current face that is up.
+        /// 
+        /// This value is set when the Pixel is being scanned or when connected.
         /// </summary>
         public int face { get; protected set; } = -1; //TODO change to face number rather than index
 
         /// <summary>
         /// Gets the Pixel last read battery level.
+        /// 
         /// The value is normalized between 0 and 1 included.
+        /// This value is set when the Pixel is being scanned and
+        /// <see cref="UpdateBatteryLevelAsync(OperationResultCallback)"/> is called while connected.
         /// </summary>
         public float batteryLevel { get; protected set; }
 
         /// <summary>
         /// Indicates whether or not the Pixel was last reported as charging.
+        ///
+        /// This value is only set when
+        /// <see cref="UpdateBatteryLevelAsync(OperationResultCallback)"/> is called while connected.
         /// </summary>
-        public bool isCharging { get; protected set; }
+        public bool? isCharging { get; protected set; }
 
         /// <summary>
         /// Gets the Pixel last read Received Signal Strength Indicator (RSSI) value.
+        ///
+        /// This value is set when the Pixel is being scanned or when
+        /// <see cref="UpdateRssiAsync(OperationResultCallback)"/> is called while connected.
         /// </summary>
         public int rssi { get; protected set; }
 

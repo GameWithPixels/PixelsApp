@@ -76,7 +76,7 @@ public class UIDiscoveredDieView : MonoBehaviour
         }
     }
     
-    void OnBatteryLevelChanged(Pixel die, float level, bool charging)
+    void OnBatteryLevelChanged(Pixel die, float level, bool? charging)
     {
         batteryView.SetLevel(level, charging);
     }

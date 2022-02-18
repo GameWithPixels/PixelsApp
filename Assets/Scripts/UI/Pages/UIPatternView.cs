@@ -56,7 +56,7 @@ public class UIPatternView
         if (previewDie != null)
         {
             previewDie.die.SetStandardMode();
-            DiceBag.Instance.DisconnectPixel(previewDie.die);
+            DiceBag.DisconnectPixel(previewDie.die);
             previewDie = null;
             previewDieConnected = false;
         }

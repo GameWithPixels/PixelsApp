@@ -49,7 +49,7 @@ public class UIDicePoolView
         }
         foreach (var editDie in connectedDice)
         {
-            DiceBag.Instance.DisconnectPixel(editDie.die);
+            DiceBag.DisconnectPixel(editDie.die);
         }
         connectedDice.Clear();
     }

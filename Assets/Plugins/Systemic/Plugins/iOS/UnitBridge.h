@@ -188,7 +188,7 @@ inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionar
 {
     NSData *manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey];
     NSString *localName = advertisementData[CBAdvertisementDataLocalNameKey];
-    NSDictionary<CBUUID *, NSData *> *servicesData = advertisementData[CBAdvertisementDataServiceDataKey];
+    NSDictionary<CBUUID *, NSData *> *serviceData = advertisementData[CBAdvertisementDataServiceDataKey];
     NSArray<CBUUID *> *serviceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey];
     NSArray<CBUUID *> *overflowServiceUUIDs = advertisementData[CBAdvertisementDataOverflowServiceUUIDsKey];
     NSNumber *txPowerLevel = advertisementData[CBAdvertisementDataTxPowerLevelKey];
@@ -199,9 +199,9 @@ inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionar
     [jsonStr appendFormat:@"{\"systemId\":\"%s\",", systemId];
     if (manufacturerData)
     {
-        [jsonStr appendString:@"\"manufacturerData\":"];
+        [jsonStr appendString:@"\"manufacturerData0\":["];
         appendToJsonStr(jsonStr, manufacturerData);
-        [jsonStr appendString:@","];
+        [jsonStr appendString:@"],"];
     }
     if (localName)
     {
@@ -211,17 +211,17 @@ inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionar
     {
         [jsonStr appendString:@"\"isConnectable\":true,"];
     }
-    if (servicesData)
+    if (serviceData)
     {
         [jsonStr appendString:@"\"serviceData\":{"];
         bool first = true;
-        for (CBUUID *uuid in servicesData)
+        for (CBUUID *uuid in serviceData)
         {
             if (!first)
                 [jsonStr appendString:@","];
             first = false;
             [jsonStr appendFormat:@"\"%@\":", toJsonStr(uuid)];
-            appendToJsonStr(jsonStr, [servicesData objectForKey:uuid]);
+            appendToJsonStr(jsonStr, [serviceData objectForKey:uuid]);
         }
         [jsonStr appendString:@"},"];
     }

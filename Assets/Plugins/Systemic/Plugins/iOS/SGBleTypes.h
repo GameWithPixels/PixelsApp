@@ -11,8 +11,8 @@
  * @note Some knowledge with Bluetooth Low Energy semantics is recommended for reading
  *       this documentation.
  *
- * The Systemic BluetoohLE library for Apple devices provides classes for scanning
- * Bluetooth Low Energy (BLE) peripherals, connecting to and communicating with them.
+ * The Systemic Games Bluetooth Low Energy library for Apple devices provides classes for
+ * scanning for Bluetooth Low Energy (BLE) peripherals, connecting to and communicating with them.
  * Those classes are based on the Apple's Core Bluetooth framework.
  * 
  * The SGBleCentralManagerDelegate class implements the Apple
@@ -32,6 +32,7 @@
  * This library also includes a set of C functions to be called from Unity for acessing
  * Bluetooth devices.
  *
+ * Below is a diagram of the main classes of this library:
  * @image html native-apple.svg "Classes diagram"
  */
 

@@ -318,7 +318,7 @@ namespace Systemic.Unity.Pixels.Messages
     public class Rssi : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.Rssi;
-        public short rssi;
+        public short value;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

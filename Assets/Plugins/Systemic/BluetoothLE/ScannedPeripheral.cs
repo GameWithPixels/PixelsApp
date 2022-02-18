@@ -7,6 +7,43 @@ using Systemic.Unity.BluetoothLE.Internal;
 namespace Systemic.Unity.BluetoothLE
 {
     /// <summary>
+    /// The manufacturer data of an advertisement packet.
+    /// </summary>
+    /// <remarks>
+    /// This is a read only class.
+    /// </remarks>
+    public struct ManufacturerData
+    {
+        /// <summary>
+        /// Initialize a manufacturer data instance from an array of bytes.
+        /// </summary>
+        /// <param name="data">The manufacturer data, should be at least of size 2.</param>
+        internal ManufacturerData(byte[] data)
+        {
+            if (data?.Length > 2)
+            {
+                ManufacturerId = (ushort)(data[0] | (data[1] << 8));
+                Data = Array.AsReadOnly(data.Skip(2).ToArray());
+            }
+            else
+            {
+                ManufacturerId = 0;
+                Data = Array.AsReadOnly(Array.Empty<byte>());
+            }
+        }
+
+        /// <summary>
+        /// The manufacturer id.
+        /// </summary>
+        public ushort ManufacturerId { get; }
+
+        /// <summary>
+        /// The data for the manufacturer.
+        /// </summary>
+        public IReadOnlyList<byte> Data { get; }
+    }
+
+    /// <summary>
     /// The advertisement data of a peripheral received during a BLE scan.
     ///
     /// This data usually holds the peripheral name and advertised services.
@@ -35,7 +72,8 @@ namespace Systemic.Unity.BluetoothLE
             IsConnectable = advertisementData.isConnectable;
             Rssi = advertisementData.rssi;
             TxPowerLevel = advertisementData.txPowerLevel;
-            ManufacturerData = Array.AsReadOnly((advertisementData.manufacturerData ?? Array.Empty<byte>()).ToArray());
+            ManufacturerData = Array.AsReadOnly(ToManufacturerDataArray(advertisementData.manufacturerData0,
+                advertisementData.manufacturerData1, advertisementData.manufacturerData2, advertisementData.manufacturerData3));
             ServicesData = new ReadOnlyDictionary<string, byte[]>(CloneDictionary(advertisementData.servicesData));
             Services = Array.AsReadOnly(ToGuidArray(advertisementData.services));
             OverflowServices = Array.AsReadOnly(ToGuidArray(advertisementData.overflowServiceUUIDs));
@@ -80,7 +118,7 @@ namespace Systemic.Unity.BluetoothLE
         /// <summary>
         /// Gets the manufacturer data of the peripheral.
         /// </summary>
-        public IReadOnlyList<byte> ManufacturerData { get; }
+        public IReadOnlyList<ManufacturerData> ManufacturerData { get; }
 
         /// <summary>
         /// Gets the service-specific advertisement data (iOS only).
@@ -102,7 +140,13 @@ namespace Systemic.Unity.BluetoothLE
         /// </summary>
         public IReadOnlyList<Guid> SolicitedServices { get; }
 
-        // Converts an of string representing BLE UUIDS to an array of Guid
+        // Converts a double array of bytes to an array of manufacturer data
+        private ManufacturerData[] ToManufacturerDataArray(byte[] data0, byte[] data1, byte[] data2, byte[] data3)
+        {
+            return new[] { data0, data1, data2, data3 }.Where(d => d != null).Select(d => new ManufacturerData(d)).ToArray();
+        }
+
+        // Converts a list of strings representing BLE UUIDS to an array of Guids
         private static Guid[] ToGuidArray(string[] uuids)
         {
             return uuids?.Select(BleUuid.StringToGuid).ToArray() ?? Array.Empty<Guid>();

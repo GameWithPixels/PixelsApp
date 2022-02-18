@@ -121,12 +121,12 @@ namespace Systemic.Unity.Pixels
             var op = new SendMessageAndProcessResponseWithValueEnumerator<RequestRssi, Rssi, int>(this,
                 rssiMsg =>
                 {
-                    if (rssi != rssiMsg.rssi)
+                    if (rssi != rssiMsg.value)
                     {
-                        rssi = rssiMsg.rssi;
+                        rssi = rssiMsg.value;
                         RssiChanged?.Invoke(this, rssi);
                     }
-                    return rssiMsg.rssi;
+                    return rssiMsg.value;
                 });
             yield return op;
             onResult?.Invoke(op.IsSuccess, op.Error);

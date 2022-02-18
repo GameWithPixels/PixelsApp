@@ -188,7 +188,7 @@ public class UIPairedDieToken : MonoBehaviour
         OnToggle();
         if (die.die != null && !die.die.isAvailable)
         {
-            DiceBag.Instance.DisconnectPixel(die.die, forceDisconnect: true);
+            DiceBag.DisconnectPixel(die.die, forceDisconnect: true);
         }
     }
 

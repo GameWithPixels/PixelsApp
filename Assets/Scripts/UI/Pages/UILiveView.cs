@@ -28,7 +28,7 @@ public class UILiveView
     public override void Leave()
     {
         base.Leave();
-        watchedDice.ForEach(d => DiceBag.Instance.DisconnectPixel(d));
+        watchedDice.ForEach(d => DiceBag.DisconnectPixel(d));
         watchedDice.Clear();
     }
 

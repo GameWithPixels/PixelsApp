@@ -9,29 +9,31 @@ using Peripheral = Systemic.Unity.BluetoothLE.ScannedPeripheral;
 namespace Systemic.Unity.Pixels
 {
     /// <summary>
-    /// Singleton that manages Bluetooth Low Energy Pixels.
+    /// Static class that scan for and connect to <see cref="Pixel"/> dice.
     /// Scan and connection requests are counted, meaning that the same number of respectively scan cancellation
     /// and disconnection requests must be made for them to effectively happen.
     ///
     /// This allows for different parts of the user code to work with this singleton without impacting each others.
+    /// 
+    /// <see cref="Central"/> must be initialized first before calling methods of this class.
     /// </summary>
-    public sealed partial class DiceBag : MonoBehaviour
+    public static partial class DiceBag
     {
         // Count the number of scan requests and cancel scanning only after the same number of stop scan requests
-        int _scanRequestCount;
+        static int _scanRequestCount;
 
         // List of known pixels
-        readonly HashSet<BlePixel> _pixels = new HashSet<BlePixel>();
+        static readonly HashSet<BlePixel> _pixels = new HashSet<BlePixel>();
 
         // Pixels to be destroyed in the next frame update
-        readonly HashSet<BlePixel> _pixelsToDestroy = new HashSet<BlePixel>();
+        static readonly HashSet<BlePixel> _pixelsToDestroy = new HashSet<BlePixel>();
 
         // Map of registered Pixels, the key is a Pixel system id and the value its name (may be empty)
-        readonly Dictionary<string, string> _registeredPixels = new Dictionary<string, string>();
+        static readonly Dictionary<string, string> _registeredPixels = new Dictionary<string, string>();
 
         // Callbacks for notifying user code
-        NotifyUserCallback _notifyUser;
-        PlayAudioClipCallback _playAudioClip;
+        static NotifyUserCallback _notifyUser;
+        static PlayAudioClipCallback _playAudioClip;
 
         /// <summary>
         /// The default Pixel connection timeout in seconds.
@@ -39,59 +41,56 @@ namespace Systemic.Unity.Pixels
         public const float DefaultConnectionTimeout = 10;
 
         /// <summary>
-        /// Gets the singleton instance.
-        /// </summary>
-        public static DiceBag Instance { get; private set; }
-
-        /// <summary>
         /// Indicates whether we are ready for scanning and connecting to peripherals.
         /// </summary>
-        public bool IsReady => Central.IsReady;
+        public static bool IsReady => Central.IsReady;
 
         /// <summary>
         /// Indicates whether we are scanning for Pixel dice.
         /// </summary>
-        public bool IsScanning => _scanRequestCount > 0; //TODO update when Bluetooth radio turned off
+        public static bool IsScanning => _scanRequestCount > 0; //TODO update when Bluetooth radio turned off
 
         /// <summary>
         /// Gets the list of all Pixels we know about.
         /// </summary>
-        public Pixel[] AllPixels => _pixels.ToArray();
+        public static Pixel[] AllPixels => _pixels.ToArray();
 
         /// <summary>
         /// Gets the list of available (scanned but not connected) Pixel dice.
         /// </summary>
-        public Pixel[] AvailablePixels => _pixels.Where(p => p.isAvailable).ToArray();
+        public static Pixel[] AvailablePixels => _pixels.Where(p => p.isAvailable).ToArray();
 
         /// <summary>
         /// Gets the list of Pixel dice that are connected and ready to communicate.
         /// </summary>
-        public Pixel[] ConnectedPixels => _pixels.Where(p => p.isReady).ToArray();
+        public static Pixel[] ConnectedPixels => _pixels.Where(p => p.isReady).ToArray();
 
         /// <summary>
         /// An event raised when a Pixel is discovered, may be raised multiple times for
         /// the same Pixel as it receives new advertisement packets from it.
         /// </summary>
-        public event System.Action<Pixel> PixelDiscovered;
+        public static event System.Action<Pixel> PixelDiscovered;
 
         #region Scan for Pixels
 
         /// <summary>
         /// Starts scanning for Pixel dice.
         /// </sumary>
-        public void ScanForPixels()
+        public static void ScanForPixels()
         {
+            InternalBehaviour.Create();
+
             ++_scanRequestCount;
             Central.PeripheralDiscovered -= OnPeripheralDiscovered; // Prevents from subscribing twice
             Central.PeripheralDiscovered += OnPeripheralDiscovered;
-            Central.ScanForPeripheralsWithServices(new[] { BleUuids.ServiceUuid });
+            Central.ScanForPeripheralsWithServices(new[] { PixelUuids.ServiceUuid });
         }
 
         /// <summary>
         /// Stops scanning for Pixels when called as many times as <see cref="ScanForPixels"/>.
         /// </sumary>
         /// <param name="forceCancel">If true stops scanning regardless of the number of scan calls that were made.</param>
-        public void CancelScanning(bool forceCancel = false)
+        public static void CancelScanning(bool forceCancel = false)
         {
             if (_scanRequestCount > 0)
             {
@@ -108,7 +107,7 @@ namespace Systemic.Unity.Pixels
         /// <summary>
         /// Removes all available Pixel dice.
         /// </summary>
-        public void ClearAvailablePixels()
+        public static void ClearAvailablePixels()
         {
             var pixelsCopy = new List<BlePixel>(_pixels);
             foreach (var pixel in pixelsCopy)
@@ -121,15 +120,17 @@ namespace Systemic.Unity.Pixels
         }
 
         // Called by Central when a new Pixel is discovered
-        void OnPeripheralDiscovered(Peripheral peripheral)
+        static void OnPeripheralDiscovered(Peripheral peripheral)
         {
+            InternalBehaviour.CheckValid();
+
             // Check if have already a Pixel object for this peripheral
             var pixel = _pixels.FirstOrDefault(d => peripheral.SystemId == d.SystemId);
             if (pixel == null)
             {
                 // Never seen this Pixel before
-                var dieObj = new GameObject(name);
-                dieObj.transform.SetParent(transform);
+                var dieObj = new GameObject(peripheral.Name);
+                dieObj.transform.SetParent(InternalBehaviour.Instance.transform);
 
                 pixel = dieObj.AddComponent<BlePixel>();
                 pixel.DisconnectedUnexpectedly += () => DestroyPixel(pixel);
@@ -142,7 +143,7 @@ namespace Systemic.Unity.Pixels
             // Discard discovery event if peripheral is not available anymore (it might just have started connecting)
             if (pixel.connectionState <= PixelConnectionState.Available)
             {
-                Debug.Log($"Discovered Pixel {peripheral.Name}");
+                Debug.Log($"Discovered Pixel {peripheral.Name}, systemId is {peripheral.SystemId}");
 
                 // Update Pixel
                 pixel.Setup(peripheral);
@@ -160,7 +161,7 @@ namespace Systemic.Unity.Pixels
         /// Subscribe to requests from Pixel dice to notify user.
         /// </summary>
         /// <param name="notifyUserCallback">The callback to be called when a Pixel requires to notify the user.</param>
-        public void SubscribeToUserNotifyRequest(NotifyUserCallback notifyUserCallback)
+        public static void SubscribeToUserNotifyRequest(NotifyUserCallback notifyUserCallback)
         {
             _notifyUser = notifyUserCallback;
             foreach (var p in _pixels)
@@ -173,7 +174,7 @@ namespace Systemic.Unity.Pixels
         /// Subscribe to requests from Pixel dice to play an audio clip.
         /// </summary>
         /// <param name="playAudioClipCallback">The callback to be called when a Pixel requires to play an audio clip.</param>
-        public void SubscribeToPlayAudioClipRequest(PlayAudioClipCallback playAudioClipCallback)
+        public static void SubscribeToPlayAudioClipRequest(PlayAudioClipCallback playAudioClipCallback)
         {
             _playAudioClip = playAudioClipCallback;
             foreach (var p in _pixels)
@@ -189,7 +190,7 @@ namespace Systemic.Unity.Pixels
         /// <summary>
         /// Reset errors on all know Pixel dice.
         /// </summary>
-        public void ResetErrors()
+        public static void ResetErrors()
         {
             foreach (var pixel in _pixels)
             {
@@ -214,7 +215,7 @@ namespace Systemic.Unity.Pixels
         ///                        successfully (true) or not (false) with an error message.</param>
         /// <param name="connectionTimeout">The connection timeout in seconds.</param>
         /// <returns>The coroutine running the request.</returns>
-        public Coroutine ConnectPixel(Pixel pixel, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null, float connectionTimeout = DefaultConnectionTimeout)
+        public static Coroutine ConnectPixel(Pixel pixel, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null, float connectionTimeout = DefaultConnectionTimeout)
         {
             if (pixel == null) throw new System.ArgumentNullException(nameof(pixel));
             if (requestCancelFunc == null) throw new System.ArgumentNullException(nameof(requestCancelFunc));
@@ -239,7 +240,7 @@ namespace Systemic.Unity.Pixels
         ///                        successfully (true) or not (false) with an error message.</param>
         /// <param name="connectionTimeout">The connection timeout in seconds.</param>
         /// <returns>The coroutine running the request.</returns>
-        public Coroutine ConnectPixels(IEnumerable<Pixel> pixels, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null, float connectionTimeout = DefaultConnectionTimeout)
+        public static Coroutine ConnectPixels(IEnumerable<Pixel> pixels, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null, float connectionTimeout = DefaultConnectionTimeout)
         {
             if (pixels == null) throw new System.ArgumentNullException(nameof(pixels));
             if (requestCancelFunc == null) throw new System.ArgumentNullException(nameof(requestCancelFunc));
@@ -324,7 +325,7 @@ namespace Systemic.Unity.Pixels
         /// <param name="forceDisconnect">Whether to disconnect even if there were more connection requests
         ///                               than calls to disconnect.</param>
         /// <returns>The coroutine running the request.</returns>
-        public Coroutine DisconnectPixel(Pixel pixel, bool forceDisconnect = false)
+        public static Coroutine DisconnectPixel(Pixel pixel, bool forceDisconnect = false)
         {
             if (pixel == null) throw new System.ArgumentNullException(nameof(pixel));
             var blePixel = (BlePixel)pixel;
@@ -346,12 +347,18 @@ namespace Systemic.Unity.Pixels
             }
         }
 
-        // Cleanly destroys a Pixel instance, disconnecting if necessary and raising events in the process
-        void DestroyPixel(BlePixel pixel)
+        // Destroys a Pixel instance and remove it from internal lists
+        static void DestroyPixel(BlePixel pixel)
         {
+            InternalBehaviour.Create();
+
             Debug.Assert(pixel);
             if (pixel)
             {
+                if (pixel.isConnectingOrReady)
+                {
+                    Debug.LogWarning($"Destroying Pixel in {pixel.connectionState} state");
+                }
                 GameObject.Destroy(pixel.gameObject);
             }
             _pixels.Remove(pixel);
@@ -360,62 +367,54 @@ namespace Systemic.Unity.Pixels
 
         #endregion
 
-        #region Unity messages
+        #region PersistentMonoBehaviourSingleton
 
-        // Called when the behaviour becomes enabled and active
-        void OnEnable()
+        /// <summary>
+        /// Internal <see cref="MonoBehaviour"/> that runs coroutines and check for Pixel to destroy
+        /// on each Unity's call to <see cref="Update"/>.
+        /// </summary>
+        sealed class InternalBehaviour :
+            BluetoothLE.Internal.PersistentMonoBehaviourSingleton<InternalBehaviour>,
+            BluetoothLE.Internal.IPersistentMonoBehaviourSingleton
         {
-            //TODO this mechanism prevents accessing the instance in OnEnable of another script if it's initialized before this one
+            // Instance name
+            string BluetoothLE.Internal.IPersistentMonoBehaviourSingleton.GameObjectName => "SystemicPixelsDiceBag";
 
-            // Safeguard
-            if ((Instance != null) && (Instance != this))
+            // Update is called once per frame
+            protected override void Update()
             {
-                Debug.LogError($"A second instance of {typeof(DiceBag)} got spawned, now destroying it");
-                Destroy(this);
-            }
-            else
-            {
-                Instance = this;
-            }
-        }
-
-        // Called when the behaviour becomes disabled or inactive
-        void OnDisable()
-        {
-            if (Instance == this)
-            {
-                Instance = null;
-            }
-        }
-
-        // Start is called before the first frame update
-        void Start()
-        {
-            Central.Initialize(); //TODO handle error + user message
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            List<BlePixel> destroyNow = null;
-            foreach (var pixel in _pixelsToDestroy)
-            {
-                if (!pixel.isConnectingOrReady)
+                // Destroys Pixels
+                List<BlePixel> destroyNow = null;
+                foreach (var pixel in _pixelsToDestroy)
                 {
-                    if (destroyNow == null)
+                    if (!pixel.isConnectingOrReady)
                     {
-                        destroyNow = new List<BlePixel>();
+                        if (destroyNow == null)
+                        {
+                            destroyNow = new List<BlePixel>();
+                        }
+                        destroyNow.Add(pixel);
                     }
-                    destroyNow.Add(pixel);
                 }
-            }
-            if (destroyNow != null)
-            {
-                foreach (var pixel in destroyNow)
+                if (destroyNow != null)
                 {
-                    DestroyPixel(pixel);
+                    foreach (var pixel in destroyNow)
+                    {
+                        DestroyPixel(pixel);
+                    }
                 }
+
+                base.Update();
             }
+        }
+
+        static Coroutine StartCoroutine(IEnumerator enumerator, bool noThrow = false)
+        {
+            if (InternalBehaviour.CheckValid(noThrow))
+            {
+                return InternalBehaviour.Instance.StartCoroutine(enumerator);
+            }
+            return null;
         }
 
         #endregion

@@ -34,23 +34,20 @@ public class UIScanView
 
         IEnumerator BeginScanCr()
         {
-            while (!DiceBag.Instance.IsReady)
+            while (!DiceBag.IsReady)
             {
                 yield return null;
             }
-            DiceBag.Instance.PixelDiscovered += OnDieDiscovered;
-            DiceBag.Instance.ScanForPixels();
+            DiceBag.PixelDiscovered += OnDieDiscovered;
+            DiceBag.ScanForPixels();
             pairSelectedDice.SetActive(false);
         }
     }
 
     void OnDisable()
     {
-        if (DiceBag.Instance != null)
-        {
-            DiceBag.Instance.PixelDiscovered -= OnDieDiscovered;
-            DiceBag.Instance.CancelScanning();
-        }
+        DiceBag.PixelDiscovered -= OnDieDiscovered;
+        DiceBag.CancelScanning();
         foreach (var die in discoveredDice)
         {
             die.die.ConnectionStateChanged -= OnDieStateChanged;
@@ -65,24 +62,21 @@ public class UIScanView
     {
         // Assume all scanned dice will be destroyed
         var toDestroy = new List<UIDiscoveredDieView>(discoveredDice);
-        if (DiceBag.Instance)
+        foreach (var die in DiceBag.AvailablePixels)
         {
-            foreach (var die in DiceBag.Instance.AvailablePixels)
+            if (AppDataSet.Instance.GetEditDie(die) == null)
             {
-                if (AppDataSet.Instance.GetEditDie(die) == null)
+                // It's an advertising die we don't *know* about
+                int prevIndex = toDestroy.FindIndex(uid => uid.die == die);
+                if (prevIndex == -1)
                 {
-                    // It's an advertising die we don't *know* about
-                    int prevIndex = toDestroy.FindIndex(uid => uid.die == die);
-                    if (prevIndex == -1)
-                    {
-                        // New scanned die
-                        var newUIDie = CreateDiscoveredDie(die);
-                        discoveredDice.Add(newUIDie);
-                    }
-                    else
-                    {
-                        toDestroy.RemoveAt(prevIndex);
-                    }
+                    // New scanned die
+                    var newUIDie = CreateDiscoveredDie(die);
+                    discoveredDice.Add(newUIDie);
+                }
+                else
+                {
+                    toDestroy.RemoveAt(prevIndex);
                 }
             }
         }
@@ -176,7 +170,7 @@ public class UIScanView
 
     void ClearList()
     {
-        DiceBag.Instance.ClearAvailablePixels();
+        DiceBag.ClearAvailablePixels();
         RefreshView();
     }
 }

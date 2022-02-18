@@ -188,7 +188,7 @@ public class UIPairedDieView : MonoBehaviour
         UpdateState();
     }
 
-    void OnBatteryLevelChanged(Pixel die, float level, bool charging)
+    void OnBatteryLevelChanged(Pixel die, float level, bool? charging)
     {
         UpdateState();
     }

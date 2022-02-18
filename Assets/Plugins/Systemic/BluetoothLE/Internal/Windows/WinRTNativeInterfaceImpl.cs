@@ -207,6 +207,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
         {
             DiscoveredPeripheralCallback onDiscoveredPeripheral = jsonStr =>
             {
+                //Debug.Log($"[BLE] Scan ==> onScanResult: {jsonStr}");
                 try
                 {
                     var adv = JsonUtility.FromJson<NativeAdvertisementDataJson>(jsonStr);

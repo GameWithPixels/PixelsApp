@@ -3,9 +3,11 @@ package com.systemic.bluetoothle;
 import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import android.os.ParcelUuid;
 import android.util.Log;
+import android.util.SparseArray;
 import android.bluetooth.BluetoothDevice;
 
 import no.nordicsemi.android.support.v18.scanner.*;
@@ -195,26 +197,96 @@ public final class Scanner
                     sb.append(",\"txPowerLevel\":");
                     sb.append(scanResult.getTxPower());
 
-                    sb.append(",\"services\":[");
-
                     ScanRecord scanRecord = scanResult.getScanRecord();
                     if (scanRecord != null)
                     {
-                        if (scanRecord.getServiceUuids() != null)
+                        // Services
+                        List<ParcelUuid> serviceUuids = scanRecord.getServiceUuids();
+                        if ((serviceUuids != null) && (serviceUuids.size() > 0))
                         {
+                            sb.append(",\"services\":[");
                             boolean first = true;
-                            for (ParcelUuid service : scanRecord.getServiceUuids())
+                            for (ParcelUuid uuid : serviceUuids)
                             {
                                 if (!first) sb.append(",");
                                 first = false;
 
                                 sb.append("\"");
-                                sb.append(service);
+                                sb.append(uuid);
                                 sb.append("\"");
                             }
+                            sb.append("]");
+                        }
+
+                        // Added in API level 29
+                        // Solicited services
+                        // List<ParcelUuid> solicitedServiceUUIDs = scanRecord.getServiceSolicitationUuids();
+                        // if ((solicitedServiceUUIDs != null) && (solicitedServiceUUIDs.size() > 0))
+                        // {
+                        //     sb.append(",\"solicitedServiceUUIDs\":[");
+                        //     boolean first = true;
+                        //     for (ParcelUuid uuid : solicitedServiceUUIDs)
+                        //     {
+                        //         if (!first) sb.append(",");
+                        //         first = false;
+
+                        //         sb.append("\"");
+                        //         sb.append(uuid);
+                        //         sb.append("\"");
+                        //     }
+                        //     sb.append("]");
+                        // }
+
+                        // Manufacturer data
+                        SparseArray<byte[]> manufacturerData = scanRecord.getManufacturerSpecificData();
+                        if ((manufacturerData != null) && (manufacturerData.size() > 0))
+                        {
+                            for (int i = 0; i < manufacturerData.size(); ++i)
+                            {
+                                sb.append(",\"manufacturerData");
+                                sb.append(i);
+                                sb.append("\":[");
+                                int companyId = manufacturerData.keyAt(i);
+                                sb.append(companyId & 0xFF);
+                                sb.append(",");
+                                sb.append((companyId >> 8) & 0xFF);
+                                byte[] data = manufacturerData.valueAt(i);
+                                for (byte b : data)
+                                {
+                                    sb.append(",");
+                                    sb.append(b);
+                                }
+                                sb.append("]");
+                            }
+                        }
+
+                        // Service data
+                        Map<ParcelUuid, byte[]> serviceData = scanRecord.getServiceData();
+                        if ((serviceData != null) && (serviceData.size() > 0))
+                        {
+                            sb.append(",\"serviceData\":{");
+                            boolean first = true;
+                            for (Map.Entry<ParcelUuid, byte[]> entry : serviceData.entrySet())
+                            {
+                                if (!first) sb.append(",");
+                                first = false;
+
+                                sb.append("\"");
+                                sb.append(entry.getKey());
+                                sb.append("\":");
+
+                                boolean f= false;
+                                for (byte b : entry.getValue())
+                                {
+                                    if (!f) sb.append(",");
+                                    f = false;
+                                    sb.append(b);
+                                }
+                            }
+                            sb.append("}");
                         }
                     }
-                    sb.append("]}");
+                    sb.append("}");
 
                     callback.onScanResult(device, sb.toString());
                 }

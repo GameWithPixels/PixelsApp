@@ -9,7 +9,7 @@ using Peripheral = Systemic.Unity.BluetoothLE.ScannedPeripheral;
 
 namespace Systemic.Unity.Pixels
 {
-    partial class DiceBag
+    static partial class DiceBag
     {
         /// <summary>
         /// Implementation of Pixel communicating over Bluetooth Low Energy.
@@ -90,14 +90,31 @@ namespace Systemic.Unity.Pixels
                 systemId = _peripheral.SystemId;
                 name = _peripheral.Name;
 
+                bool rssiChanged = rssi != _peripheral.Rssi;
+                rssi = _peripheral.Rssi;
+                if (rssiChanged)
+                {
+                    RssiChanged?.Invoke(this, rssi);
+                }
+
                 if (_peripheral.ManufacturerData?.Count > 0)
                 {
                     // Marshall the data into the struct we expect
                     int size = Marshal.SizeOf(typeof(PixelAdvertisingData));
-                    if (_peripheral.ManufacturerData.Count == size)
+                    if (_peripheral.ManufacturerData[0].Data.Count == (size - 2))
                     {
-                        System.IntPtr ptr = Marshal.AllocHGlobal(size);
-                        Marshal.Copy(_peripheral.ManufacturerData.ToArray(), 0, ptr, size);
+                        // Copy data in a byte array for marshaling
+                        var manufData = _peripheral.ManufacturerData[0];
+                        var arr = new byte[size];
+                        arr[0] = (byte)(manufData.ManufacturerId & 0xFF);
+                        arr[1] = (byte)(manufData.ManufacturerId >> 8);
+                        for (int i = 2; i < size; ++i)
+                        {
+                            arr[i] = manufData.Data[i - 2];
+                        }
+
+                        var ptr = Marshal.AllocHGlobal(size);
+                        Marshal.Copy(arr, 0, ptr, size);
                         var advData = Marshal.PtrToStructure<PixelAdvertisingData>(ptr);
                         Marshal.FreeHGlobal(ptr);
 
@@ -112,9 +129,7 @@ namespace Systemic.Unity.Pixels
                         float newBatteryLevel = advData.batteryLevel / 255f;
                         bool batteryLevelChanged = batteryLevel != newBatteryLevel;
                         batteryLevel = newBatteryLevel;
-
-                        bool rssiChanged = rssi != _peripheral.Rssi;
-                        rssi = _peripheral.Rssi;
+                        isCharging = null;
 
                         // Run callbacks
                         if (appearanceChanged)
@@ -128,10 +143,6 @@ namespace Systemic.Unity.Pixels
                         if (batteryLevelChanged)
                         {
                             BatteryLevelChanged?.Invoke(this, batteryLevel, isCharging);
-                        }
-                        if (rssiChanged)
-                        {
-                            RssiChanged?.Invoke(this, rssi);
                         }
                     }
                     else
@@ -181,7 +192,7 @@ namespace Systemic.Unity.Pixels
                         IncrementConnectCount();
                         Debug.Assert(_connectionCount == 1);
                         _onConnectionResult += onResult;
-                        DoConnect(timeout);
+                        StartCoroutine(DoConnect(timeout));
                         break;
                     case PixelConnectionState.Connecting:
                     case PixelConnectionState.Identifying:
@@ -223,16 +234,15 @@ namespace Systemic.Unity.Pixels
                     case PixelConnectionState.Connecting:
                     case PixelConnectionState.Identifying:
                         Debug.Assert(_connectionCount > 0);
-                        _connectionCount = forceDisconnect ? 0 : Mathf.Max(0, _connectionCount - 1);
-
                         Debug.Log($"Pixel {SafeName}: Disconnecting, counter={_connectionCount}, forceDisconnect={forceDisconnect}");
+                        _connectionCount = forceDisconnect ? 0 : Mathf.Max(0, _connectionCount - 1);
 
                         if (_connectionCount == 0)
                         {
                             // Register to be notified when disconnection is complete
                             _onDisconnectionResult += onResult;
                             willDisconnect = true;
-                            DoDisconnect();
+                            StartCoroutine(DoDisconnect());
                         }
                         else
                         {
@@ -246,119 +256,115 @@ namespace Systemic.Unity.Pixels
             }
 
             // Connect with a timeout in seconds
-            void DoConnect(float connectionTimeout)
+            IEnumerator DoConnect(float connectionTimeout)
             {
                 Debug.Assert(connectionState == PixelConnectionState.Available);
                 if (connectionState == PixelConnectionState.Available)
                 {
+                    Debug.Log($"Pixel {SafeName}: Connecting...");
                     connectionState = PixelConnectionState.Connecting;
-                    StartCoroutine(ConnectAsync());
 
-                    IEnumerator ConnectAsync()
+                    BluetoothLE.RequestEnumerator connectRequest = null;
+                    connectRequest = Central.ConnectPeripheralAsync(
+                        _peripheral,
+                        // Forward connection event it our behaviour is still valid and the request hasn't timed-out
+                        // (in which case the disconnect event is already taken care by the code following the yield below)
+                        (p, connected) => { if ((this != null) && (!connectRequest.IsTimeout)) OnConnectionEvent(p, connected); },
+                        connectionTimeout);
+
+                    yield return connectRequest;
+                    string lastRequestError = connectRequest.Error;
+
+                    bool canceled = connectionState != PixelConnectionState.Connecting;
+                    if (!canceled)
                     {
-                        Debug.Log($"Pixel {SafeName}: Connecting...");
-                        BluetoothLE.RequestEnumerator connectRequest = null;
-                        connectRequest = Central.ConnectPeripheralAsync(
-                            _peripheral,
-                            // Forward connection event it our behavior is still valid and the request hasn't timed-out
-                            // (in which case the disconnect event is already taken care by the code following the yield below)
-                            (p, connected) => { if ((this != null) && (!connectRequest.IsTimeout)) OnConnectionEvent(p, connected); },
-                            connectionTimeout);
-
-                        yield return connectRequest;
-                        string lastRequestError = connectRequest.Error;
-
-                        bool canceled = connectionState != PixelConnectionState.Connecting;
-                        if (!canceled)
+                        string error = null;
+                        if (connectRequest.IsSuccess)
                         {
-                            string error = null;
-                            if (connectRequest.IsSuccess)
+                            // Now connected to a Pixel, get characteristics and subscribe before switching to Identifying state
+                            var pixelService = PixelUuids.ServiceUuid;
+                            var subscribeCharacteristic = PixelUuids.NotifyCharacteristicUuid;
+                            var writeCharacteristic = PixelUuids.WriteCharacteristicUuid;
+
+                            var characteristics = Central.GetPeripheralServiceCharacteristics(_peripheral, pixelService);
+                            if ((characteristics != null) && characteristics.Contains(subscribeCharacteristic) && characteristics.Contains(writeCharacteristic))
                             {
-                                // Now connected to a Pixel, get characteristics and subscribe before switching to Identifying state
-                                var pixelService = BleUuids.ServiceUuid;
-                                var subscribeCharacteristic = BleUuids.NotifyCharacteristicUuid;
-                                var writeCharacteristic = BleUuids.WriteCharacteristicUuid;
+                                var subscribeRequest = Central.SubscribeCharacteristicAsync(
+                                    _peripheral, pixelService, subscribeCharacteristic,
+                                    // Forward value change event if our behaviour is still valid
+                                    data => { if (this != null) { OnValueChanged(data); } });
 
-                                var characteristics = Central.GetPeripheralServiceCharacteristics(_peripheral, pixelService);
-                                if ((characteristics != null) && characteristics.Contains(subscribeCharacteristic) && characteristics.Contains(writeCharacteristic))
+                                yield return subscribeRequest;
+                                lastRequestError = subscribeRequest.Error;
+
+                                if (subscribeRequest.IsTimeout)
                                 {
-                                    var subscribeRequest = Central.SubscribeCharacteristicAsync(
-                                        _peripheral, pixelService, subscribeCharacteristic,
-                                        // Forward value change event if our behavior is still valid
-                                        data => { if (this != null) { OnValueChanged(data); } });
-
-                                    yield return subscribeRequest;
-                                    lastRequestError = subscribeRequest.Error;
-
-                                    if (subscribeRequest.IsTimeout)
-                                    {
-                                        error = _connectTimeoutErrorMessage;
-                                    }
-                                    else if (!subscribeRequest.IsSuccess)
-                                    {
-                                        error = $"Subscribe request failed, {subscribeRequest.Error}";
-                                    }
+                                    error = _connectTimeoutErrorMessage;
                                 }
-                                else if (characteristics == null)
+                                else if (!subscribeRequest.IsSuccess)
                                 {
-                                    error = $"Characteristics request failed";
-                                }
-                                else
-                                {
-                                    error = "Missing required characteristics";
+                                    error = $"Subscribe request failed, {subscribeRequest.Error}";
                                 }
                             }
-                            else if (connectRequest.IsTimeout)
+                            else if (characteristics == null)
                             {
-                                error = _connectTimeoutErrorMessage;
+                                error = $"Characteristics request failed";
                             }
                             else
                             {
-                                error = $"Connection failed: {connectRequest.Error}";
-                            }
-
-                            // Check that we are still in the connecting state
-                            canceled = connectionState != PixelConnectionState.Connecting;
-                            if ((!canceled) && (error == null))
-                            {
-                                // Move on to identification
-                                yield return DoIdentifyAsync(req =>
-                                {
-                                    lastRequestError = req.Error;
-                                    error = req.IsTimeout ? _connectTimeoutErrorMessage : req.Error;
-                                });
-
-                                // Check connection state
-                                canceled = connectionState != PixelConnectionState.Identifying;
-                                //TODO we need a counter, in case another connect is already going on
-                            }
-
-                            if (!canceled)
-                            {
-                                if (error == null)
-                                {
-                                    // Pixel is finally ready, awesome!
-                                    connectionState = PixelConnectionState.Ready;
-
-                                    // Notify success
-                                    NotifyConnectionResult();
-                                }
-                                else
-                                {
-                                    // Run callback
-                                    NotifyConnectionResult(error);
-
-                                    // Updating info didn't work, disconnect the Pixel
-                                    DoDisconnect(PixelError.ConnectionError);
-                                }
+                                error = "Missing required characteristics";
                             }
                         }
-
-                        if (canceled)
+                        else if (connectRequest.IsTimeout)
                         {
-                            // Wrong state => we got canceled, just abort without notifying
-                            Debug.LogWarning($"Pixel {SafeName}: Connect sequence interrupted, last request error is: {lastRequestError}");
+                            error = _connectTimeoutErrorMessage;
                         }
+                        else
+                        {
+                            error = $"Connection failed: {connectRequest.Error}";
+                        }
+
+                        // Check that we are still in the connecting state
+                        canceled = connectionState != PixelConnectionState.Connecting;
+                        if ((!canceled) && (error == null))
+                        {
+                            // Move on to identification
+                            yield return DoIdentifyAsync(req =>
+                            {
+                                lastRequestError = req.Error;
+                                error = req.IsTimeout ? _connectTimeoutErrorMessage : req.Error;
+                            });
+
+                            // Check connection state
+                            canceled = connectionState != PixelConnectionState.Identifying;
+                            //TODO we need a counter, in case another connect is already going on
+                        }
+
+                        if (!canceled)
+                        {
+                            if (error == null)
+                            {
+                                // Pixel is finally ready, awesome!
+                                connectionState = PixelConnectionState.Ready;
+
+                                // Notify success
+                                NotifyConnectionResult();
+                            }
+                            else
+                            {
+                                // Run callback
+                                NotifyConnectionResult(error);
+
+                                // Updating info didn't work, disconnect the Pixel
+                                yield return DoDisconnect(PixelError.ConnectionError);
+                            }
+                        }
+                    }
+
+                    if (canceled)
+                    {
+                        // Wrong state => we got canceled, just abort without notifying
+                        Debug.LogWarning($"Pixel {SafeName}: Connect sequence interrupted, last request error is: {lastRequestError}");
                     }
                 }
 
@@ -442,7 +448,7 @@ namespace Systemic.Unity.Pixels
             }
 
             // Disconnect the Pixel, an error might be given as the reason for disconnecting
-            void DoDisconnect(PixelError error = PixelError.None)
+            IEnumerator DoDisconnect(PixelError error = PixelError.None)
             {
                 if (error != PixelError.None)
                 {
@@ -453,22 +459,18 @@ namespace Systemic.Unity.Pixels
                 Debug.Assert(isConnectingOrReady);
                 if (isConnectingOrReady)
                 {
+                    Debug.Log($"Pixel {SafeName}: Disconnecting...");
                     _connectionCount = 0;
                     connectionState = PixelConnectionState.Disconnecting;
-                    StartCoroutine(DisconnectAsync());
 
-                    IEnumerator DisconnectAsync()
-                    {
-                        Debug.Log($"Pixel {SafeName}: Disconnecting...");
-                        yield return Central.DisconnectPeripheralAsync(_peripheral);
+                    yield return Central.DisconnectPeripheralAsync(_peripheral);
 
-                        Debug.Assert(_connectionCount == 0);
-                        connectionState = PixelConnectionState.Available;
+                    Debug.Assert(_connectionCount == 0);
+                    connectionState = PixelConnectionState.Available;
 
-                        var callbackCopy = _onDisconnectionResult;
-                        _onDisconnectionResult = null;
-                        callbackCopy?.Invoke(this, true, null); // Always return a success
-                    }
+                    var callbackCopy = _onDisconnectionResult;
+                    _onDisconnectionResult = null;
+                    callbackCopy?.Invoke(this, true, null); // Always return a success
                 }
             }
 
@@ -499,8 +501,8 @@ namespace Systemic.Unity.Pixels
 
                 public WriteDataEnumerator(Peripheral peripheral, byte[] bytes, float timeout)
                 {
-                    var pixelService = BleUuids.ServiceUuid;
-                    var writeCharacteristic = BleUuids.WriteCharacteristicUuid;
+                    var pixelService = PixelUuids.ServiceUuid;
+                    var writeCharacteristic = PixelUuids.WriteCharacteristicUuid;
                     _request = Central.WriteCharacteristicAsync(peripheral, pixelService, writeCharacteristic, bytes, timeout);
                 }
 
@@ -545,11 +547,7 @@ namespace Systemic.Unity.Pixels
                     Debug.Assert(_peripheral != null);
 
                     // Start Disconnect coroutine on DiceBag since we are getting destroyed
-                    var diceBag = DiceBag.Instance;
-                    if (diceBag && diceBag.gameObject.activeInHierarchy)
-                    {
-                        diceBag.StartCoroutine(Central.DisconnectPeripheralAsync(_peripheral));
-                    }
+                    DiceBag.StartCoroutine(Central.DisconnectPeripheralAsync(_peripheral), noThrow: true);
                 }
             }
         }

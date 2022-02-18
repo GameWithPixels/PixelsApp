@@ -189,7 +189,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         bool changed = false;
         foreach (var die in discoveredDice)
         {
-            if ((die == null) || (!DiceBag.Instance.AllPixels.Contains(die)))
+            if ((die == null) || (!DiceBag.AllPixels.Contains(die)))
             {
                 Debug.LogError($"Attempting to add unknown die {die.name}");
                 continue;
@@ -243,7 +243,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
         IEnumerator ConnectAllDiceCr()
         {
-            DiceBag.Instance.ResetErrors();
+            DiceBag.ResetErrors();
 
             // Scan for missing dice
             var missingDice = dice.Where(ed => ed.die == null).ToArray();
@@ -253,7 +253,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                 {
                     Debug.Log($"Scanning for dice {string.Join(", ", missingDice.Select(ed => ed.name))}"
                         + $" with timeout of {AppConstants.Instance.ScanTimeout}s");
-                    DiceBag.Instance.ScanForPixels();
+                    DiceBag.ScanForPixels();
 
                     // Wait for all dice to be scanned, or timeout
                     float scanTimeout = Time.realtimeSinceStartup + AppConstants.Instance.ScanTimeout;
@@ -263,7 +263,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                 }
                 finally
                 {
-                    DiceBag.Instance.CancelScanning();
+                    DiceBag.CancelScanning();
                 }
             }
 
@@ -273,7 +273,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                 var toConnect = dice.Where(ed => ed.die?.isAvailable ?? false).ToArray();
                 if (toConnect.Length > 0)
                 {
-                    yield return DiceBag.Instance.ConnectPixels(toConnect.Select(ed => ed.die), () => !calleeGameObject.activeInHierarchy,
+                    yield return DiceBag.ConnectPixels(toConnect.Select(ed => ed.die), () => !calleeGameObject.activeInHierarchy,
                         (pixel, ready, error) =>
                         {
                             var editDie = toConnect.First(ed => ed.die == pixel);
@@ -303,7 +303,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
             if (editDie.die != null)
             {
-                DiceBag.Instance.DisconnectPixel(editDie.die, forceDisconnect: true);
+                DiceBag.DisconnectPixel(editDie.die, forceDisconnect: true);
             }
 
             AppDataSet.Instance.DeleteDie(editDie);
@@ -427,7 +427,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                     finally
                     {
                         HideProgrammingBox();
-                        DiceBag.Instance.DisconnectPixel(editDie.die);
+                        DiceBag.DisconnectPixel(editDie.die);
                     }
 
                     if (error != null)
@@ -774,7 +774,10 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
         yield return null; // Wait on frame before accessing DiceBag
 
-        DiceBag.Instance.PixelDiscovered += pixel =>
+        // Initialize Central
+        Systemic.Unity.BluetoothLE.Central.Initialize();
+
+        DiceBag.PixelDiscovered += pixel =>
         {
             var editDie = AppDataSet.Instance.GetEditDie(pixel.systemId);
             if (editDie != null)
@@ -788,7 +791,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
             }
         };
 
-        while (!DiceBag.Instance.IsReady) yield return null;
+        while (!DiceBag.IsReady) yield return null;
 
         // Pretend to have updated the current preset on load
         foreach (var editDie in AppDataSet.Instance.dice)

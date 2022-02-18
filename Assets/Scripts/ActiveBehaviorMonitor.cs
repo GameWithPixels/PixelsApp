@@ -38,7 +38,7 @@ public class ActiveBehaviorMonitor : MonoBehaviour
         foreach (var d in toDisconnect)
         {
             connectedDice.Remove(d);
-            DiceBag.Instance.DisconnectPixel(d.die);
+            DiceBag.DisconnectPixel(d.die);
         }
     }
 }

@@ -48,7 +48,6 @@ namespace Systemic.Unity.Pixels.Animations
             var preset = getPreset();
 
             // Compute color
-            uint color = 0;
             int fadeTime = preset.duration * preset.fade / (255 * 2);
             int time = (ms - startTime);
 
@@ -83,7 +82,7 @@ namespace Systemic.Unity.Pixels.Animations
             else
             {
                 // All LEDs same color
-                color = GammaUtils.Gamma(ColorUIntUtils.RainbowWheel((byte)wheelPos, intensity));
+                uint color = GammaUtils.Gamma(ColorUIntUtils.RainbowWheel((byte)wheelPos, intensity));
 
                 // Fill the indices and colors for the anim controller to know how to update LEDs
                 for (int i = 0; i < 20; ++i)

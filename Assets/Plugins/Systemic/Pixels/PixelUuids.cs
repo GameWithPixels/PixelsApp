@@ -6,7 +6,7 @@ namespace Systemic.Unity.Pixels
     /// <summary>
     /// Pixel dice Bluetooth Low Energy UUIDs.
     /// </summary>
-    public class BleUuids
+    public class PixelUuids
     {
         /// <summary>
         /// Pixel service UUID.
