@@ -19,7 +19,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 
         void onRequestFailed(AndroidJavaObject device, int status)
         {
-            Debug.LogError($"[BLE] {RequestOperation.ReadPeripheralRssi} ==> onRequestFailed: {(AndroidRequestStatus)status}");
+            Debug.LogError($"[BLE] {RequestOperation.ReadPeripheralRssi} ==> onRequestFailed: {(AndroidRequestStatus)status} ({status})");
             _onRssiRead?.Invoke(int.MinValue, AndroidNativeInterfaceImpl.ToRequestStatus(status));
         }
 

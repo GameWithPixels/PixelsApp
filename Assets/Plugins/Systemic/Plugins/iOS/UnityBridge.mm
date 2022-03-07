@@ -416,7 +416,7 @@ void sgBleWriteCharacteristicValue(peripheral_id_t peripheralId,
     }
     else if (onRequestStatus)
     {
-        onRequestStatus(requestIndex, invalidParametersError);
+        onRequestStatus(requestIndex, toErrorCode(SGBleInvalidParametersError));
     }
 }
 

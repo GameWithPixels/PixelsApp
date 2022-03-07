@@ -18,7 +18,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 
         void onRequestFailed(AndroidJavaObject device, int status)
         {
-            Debug.LogError($"[BLE] {RequestOperation.RequestPeripheralMtu} ==> onRequestFailed: {(AndroidRequestStatus)status}");
+            Debug.LogError($"[BLE] {RequestOperation.RequestPeripheralMtu} ==> onRequestFailed: {(AndroidRequestStatus)status} ({status})");
             _onMtuResult?.Invoke(0, AndroidNativeInterfaceImpl.ToRequestStatus(status));
         }
 

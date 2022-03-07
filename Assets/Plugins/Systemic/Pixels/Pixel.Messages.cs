@@ -93,6 +93,7 @@ namespace Systemic.Unity.Pixels
         /// <returns>An enumerator meant to be run as a coroutine.</returns>
         public IEnumerator UpdateBatteryLevelAsync(OperationResultCallback onResult = null)
         {
+            //TODO stay registered?
             var op = new SendMessageAndProcessResponseWithValueEnumerator<RequestBatteryLevel, BatteryLevel, float>(this,
                 lvlMsg =>
                 {
@@ -118,6 +119,7 @@ namespace Systemic.Unity.Pixels
         /// <returns>An enumerator meant to be run as a coroutine.</returns>
         public IEnumerator UpdateRssiAsync(OperationResultCallback onResult = null)
         {
+            //TODO stay registered?
             var op = new SendMessageAndProcessResponseWithValueEnumerator<RequestRssi, Rssi, int>(this,
                 rssiMsg =>
                 {

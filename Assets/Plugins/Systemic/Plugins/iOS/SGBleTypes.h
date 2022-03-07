@@ -37,6 +37,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CoreBluetooth/CoreBluetooth.h>
 
 /**
  * @brief Peripheral connection events.

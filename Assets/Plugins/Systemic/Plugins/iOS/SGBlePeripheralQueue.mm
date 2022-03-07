@@ -1,30 +1,6 @@
 #import "SGBlePeripheralQueue.h"
 #import "SGBleUtils.h"
 
-typedef NS_ENUM(NSInteger, SGBlePeripheralRequestError)
-{
-    SGBlePeripheralRequestErrorDisconnected,
-    SGBlePeripheralRequestErrorInvalidCall,
-    SGBlePeripheralRequestErrorInvalidParameters,
-    SGBlePeripheralRequestErrorCanceled,
-};
-
-static NSError *invalidCallError = [NSError errorWithDomain:sgBleGetErrorDomain()
-                                                       code:SGBlePeripheralRequestErrorInvalidCall
-                                                   userInfo:@{ NSLocalizedDescriptionKey: @"Invalid call" }];
-
-static NSError *disconnectedError = [NSError errorWithDomain:sgBleGetErrorDomain()
-                                                        code:SGBlePeripheralRequestErrorDisconnected
-                                                    userInfo:@{ NSLocalizedDescriptionKey: @"Disconnected" }];
-
-static NSError *invalidParametersError = [NSError errorWithDomain:sgBleGetErrorDomain()
-                                                             code:SGBlePeripheralRequestErrorInvalidParameters
-                                                         userInfo:@{ NSLocalizedDescriptionKey: @"Invalid parameters" }];
-
-static NSError *canceledError = [NSError errorWithDomain:sgBleGetErrorDomain()
-                                                    code:SGBlePeripheralRequestErrorCanceled
-                                                userInfo:@{ NSLocalizedDescriptionKey: @"Canceled" }];
-
 @implementation SGBlePeripheralQueue
 
 //
@@ -125,7 +101,7 @@ static NSError *canceledError = [NSError errorWithDomain:sgBleGetErrorDomain()
                             strongSelf->_disconnectReason = SGBleConnectionEventReasonSuccess;
                             if (reason == SGBleConnectionEventReasonCanceled)
                             {
-                                error = canceledError;
+                                error = SGBleCanceledError;
                             }
                         }
                         else if (!disconnecting)
@@ -137,7 +113,7 @@ static NSError *canceledError = [NSError errorWithDomain:sgBleGetErrorDomain()
                         // We were connecting, we need to have an error
                         if (connecting && !error)
                         {
-                            error = disconnectedError;
+                            error = SGBleDisconnectedError;
                         }
                         
                         [strongSelf qNotifyConnectionEvent:SGBleConnectionEventDisconnected reason:reason];
@@ -236,7 +212,7 @@ static NSError *canceledError = [NSError errorWithDomain:sgBleGetErrorDomain()
         if (!characteristic || !valueReadHandler)
         {
             NSLog(@">> ReadValueForCharacteristic -> invalid parameters");
-            return invalidParametersError;
+            return SGBleInvalidParametersError;
         }
         
         NSLog(@">> ReadValueForCharacteristic");
@@ -261,7 +237,7 @@ static NSError *canceledError = [NSError errorWithDomain:sgBleGetErrorDomain()
         if (!characteristic || !data)
         {
             NSLog(@">> WriteValue -> invalid parameters");
-            return invalidParametersError;
+            return SGBleInvalidParametersError;
         }
         
         NSLog(@">> WriteValue");
@@ -289,7 +265,7 @@ static NSError *canceledError = [NSError errorWithDomain:sgBleGetErrorDomain()
         if (!characteristic || !valueChangedHandler)
         {
             NSLog(@">> SetNotifyValueForCharacteristic -> invalid parameters");
-            return invalidParametersError;
+            return SGBleInvalidParametersError;
         }
         
         NSLog(@">> SetNotifyValueForCharacteristic");
@@ -321,7 +297,7 @@ static NSError *canceledError = [NSError errorWithDomain:sgBleGetErrorDomain()
 
             // Cancel the running request
             NSLog(@">> Queue canceled while running request of type %@", [SGBleRequest requestTypeToString:requestType]);
-            [self qReportRequestResult:canceledError forRequestType:requestType];
+            [self qReportRequestResult:SGBleCanceledError forRequestType:requestType];
         
             // If were trying to connect, cancel connection immediately
             if (requestType == SGBleRequestTypeConnect)
@@ -409,7 +385,7 @@ static NSError *canceledError = [NSError errorWithDomain:sgBleGetErrorDomain()
         else
         {
             // Any other request other than connect are only valid when peripheral is connected
-            NSError *error = invalidCallError;
+            NSError *error = SGBleInvalidCallError;
             if ((state == CBPeripheralStateConnected) || (request.type == SGBleRequestTypeConnect))
             {
                 error = [request execute];
