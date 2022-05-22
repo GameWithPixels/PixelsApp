@@ -50,8 +50,6 @@ public class UIScanView
         DiceBag.CancelScanning();
         foreach (var die in discoveredDice)
         {
-            die.die.ConnectionStateChanged -= OnDieStateChanged;
-            die.onSelected -= OnDieSelected;
             DestroyDiscoveredDie(die);
         }
         selectedDice.Clear();
@@ -60,6 +58,12 @@ public class UIScanView
 
     void RefreshView()
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            Debug.LogError("RefreshView called on inactive UIScanView!");
+            return;
+        }
+
         // Assume all scanned dice will be destroyed
         var toDestroy = new List<UIDiscoveredDieView>(discoveredDice);
         foreach (var die in DiceBag.AvailablePixels)
@@ -105,12 +109,15 @@ public class UIScanView
         // Initialize it
         ret.Setup(die);
         ret.onSelected += OnDieSelected;
+        die.ConnectionStateChanged += OnDieStateChanged;
         return ret;
     }
 
     void DestroyDiscoveredDie(UIDiscoveredDieView dieView)
     {
         //Debug.Log("Destroying discovered Die: " + dieView.die.name);
+        dieView.die.ConnectionStateChanged -= OnDieStateChanged;
+        dieView.onSelected -= OnDieSelected;
         GameObject.Destroy(dieView.gameObject);
     }
 
@@ -125,7 +132,6 @@ public class UIScanView
 
     void OnDieDiscovered(Pixel newDie)
     {
-        newDie.ConnectionStateChanged += OnDieStateChanged;
         RefreshView();
     }
 
