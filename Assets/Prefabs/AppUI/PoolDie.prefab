@@ -539,7 +539,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3163808451211717118}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
   m_Name: 
@@ -1065,7 +1065,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Rename Dice
+  m_Text: Rename Die
 --- !u!1 &5741875876527426428
 GameObject:
   m_ObjectHideFlags: 0
@@ -1294,7 +1294,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Forget Dice
+  m_Text: Forget Die
 --- !u!1 &5741875877027927073
 GameObject:
   m_ObjectHideFlags: 0
@@ -1373,7 +1373,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Reset Dice
+  m_Text: Reset Die
 --- !u!1 &5741875877191216473
 GameObject:
   m_ObjectHideFlags: 0
@@ -1521,7 +1521,7 @@ GameObject:
   - component: {fileID: 3314541903339357364}
   - component: {fileID: 4586153783329675193}
   m_Layer: 5
-  m_Name: Forget Dice
+  m_Name: Forget Die
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2217,7 +2217,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6405598940851332375
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2519,7 +2519,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6405598941077064071}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
   m_Name: 
@@ -2542,7 +2542,7 @@ GameObject:
   - component: {fileID: 7611762501918277941}
   - component: {fileID: 1662445479}
   m_Layer: 5
-  m_Name: Rename Dice
+  m_Name: Rename Die
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2684,7 +2684,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6405598941288236727}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
   m_Name: 
@@ -3408,7 +3408,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9155582381126098599}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
   m_Name: 
