@@ -65,8 +65,11 @@ public class UIDicePoolView
 
     void OnDisable()
     {
-        PixelsApp.Instance.onDieAdded -= OnDieAdded;
-        PixelsApp.Instance.onWillRemoveDie -= OnWillRemoveDie;
+        if (PixelsApp.Instance)
+        {
+            PixelsApp.Instance.onDieAdded -= OnDieAdded;
+            PixelsApp.Instance.onWillRemoveDie -= OnWillRemoveDie;
+        }
 
         foreach (var uidie in pairedDice)
         {

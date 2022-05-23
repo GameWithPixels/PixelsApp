@@ -94,7 +94,8 @@ public class UIPairedDieView : MonoBehaviour
                     {
                     case PixelConnectionState.Invalid:
                         dieRenderer.SetAuto(false);
-                        dieRenderImage.color = AppConstants.Instance.DieUnavailableColor;
+                        if (AppConstants.Instance)
+                            dieRenderImage.color = AppConstants.Instance.DieUnavailableColor;
                         batteryView.gameObject.SetActive(false);
                         signalView.gameObject.SetActive(false);
                         statusText.text = "Invalid";
@@ -141,7 +142,8 @@ public class UIPairedDieView : MonoBehaviour
                     break;
                 case PixelError.ConnectionError:
                     dieRenderer.SetAuto(false);
-                    dieRenderImage.color = AppConstants.Instance.DieUnavailableColor;
+                    if (AppConstants.Instance)
+                        dieRenderImage.color = AppConstants.Instance.DieUnavailableColor;
                     batteryView.gameObject.SetActive(false);
                     signalView.gameObject.SetActive(false);
                     statusText.text = "Connection Error";
@@ -150,7 +152,8 @@ public class UIPairedDieView : MonoBehaviour
                     break;
                 case PixelError.Disconnected:
                     dieRenderer.SetAuto(false);
-                    dieRenderImage.color = AppConstants.Instance.DieUnavailableColor;
+                    if (AppConstants.Instance)
+                        dieRenderImage.color = AppConstants.Instance.DieUnavailableColor;
                     batteryView.gameObject.SetActive(false);
                     signalView.gameObject.SetActive(false);
                     statusText.text = "Disconnected";
@@ -163,7 +166,7 @@ public class UIPairedDieView : MonoBehaviour
 
     void OnDestroy()
     {
-        if (dieRenderer != null)
+        if (dieRenderer != null && DiceRendererManager.Instance)
         {
             DiceRendererManager.Instance.DestroyDiceRenderer(dieRenderer);
             dieRenderer = null;

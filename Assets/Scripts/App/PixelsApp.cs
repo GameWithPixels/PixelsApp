@@ -793,7 +793,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
         DiceBag.SubscribeToUserNotifyRequest((Pixel pixel, string text, bool canCancel, System.Action<bool> userActionCallback) =>
         {
-            PixelsApp.Instance.ShowDialogBox("Message from " + pixel.name, text, "Ok", canCancel ? "Cancel" : null, userActionCallback);
+            ShowDialogBox("Message from " + pixel.name, text, "Ok", canCancel ? "Cancel" : null, userActionCallback);
         });
 
         DiceBag.SubscribeToPlayAudioClipRequest((Pixel pixel, uint clipId) =>
