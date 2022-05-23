@@ -9,19 +9,12 @@ public class PoolDieDevOnlyMenuEntry : MonoBehaviour
     public Text menuText;
     public Image menuIcon;
 
-    // Start is called before the first frame update
-    void Awake()
+    void OnEnable()
     {
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
         menuText.color = disabledColor;
         menuIcon.color = disabledColor;
         GetComponent<Button>().interactable = false;
 #endif
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

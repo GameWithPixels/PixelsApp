@@ -29,7 +29,7 @@ public class UIMainMenu : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        versionText.text = $"Version {AppConstants.Instance.AppVersion}";
+        versionText.text = $"Version {Application.version}";
 
         menuButton.onClick.AddListener(Hide);
         outsideButton.onClick.AddListener(Hide);

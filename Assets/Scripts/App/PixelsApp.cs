@@ -770,7 +770,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
     // Start is called before the first frame update
     IEnumerator Start()
     {
-        Debug.Log($"Running app version {AppConstants.Instance.AppVersion}");
+        Debug.Log($"Running app version {Application.version}");
 
         yield return null; // Wait on frame before accessing DiceBag
 
