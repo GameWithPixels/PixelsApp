@@ -55,7 +55,7 @@ public class EditAnimationKeyframed
     : EditAnimation
 {
     public float speedMultiplier = 1.0f;
-    [Slider, FloatRange(0.1f, 10.0f, 0.1f), Units("sec")]
+    [Slider, FloatRange(0.1f, 30.0f, 0.1f), Units("sec")]
     public override float duration
     {
         get
