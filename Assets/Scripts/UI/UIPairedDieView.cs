@@ -84,7 +84,7 @@ public class UIPairedDieView : MonoBehaviour
         }
         else
         {
-            firmwareIDText.text = "Firmware: " + die.die.firmwareVersionId;
+            firmwareIDText.text = $"Firmware: {die.die.buildDateTime}";
             batteryView.SetLevel(die.die.batteryLevel, die.die.isCharging);
             signalView.SetRssi(die.die.rssi);
             switch (die.die.lastError)

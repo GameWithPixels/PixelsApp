@@ -289,7 +289,10 @@ public class DiceRendererDice : MonoBehaviour
 
     void OnValidate()
     {
-        UpdateColors();
+        if (_propertyBlocks != null)
+        {
+            UpdateColors();
+        }
     }
 
     void SetupInstance(int animationIndex, int startTime, byte remapFace)
