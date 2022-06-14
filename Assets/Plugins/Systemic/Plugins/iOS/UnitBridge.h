@@ -164,24 +164,36 @@ inline void appendToJsonStr(NSMutableString *jsonStr, NSArray<CBUUID *> *uuids)
     for (NSUInteger i = 0; i < len; i++)
     {
         if (i)
+        {
             [jsonStr appendString:@","];
+        }
         [jsonStr appendFormat:@"\"%@\"", toJsonStr(uuids[i])];
     }
     [jsonStr appendString:@"]"];
 }
 
-inline void appendToJsonStr(NSMutableString *jsonStr, NSData *data)
+inline void appendToJsonStr(NSMutableString *jsonStr,
+                            std::uint8_t *bytes,
+                            NSUInteger offset,
+                            NSUInteger length)
 {
     [jsonStr appendString:@"["];
-    std::uint8_t *bytes = (std::uint8_t *)data.bytes;
-    NSUInteger len = data.length;
-    for (NSUInteger i = 0; i < len; i++)
+    for (NSUInteger i = offset; i < length; i++)
     {
-        if (i)
+        if (i > offset)
+        {
             [jsonStr appendString:@","];
+        }
         [jsonStr appendFormat:@"%d", bytes[i]];
     }
     [jsonStr appendString:@"]"];
+}
+
+
+inline void appendToJsonStr(NSMutableString *jsonStr, NSData *data)
+{
+    std::uint8_t *bytes = (std::uint8_t *)data.bytes;
+    appendToJsonStr(jsonStr, bytes, 0, data.length);
 }
 
 inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionary<NSString *, id> *advertisementData, NSNumber *RSSI)
@@ -197,11 +209,15 @@ inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionar
 
     NSMutableString *jsonStr = [NSMutableString new];
     [jsonStr appendFormat:@"{\"systemId\":\"%s\",", systemId];
-    if (manufacturerData)
+    if (manufacturerData && manufacturerData.length >= 2)
     {
-        [jsonStr appendString:@"\"manufacturerData0\":["];
-        appendToJsonStr(jsonStr, manufacturerData);
-        [jsonStr appendString:@"],"];
+        [jsonStr appendString:@"\"manufacturerData\":["];
+        std::uint8_t *bytes = (std::uint8_t *)manufacturerData.bytes;
+        uint16_t companyId = bytes[0] | ((uint16_t)bytes[1] << 8);
+        [jsonStr appendFormat:@"{\"companyId\":%d,", companyId];
+        [jsonStr appendString:@"\"data\":"];
+        appendToJsonStr(jsonStr, bytes, 2, manufacturerData.length - 2);
+        [jsonStr appendString:@"}],"];
     }
     if (localName)
     {
@@ -211,35 +227,39 @@ inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionar
     {
         [jsonStr appendString:@"\"isConnectable\":true,"];
     }
-    if (serviceData)
+    if (serviceData && serviceData.count)
     {
-        [jsonStr appendString:@"\"serviceData\":{"];
+        [jsonStr appendString:@"\"serviceData\":["];
         bool first = true;
         for (CBUUID *uuid in serviceData)
         {
             if (!first)
+            {
                 [jsonStr appendString:@","];
+            }
             first = false;
-            [jsonStr appendFormat:@"\"%@\":", toJsonStr(uuid)];
+            [jsonStr appendFormat:@"{\"uuid\":\"%@\",", uuid];
+            [jsonStr appendString:@"\"data\":"];
             appendToJsonStr(jsonStr, [serviceData objectForKey:uuid]);
+            [jsonStr appendString:@"}"];
         }
-        [jsonStr appendString:@"},"];
+        [jsonStr appendString:@"],"];
     }
-    if (serviceUUIDs)
+    if (serviceUUIDs && serviceUUIDs.count)
     {
         [jsonStr appendString:@"\"services\":"];
         appendToJsonStr(jsonStr, serviceUUIDs);
         [jsonStr appendString:@","];
     }
-    if (overflowServiceUUIDs)
+    if (overflowServiceUUIDs && overflowServiceUUIDs.count)
     {
-        [jsonStr appendString:@"\"overflowServiceUUIDs\":"];
+        [jsonStr appendString:@"\"overflowServices\":"];
         appendToJsonStr(jsonStr, overflowServiceUUIDs);
         [jsonStr appendString:@","];
     }
-    if (solicitedServiceUUIDs)
+    if (solicitedServiceUUIDs && solicitedServiceUUIDs.count)
     {
-        [jsonStr appendString:@"\"solicitedServiceUUIDs\":"];
+        [jsonStr appendString:@"\"solicitedServices\":"];
         appendToJsonStr(jsonStr, solicitedServiceUUIDs);
         [jsonStr appendString:@","];
     }

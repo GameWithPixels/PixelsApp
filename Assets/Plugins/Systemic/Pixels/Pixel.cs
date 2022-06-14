@@ -94,11 +94,18 @@ namespace Systemic.Unity.Pixels
         public PixelDesignAndColor designAndColor { get; protected set; } = PixelDesignAndColor.Unknown;
 
         /// <summary>
-        /// Get the version id of the firmware running on the Pixel.
+        /// Gets the Pixel firmware build Unix timestamp.
         ///
-        /// This value is set once when the Pixel is being connected.
+        /// This value is set when the Pixel is being scanned or when connected.
         /// </summary>
-        public string firmwareVersionId { get; protected set; } = "Unknown";
+        public uint buildTimestamp { get; protected set; }
+
+        /// <summary>
+        /// Gets the Pixel firmware build data/time.
+        ///
+        /// This value is the <see cref="buildTimestamp"/> converted to a DataTime value.
+        /// </summary>
+        public System.DateTime buildDateTime => UnixTimestampToDateTime(buildTimestamp);
 
         /// <summary>
         /// Get the hash value of the animation data loaded on the Pixel.
@@ -112,7 +119,7 @@ namespace Systemic.Unity.Pixels
         ///
         /// This value is set once when the Pixel is being connected.
         /// </summary>
-        public uint flashSize { get; protected set; }
+        public uint availableFlashSize { get; protected set; }
 
         /// <summary>
         /// Gets the Pixel current roll state.
@@ -152,6 +159,13 @@ namespace Systemic.Unity.Pixels
         /// <see cref="UpdateRssiAsync(OperationResultCallback)"/> is called while connected.
         /// </summary>
         public int rssi { get; protected set; }
+
+        /// <summary>
+        /// Gets the Pixel unique device id.
+        ///
+        /// This value is set when the Pixel is being scanned or when connected.
+        /// </summary>
+        public uint deviceId { get; protected set; }
 
         #endregion
 
@@ -360,16 +374,17 @@ namespace Systemic.Unity.Pixels
 
             void ProcessIAmADieMessage(IAmADie message)
             {
-                Debug.Log($"Pixel {SafeName}: {message.flashSize} bytes available for data,"
-                    + $" current dataset hash {message.dataSetHash:X08}, firmware version is {message.versionInfo}");
+                Debug.Log($"Pixel {SafeName}: {message.availableFlashSize} bytes available for data,"
+                    + $" current dataset hash {message.dataSetHash:X08}, firmware build is {System.DateTime.FromFileTimeUtc(message.buildTimestamp)}");
 
                 // Update instance
                 bool appearanceChanged = faceCount != message.faceCount || designAndColor != message.designAndColor;
                 faceCount = message.faceCount;
                 designAndColor = message.designAndColor;
                 dataSetHash = message.dataSetHash;
-                flashSize = message.flashSize;
-                firmwareVersionId = message.versionInfo;
+                availableFlashSize = message.availableFlashSize;
+                deviceId = message.deviceId;
+                buildTimestamp = message.buildTimestamp;
 
                 if (appearanceChanged)
                 {
@@ -401,7 +416,7 @@ namespace Systemic.Unity.Pixels
 
             void ProcessDebugLogMessage(DebugLog message)
             {
-                string text = System.Text.Encoding.UTF8.GetString(message.data, 0, message.data.Length);
+                string text = Marshaling.BytesToString(message.data);
                 Debug.Log($"Pixel {SafeName}: {text}");
             }
 
@@ -410,7 +425,7 @@ namespace Systemic.Unity.Pixels
                 //bool ok = message.ok != 0;
                 bool cancel = message.cancel != 0;
                 //float timeout = message.timeout_s;
-                string text = System.Text.Encoding.UTF8.GetString(message.data, 0, message.data.Length);
+                string text = Marshaling.BytesToString(message.data);
                 _notifyUser?.Invoke(this, text, cancel,
                     res => PostMessage(new NotifyUserAck() { okCancel = (byte)(res ? 1 : 0) }));
             }
@@ -431,6 +446,15 @@ namespace Systemic.Unity.Pixels
         void Awake()
         {
             RegisterDefaultMessageHandlers();
+        }
+
+        // https://stackoverflow.com/a/250400
+        static System.DateTime UnixTimestampToDateTime(uint unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            var dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dateTime;
         }
     }
 }

@@ -45,8 +45,8 @@ namespace Systemic.Unity.Pixels
                     var data = new BulkData()
                     {
                         offset = offset,
-                        size = (byte)Mathf.Min(remainingSize, Marshaling.maxDataSize),
-                        data = new byte[Marshaling.maxDataSize],
+                        size = (byte)Mathf.Min(remainingSize, Marshaling.MaxDataSize),
+                        data = new byte[Marshaling.MaxDataSize],
                     };
 
                     System.Array.Copy(bytes, offset, data.data, 0, data.size);

@@ -870,7 +870,7 @@ namespace Systemic.Unity.BluetoothLE
             Internal.IPersistentMonoBehaviourSingleton
         {
             // Our action queue
-            ConcurrentQueue<Action> _actionQueue = new ConcurrentQueue<Action>();
+            readonly ConcurrentQueue<Action> _actionQueue = new ConcurrentQueue<Action>();
 
             // Instance name
             string Internal.IPersistentMonoBehaviourSingleton.GameObjectName => "SystemicBleCentral";

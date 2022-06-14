@@ -1,20 +1,31 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Linq;
 using UnityEngine;
 
 namespace Systemic.Unity.Pixels.Messages
 {
     public static class Marshaling
     {
-        public const int maxDataSize = 100;
+        public const int MaxDataSize = 100;
+
+        readonly static int MaxMessageType = (int)(System.Enum.GetValues(typeof(MessageType)) as MessageType[]).Last();
 
         public static IPixelMessage FromByteArray(byte[] data)
         {
             IPixelMessage ret = null;
-            if (data.Length > 0)
+            if (data?.Length == 0)
             {
-                MessageType type = (MessageType)data[0];
+                Debug.LogError("Got null or empty data for message marshaling");
+            }
+            else if (data[0] > MaxMessageType)
+            {
+                Debug.LogError($"Got unhandled message type {data[0]} for message marshaling");
+            }
+            else
+            {
+                var type = (MessageType)data[0];
                 switch (type)
                 {
                     case MessageType.RollState:
@@ -24,28 +35,57 @@ namespace Systemic.Unity.Pixels.Messages
                         ret = FromByteArray<WhoAreYou>(data);
                         break;
                     case MessageType.IAmADie:
+                        if (data.Length == Marshal.SizeOf<IAmADie>())
                         {
-                            var baseData = new byte[Marshal.SizeOf<IAmADieMarshaledData>()];
-                            if (data.Length > baseData.Length)
+                            ret = FromByteArray<IAmADie>(data);
+                        }
+                        else
+                        {
+                            // This an older firwmare with the "versionInfo" string
+
+                            // Get the message part before the versionInfo string
+                            var baseData = new byte[Marshal.SizeOf<IAmADieMarshaledDataBeforeBuildTimestamp>()];
+                            System.Array.Copy(data, baseData, baseData.Length);
+                            var baseMsg = FromByteArray<IAmADieMarshaledDataBeforeBuildTimestamp>(baseData);
+
+                            if (baseMsg != null)
                             {
-                                System.Array.Copy(data, baseData, baseData.Length);
-                                var baseMsg = FromByteArray<IAmADieMarshaledData>(baseData);
-                                if (baseMsg != null)
+                                // Get the versionInfo string
+                                var versionInfo = BytesToString(data, baseData.Length, data.Length - baseData.Length);
+
+                                // Convert to timestamp
+                                uint timestamp = 0;
+                                if (versionInfo?.Length > 0)
                                 {
-                                    var strData = new byte[data.Length - baseData.Length - 1]; // It's ok if size is zero
-                                    System.Array.Copy(data, baseData.Length, strData, 0, strData.Length);
-                                    var str = Encoding.UTF8.GetString(strData);
-                                    ret = new IAmADie
+                                    var numbers = versionInfo.Split('_');
+                                    if (numbers.Length >= 2)
                                     {
-                                        faceCount = baseMsg.faceCount,
-                                        designAndColor = baseMsg.designAndColor,
-                                        padding = baseMsg.padding,
-                                        dataSetHash = baseMsg.dataSetHash,
-                                        deviceId = baseMsg.deviceId,
-                                        flashSize = baseMsg.flashSize,
-                                        versionInfo = str,
-                                    };
+                                        try
+                                        {
+                                            int month = int.Parse(numbers[0]);
+                                            int day = int.Parse(numbers[1]);
+                                            int year = numbers.Length > 2 ? 2000 + int.Parse(numbers[2]) : (month < 7 ? 2021 : 2020);
+                                            var dt = new System.DateTime(year, month, day);
+                                            var epoch = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
+                                            timestamp = (uint)(dt - epoch).TotalSeconds;
+                                        }
+                                        catch (System.Exception ex)
+                                        {
+                                            Debug.LogError($"Error parsing versionInfo: {ex.Message}");
+                                        }
+                                    }
                                 }
+
+                                ret = new IAmADie
+                                {
+                                    faceCount = baseMsg.faceCount,
+                                    designAndColor = baseMsg.designAndColor,
+                                    padding = baseMsg.padding,
+                                    dataSetHash = baseMsg.dataSetHash,
+                                    deviceId = baseMsg.deviceId,
+                                    availableFlashSize = baseMsg.flashSize,
+                                    buildTimestamp = timestamp,
+                                };
                             }
                         }
                         break;
@@ -204,19 +244,19 @@ namespace Systemic.Unity.Pixels.Messages
                         ret = FromByteArray<DebugAnimationController>(data);
                         break;
                     default:
-                        throw new System.Exception("Unhandled DieMessage type " + type.ToString() + " for marshaling");
+                        throw new System.Exception($"Unhandled DieMessage type {type} for marshaling");
                 }
             }
             return ret;
         }
 
         static T FromByteArray<T>(byte[] data)
-            where T : class, IPixelMessage
+            where T : class
         {
             int size = Marshal.SizeOf<T>();
-            if (data.Length == size)
+            if (data?.Length == size)
             {
-                System.IntPtr ptr = Marshal.AllocHGlobal(size);
+                var ptr = Marshal.AllocHGlobal(size);
                 try
                 {
                     Marshal.Copy(data, 0, ptr, size);
@@ -229,7 +269,7 @@ namespace Systemic.Unity.Pixels.Messages
             }
             else
             {
-                Debug.LogError("Wrong message length for type " + typeof(T).Name);
+                Debug.LogError($"Incorrect data size ${data?.Length ?? -1} != ${size} for marshaling to message of type {typeof(T).Name}");
                 return null;
             }
         }
@@ -246,7 +286,35 @@ namespace Systemic.Unity.Pixels.Messages
             return ret;
         }
 
-        static private Dictionary<System.Type, MessageType> _messageTypes = new Dictionary<System.Type, MessageType>();
+        public static string BytesToString(byte[] buffer, int startIndex = 0, int strSize = -1)
+        {
+            if (strSize < 0)
+            {
+                strSize = buffer.Length - startIndex;
+            }
+            var strData = new byte[strSize]; // It's ok if size is zero
+            System.Array.Copy(buffer, startIndex, strData, 0, strData.Length);
+            int zeroIndex = System.Array.IndexOf<byte>(strData, 0);
+            return Encoding.UTF8.GetString(strData, 0, zeroIndex >= 0 ? zeroIndex : strSize);
+        }
+
+        public static byte[] StringToBytes(string str, bool withZeroTerminator = false, int maxSize = -1)
+        {
+            if (withZeroTerminator)
+            {
+                str += "\0";
+            }
+            byte[] bytes = Encoding.UTF8.GetBytes(str);
+            if (maxSize >= 0 && maxSize < bytes.Length)
+            {
+                byte[] lessBytes = new byte[maxSize];
+                System.Array.Copy(bytes, lessBytes, maxSize - (withZeroTerminator ? 1 : 0));
+                bytes = lessBytes;
+            }
+            return bytes;
+        }
+
+        static readonly Dictionary<System.Type, MessageType> _messageTypes = new Dictionary<System.Type, MessageType>();
 
         public static MessageType GetMessageType<T>()
             where T : IPixelMessage, new()

@@ -13,11 +13,11 @@ namespace Systemic.Unity.Pixels.Messages
         public MessageType type { get; set; } = MessageType.WhoAreYou;
     }
 
+    // Represents the first part of IAmADie message (before versionInfo was replaced by buildTimestamp)
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class IAmADieMarshaledData : IPixelMessage
+    internal class IAmADieMarshaledDataBeforeBuildTimestamp
     {
-        public MessageType type { get; set; } = MessageType.IAmADie;
-
+        public MessageType type;
         public byte faceCount; // Which kind of dice this is
         public PixelDesignAndColor designAndColor; // Physical look
         public byte padding;
@@ -27,9 +27,17 @@ namespace Systemic.Unity.Pixels.Messages
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class IAmADie : IAmADieMarshaledData
+    public class IAmADie : IPixelMessage
     {
-        public string versionInfo; // Firmware version string, i.e. "10_05_21", variable size
+        public MessageType type { get; set; } = MessageType.IAmADie;
+
+        public byte faceCount; // Which kind of dice this is
+        public PixelDesignAndColor designAndColor; // Physical look
+        public byte padding;
+        public uint dataSetHash;
+        public uint deviceId; // A unique identifier
+        public ushort availableFlashSize; // Available flash memory size for storing settings
+        public uint buildTimestamp; // Firmware build timestamp
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -67,7 +75,7 @@ namespace Systemic.Unity.Pixels.Messages
         public MessageType type { get; set; } = MessageType.BulkData;
         public byte size;
         public ushort offset;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = Marshaling.maxDataSize)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = Marshaling.MaxDataSize)]
         public byte[] data;
     }
 
@@ -186,7 +194,7 @@ namespace Systemic.Unity.Pixels.Messages
     public class DebugLog : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.DebugLog;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = Marshaling.maxDataSize)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = Marshaling.MaxDataSize)]
         public byte[] data;
     }
 
@@ -341,7 +349,7 @@ namespace Systemic.Unity.Pixels.Messages
         public byte timeout_s;
         public byte ok; // Boolean
         public byte cancel; // Boolean
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = Marshaling.maxDataSize - 4)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = Marshaling.MaxDataSize - 4)]
         public byte[] data;
     }
 
@@ -430,7 +438,7 @@ namespace Systemic.Unity.Pixels.Messages
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class SetName : IPixelMessage
     {
-        public const int NameMaxSize = 10;
+        public const int NameMaxSize = 25; // Including zero terminating character
 
         public MessageType type { get; set; } = MessageType.SetName;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = NameMaxSize)]

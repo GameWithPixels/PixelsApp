@@ -201,18 +201,15 @@ public final class Scanner
                     if (scanRecord != null)
                     {
                         // Services
-                        List<ParcelUuid> serviceUuids = scanRecord.getServiceUuids();
-                        if ((serviceUuids != null) && (serviceUuids.size() > 0))
+                        List<ParcelUuid> services = scanRecord.getServiceUuids();
+                        if ((services != null) && (services.size() > 0))
                         {
                             sb.append(",\"services\":[");
-                            boolean first = true;
-                            for (ParcelUuid uuid : serviceUuids)
+                            for (int i = 0; i < services.size(); ++i)
                             {
-                                if (!first) sb.append(",");
-                                first = false;
-
+                                if (i > 0) sb.append(",");
                                 sb.append("\"");
-                                sb.append(uuid);
+                                sb.append(services.get(i));
                                 sb.append("\"");
                             }
                             sb.append("]");
@@ -220,70 +217,65 @@ public final class Scanner
 
                         // Added in API level 29
                         // Solicited services
-                        // List<ParcelUuid> solicitedServiceUUIDs = scanRecord.getServiceSolicitationUuids();
-                        // if ((solicitedServiceUUIDs != null) && (solicitedServiceUUIDs.size() > 0))
+                        // List<ParcelUuid> solicitedServices = scanRecord.getServiceSolicitationUuids();
+                        // if ((solicitedServices != null) && (solicitedServices.size() > 0))
                         // {
-                        //     sb.append(",\"solicitedServiceUUIDs\":[");
-                        //     boolean first = true;
-                        //     for (ParcelUuid uuid : solicitedServiceUUIDs)
+                        //     sb.append(",\"solicitedServices\":[");
+                        //     for (int i = 0; i < solicitedServices.size(); ++i)
                         //     {
-                        //         if (!first) sb.append(",");
-                        //         first = false;
-
+                        //         if (i > 0) sb.append(",");
                         //         sb.append("\"");
-                        //         sb.append(uuid);
+                        //         sb.append(solicitedServices.get(i));
                         //         sb.append("\"");
                         //     }
                         //     sb.append("]");
                         // }
 
                         // Manufacturer data
-                        SparseArray<byte[]> manufacturerData = scanRecord.getManufacturerSpecificData();
-                        if ((manufacturerData != null) && (manufacturerData.size() > 0))
+                        SparseArray<byte[]> manufacturersData = scanRecord.getManufacturerSpecificData();
+                        if ((manufacturersData != null) && (manufacturersData.size() > 0))
                         {
-                            for (int i = 0; i < manufacturerData.size(); ++i)
+                            sb.append(",\"manufacturersData\":[");
+                            for (int i = 0; i < manufacturersData.size(); ++i)
                             {
-                                sb.append(",\"manufacturerData");
-                                sb.append(i);
-                                sb.append("\":[");
-                                int companyId = manufacturerData.keyAt(i);
-                                sb.append(companyId & 0xFF);
-                                sb.append(",");
-                                sb.append((companyId >> 8) & 0xFF);
-                                byte[] data = manufacturerData.valueAt(i);
-                                for (byte b : data)
+                                if (i > 0) sb.append(",");
+                                sb.append("{\"companyId\":");
+                                sb.append(manufacturersData.keyAt(i));
+                                sb.append(",\"data\":[");
+                                byte[] data = manufacturersData.valueAt(i);
+                                for (int j = 0; j < data.length; ++j)
                                 {
-                                    sb.append(",");
-                                    sb.append(b);
+                                    if (j > 0) sb.append(",");
+                                    sb.append(data[j]);
                                 }
-                                sb.append("]");
+                                sb.append("]}");
                             }
+                            sb.append("]");
                         }
 
                         // Service data
-                        Map<ParcelUuid, byte[]> serviceData = scanRecord.getServiceData();
-                        if ((serviceData != null) && (serviceData.size() > 0))
+                        Map<ParcelUuid, byte[]> servicesData = scanRecord.getServiceData();
+                        if ((servicesData != null) && (servicesData.size() > 0))
                         {
-                            sb.append(",\"serviceData\":{");
+                            sb.append(",\"servicesData\":[");
                             boolean first = true;
-                            for (Map.Entry<ParcelUuid, byte[]> entry : serviceData.entrySet())
+                            for (Map.Entry<ParcelUuid, byte[]> entry : servicesData.entrySet())
                             {
                                 if (!first) sb.append(",");
                                 first = false;
 
-                                sb.append("\"");
+                                sb.append("{\"uuid\":\"");
                                 sb.append(entry.getKey());
-                                sb.append("\":");
-
-                                boolean f= false;
-                                for (byte b : entry.getValue())
+                                sb.append("\",\"data\":[");
+                                byte[] data = entry.getValue();
+                                for (int j = 0; j < data.length; ++j)
                                 {
-                                    if (!f) sb.append(",");
-                                    f = false;
-                                    sb.append(b);
+                                    if (j > 0) sb.append(",");
+                                    sb.append(data[j]);
                                 }
+                                sb.append("]}");
                             }
-                            sb.append("}");
+                            sb.append("]");
                         }
                     }
                     sb.append("}");

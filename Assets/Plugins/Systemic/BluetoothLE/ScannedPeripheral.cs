@@ -7,7 +7,7 @@ using Systemic.Unity.BluetoothLE.Internal;
 namespace Systemic.Unity.BluetoothLE
 {
     /// <summary>
-    /// The manufacturer data of an advertisement packet.
+    /// Represents the manufacturer data of an advertisement packet.
     /// </summary>
     /// <remarks>
     /// This is a read only class.
@@ -18,27 +18,48 @@ namespace Systemic.Unity.BluetoothLE
         /// Initialize a manufacturer data instance from an array of bytes.
         /// </summary>
         /// <param name="data">The manufacturer data, should be at least of size 2.</param>
-        internal ManufacturerData(byte[] data)
+        internal ManufacturerData(ushort companyId, byte[] data = null)
         {
-            if (data?.Length > 2)
-            {
-                ManufacturerId = (ushort)(data[0] | (data[1] << 8));
-                Data = Array.AsReadOnly(data.Skip(2).ToArray());
-            }
-            else
-            {
-                ManufacturerId = 0;
-                Data = Array.AsReadOnly(Array.Empty<byte>());
-            }
+            CompanyId = companyId;
+            Data = Array.AsReadOnly(data ?? Array.Empty<byte>());
         }
 
         /// <summary>
-        /// The manufacturer id.
+        /// The company assigned id.
         /// </summary>
-        public ushort ManufacturerId { get; }
+        public ushort CompanyId { get; }
 
         /// <summary>
         /// The data for the manufacturer.
+        /// </summary>
+        public IReadOnlyList<byte> Data { get; }
+    }
+
+    /// <summary>
+    /// Represents the service data of an advertisement packet.
+    /// </summary>
+    /// <remarks>
+    /// This is a read only class.
+    /// </remarks>
+    public struct ServiceData
+    {
+        /// <summary>
+        /// Initialize a manufacturer data instance from an array of bytes.
+        /// </summary>
+        /// <param name="data">The manufacturer data, should be at least of size 2.</param>
+        internal ServiceData(Guid uuid, byte[] data = null)
+        {
+            Uuid = uuid;
+            Data = Array.AsReadOnly(data ?? Array.Empty<byte>());
+        }
+
+        /// <summary>
+        /// The service UUID.
+        /// </summary>
+        public Guid Uuid { get; }
+
+        /// <summary>
+        /// The custom data for the service.
         /// </summary>
         public IReadOnlyList<byte> Data { get; }
     }
@@ -72,12 +93,11 @@ namespace Systemic.Unity.BluetoothLE
             IsConnectable = advertisementData.isConnectable;
             Rssi = advertisementData.rssi;
             TxPowerLevel = advertisementData.txPowerLevel;
-            ManufacturerData = Array.AsReadOnly(ToManufacturerDataArray(advertisementData.manufacturerData0,
-                advertisementData.manufacturerData1, advertisementData.manufacturerData2, advertisementData.manufacturerData3));
-            ServicesData = new ReadOnlyDictionary<string, byte[]>(CloneDictionary(advertisementData.servicesData));
+            ManufacturersData = Array.AsReadOnly(ToManufacturerDataArray(advertisementData.manufacturersData));
+            ServicesData = Array.AsReadOnly(ToServiceDataArray(advertisementData.servicesData));
             Services = Array.AsReadOnly(ToGuidArray(advertisementData.services));
-            OverflowServices = Array.AsReadOnly(ToGuidArray(advertisementData.overflowServiceUUIDs));
-            SolicitedServices = Array.AsReadOnly(ToGuidArray(advertisementData.solicitedServiceUUIDs));
+            OverflowServices = Array.AsReadOnly(ToGuidArray(advertisementData.overflowServices));
+            SolicitedServices = Array.AsReadOnly(ToGuidArray(advertisementData.solicitedServices));
         }
 
         /// <summary>
@@ -116,14 +136,14 @@ namespace Systemic.Unity.BluetoothLE
         public int TxPowerLevel { get; }
 
         /// <summary>
-        /// Gets the manufacturer data of the peripheral.
+        /// Gets the manufacturers data of the peripheral.
         /// </summary>
-        public IReadOnlyList<ManufacturerData> ManufacturerData { get; }
+        public IReadOnlyList<ManufacturerData> ManufacturersData { get; }
 
         /// <summary>
-        /// Gets the service-specific advertisement data (iOS only).
+        /// Gets the advertised services data.
         /// </summary>
-        public IReadOnlyDictionary<string, byte[]> ServicesData { get; }
+        public IReadOnlyList<ServiceData> ServicesData { get; }
 
         /// <summary>
         /// Gets the list of services advertised by the peripheral.
@@ -140,30 +160,22 @@ namespace Systemic.Unity.BluetoothLE
         /// </summary>
         public IReadOnlyList<Guid> SolicitedServices { get; }
 
-        // Converts a double array of bytes to an array of manufacturer data
-        private ManufacturerData[] ToManufacturerDataArray(byte[] data0, byte[] data1, byte[] data2, byte[] data3)
+        // Converts an array of JSON manufacturer data to an array of manufacturer data
+        private ManufacturerData[] ToManufacturerDataArray(NativeAdvertisementDataJson.ManufacturerData[] arr)
         {
-            return new[] { data0, data1, data2, data3 }.Where(d => d != null).Select(d => new ManufacturerData(d)).ToArray();
+            return arr?.Select(d => new ManufacturerData(d.companyId, d.data)).ToArray() ?? Array.Empty<ManufacturerData>();
+        }
+
+        // Converts an array of JSON service data to an array of service data
+        private ServiceData[] ToServiceDataArray(NativeAdvertisementDataJson.ServiceData[] arr)
+        {
+            return arr?.Select(d => new ServiceData(new Guid(d.uuid), d.data)).ToArray() ?? Array.Empty<ServiceData>();
         }
 
         // Converts a list of strings representing BLE UUIDS to an array of Guids
         private static Guid[] ToGuidArray(string[] uuids)
         {
             return uuids?.Select(BleUuid.StringToGuid).ToArray() ?? Array.Empty<Guid>();
-        }
-
-        // Duplicates the given dictionary and its contents
-        private static IDictionary<string, byte[]> CloneDictionary(IDictionary<string, byte[]> servicesData)
-        {
-            var clone = new Dictionary<string, byte[]>(servicesData?.Count ?? 0);
-            if (servicesData != null)
-            {
-                foreach (var kv in servicesData)
-                {
-                    clone.Add(kv.Key, (byte[])kv.Value.Clone());
-                }
-            }
-            return clone;
         }
     }
 }

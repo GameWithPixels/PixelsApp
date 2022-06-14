@@ -17,10 +17,46 @@ namespace Systemic.Unity.Pixels
         sealed class BlePixel : Pixel
         {
             /// <summary>
-            /// This data structure mirrors the data in firmware/bluetooth/bluetooth_stack.cpp
+            /// The default Pixel connection timeout in seconds.
+            /// </summary>
+            public const float DefaultConnectionTimeout = 12;
+
+            /// <summary>
+            /// The standard UUID for the BLE Information Service.
+            /// </summary>
+            static readonly System.Guid InformationServiceUuid = BluetoothLE.BleUuid.ToFullUuid(0x180A);
+
+            /// <summary>
+            /// This data structure mirrors CustomManufacturerData in firmware/bluetooth/bluetooth_stack.cpp
             /// </sumary>
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
-            struct PixelAdvertisingData
+            struct CustomManufacturerData
+            {
+                // Pixel type identification
+                public byte faceCount; // Which kind of dice this is
+                public PixelDesignAndColor designAndColor; // Physical look, also only 8 bits
+
+                // Current state
+                public PixelRollState rollState; // Indicates whether the dice is being shaken
+                public byte currentFace; // Which face is currently up
+                public byte batteryLevel; // 0 -> 255
+            };
+
+            /// <summary>
+            /// This data structure mirrors CustomServiceData in firmware/bluetooth/bluetooth_stack.cpp
+            /// </sumary>
+            [StructLayout(LayoutKind.Sequential, Pack = 1)]
+            struct CustomServiceData
+            {
+                public uint deviceId;
+                public uint buildTimestamp;
+            };
+
+            /// <summary>
+            /// Older version of the CustomManufacturerData (was named CustomAdvertisingData in firmware code)
+            /// </sumary>
+            [StructLayout(LayoutKind.Sequential, Pack = 1)]
+            struct CustomAdvertisingData
             {
                 // Pixel type identification
                 public PixelDesignAndColor designAndColor; // Physical look, also only 8 bits
@@ -97,39 +133,90 @@ namespace Systemic.Unity.Pixels
                     RssiChanged?.Invoke(this, rssi);
                 }
 
-                if (_peripheral.ManufacturerData?.Count > 0)
+                if (_peripheral.ManufacturersData?.Count > 0)
                 {
+                    var manufDataSrc = _peripheral.ManufacturersData[0]; // Assume we want to use the first one
+                    bool isManufData = manufDataSrc.Data.Count == Marshal.SizeOf(typeof(CustomManufacturerData));
+                    bool isOldAdvData = manufDataSrc.Data.Count == (Marshal.SizeOf(typeof(CustomAdvertisingData)) - 2);
+
                     // Marshall the data into the struct we expect
-                    int size = Marshal.SizeOf(typeof(PixelAdvertisingData));
-                    if (_peripheral.ManufacturerData[0].Data.Count == (size - 2))
+                    if (isManufData || isOldAdvData)
                     {
-                        // Copy data in a byte array for marshaling
-                        var manufData = _peripheral.ManufacturerData[0];
-                        var arr = new byte[size];
-                        arr[0] = (byte)(manufData.ManufacturerId & 0xFF);
-                        arr[1] = (byte)(manufData.ManufacturerId >> 8);
-                        for (int i = 2; i < size; ++i)
+                        CustomManufacturerData manufData;
+                        CustomServiceData servData = new CustomServiceData();
+
+                        if (isManufData)
                         {
-                            arr[i] = manufData.Data[i - 2];
+                            int size = Marshal.SizeOf(typeof(CustomManufacturerData));
+
+                            // Marshal data to an object
+                            var ptr = Marshal.AllocHGlobal(size);
+                            Marshal.Copy(manufDataSrc.Data.ToArray(), 0, ptr, size);
+                            manufData = Marshal.PtrToStructure<CustomManufacturerData>(ptr);
+                            Marshal.FreeHGlobal(ptr);
+
+                            // Now with service data
+                            size = Marshal.SizeOf(typeof(CustomServiceData));
+
+                            var servDataSrc = _peripheral.ServicesData.FirstOrDefault(s => s.Uuid == InformationServiceUuid).Data;
+                            if (servDataSrc?.Count == size)
+                            {
+                                // Marshal data to an object
+                                ptr = Marshal.AllocHGlobal(size);
+                                Marshal.Copy(servDataSrc.ToArray(), 0, ptr, size);
+                                servData = Marshal.PtrToStructure<CustomServiceData>(ptr);
+                                Marshal.FreeHGlobal(ptr);
+                            }
+                            else if(servDataSrc != null)
+                            {
+                                Debug.LogError($"Pixel {name}: unexpected advertising service data length, got {servDataSrc.Count}");
+                            }
+                            else
+                            {
+                                Debug.LogError($"Pixel {name}: missing advertising service data");
+                            }
+                        }
+                        else
+                        {
+                            int size = Marshal.SizeOf(typeof(CustomAdvertisingData));
+
+                            // Copy data in a byte array for marshaling
+                            var arr = new byte[size];
+                            arr[0] = (byte)(manufDataSrc.CompanyId & 0xFF);
+                            arr[1] = (byte)(manufDataSrc.CompanyId >> 8);
+                            for (int i = 2; i < size; ++i)
+                            {
+                                arr[i] = manufDataSrc.Data[i - 2];
+                            }
+
+                            // Marshal data to an object
+                            var ptr = Marshal.AllocHGlobal(size);
+                            Marshal.Copy(arr, 0, ptr, size);
+                            var advData1 = Marshal.PtrToStructure<CustomAdvertisingData>(ptr);
+                            Marshal.FreeHGlobal(ptr);
+
+                            manufData.faceCount = advData1.faceCount;
+                            manufData.designAndColor = advData1.designAndColor;
+                            manufData.rollState = advData1.rollState;
+                            manufData.currentFace = advData1.currentFace;
+                            manufData.batteryLevel = advData1.batteryLevel;
                         }
 
-                        var ptr = Marshal.AllocHGlobal(size);
-                        Marshal.Copy(arr, 0, ptr, size);
-                        var advData = Marshal.PtrToStructure<PixelAdvertisingData>(ptr);
-                        Marshal.FreeHGlobal(ptr);
-
                         // Update Pixel data
-                        bool appearanceChanged = faceCount != advData.faceCount || designAndColor != advData.designAndColor;
-                        bool rollStateChanged = rollState != advData.rollState || face != advData.currentFace;
-                        faceCount = advData.faceCount;
-                        designAndColor = advData.designAndColor;
-                        rollState = advData.rollState;
-                        face = advData.currentFace;
+                        bool appearanceChanged = faceCount != manufData.faceCount || designAndColor != manufData.designAndColor;
+                        bool rollStateChanged = rollState != manufData.rollState || face != manufData.currentFace;
+                        faceCount = manufData.faceCount;
+                        designAndColor = manufData.designAndColor;
+                        rollState = manufData.rollState;
+                        face = manufData.currentFace;
 
-                        float newBatteryLevel = advData.batteryLevel / 255f;
+                        float newBatteryLevel = manufData.batteryLevel / 255f;
                         bool batteryLevelChanged = batteryLevel != newBatteryLevel;
                         batteryLevel = newBatteryLevel;
                         isCharging = null;
+
+                        deviceId = servData.deviceId;
+                        buildTimestamp = servData.buildTimestamp;
 
                         // Run callbacks
                         if (appearanceChanged)
@@ -147,7 +234,7 @@ namespace Systemic.Unity.Pixels
                     }
                     else
                     {
-                        Debug.LogError($"Pixel {name}: incorrect advertising data length {_peripheral.ManufacturerData.Count}, expected: {size}");
+                        Debug.LogError($"Pixel {name}: unexpected advertising manufacturer data length, got {_peripheral.ManufacturersData[0].Data.Count}");
                     }
                 }
             }
@@ -169,9 +256,9 @@ namespace Systemic.Unity.Pixels
             /// number of calls to <see cref="Disconnect(ConnectionResultCallback, bool)"/> must be made
             /// to disconnect the Pixel.
             /// </summary>
-            /// <param name="timeout">Timeout in seconds.</param>
             /// <param name="onResult">Optional callback that is called once the connection has succeeded or timed-out.</param>
-            public void Connect(float timeout, ConnectionResultCallback onResult = null)
+            /// <param name="timeout">Timeout in seconds.</param>
+            public void Connect(ConnectionResultCallback onResult = null, float timeout = DefaultConnectionTimeout)
             {
                 EnsureRunningOnMainThread();
 
@@ -423,7 +510,7 @@ namespace Systemic.Unity.Pixels
 
                 void OnValueChanged(byte[] data)
                 {
-                    Debug.Assert(data != null);
+                    Debug.Assert(data?.Length > 0);
 
                     // Process the message coming from the actual Pixel!
                     var message = Marshaling.FromByteArray(data);

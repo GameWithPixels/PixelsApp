@@ -36,11 +36,6 @@ namespace Systemic.Unity.Pixels
         static PlayAudioClipCallback _playAudioClip;
 
         /// <summary>
-        /// The default Pixel connection timeout in seconds.
-        /// </summary>
-        public const float DefaultConnectionTimeout = 10;
-
-        /// <summary>
         /// Indicates whether we are ready for scanning and connecting to peripherals.
         /// </summary>
         public static bool IsReady => Central.IsReady;
@@ -213,14 +208,13 @@ namespace Systemic.Unity.Pixels
         ///                                 it may return true to cancel the connection request.</param>
         /// <param name="onResult">An optional callback that is called when the operation completes
         ///                        successfully (true) or not (false) with an error message.</param>
-        /// <param name="connectionTimeout">The connection timeout in seconds.</param>
         /// <returns>The coroutine running the request.</returns>
-        public static Coroutine ConnectPixel(Pixel pixel, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null, float connectionTimeout = DefaultConnectionTimeout)
+        public static Coroutine ConnectPixel(Pixel pixel, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null)
         {
             if (pixel == null) throw new System.ArgumentNullException(nameof(pixel));
             if (requestCancelFunc == null) throw new System.ArgumentNullException(nameof(requestCancelFunc));
 
-            return ConnectPixels(new Pixel[] { pixel }, requestCancelFunc, onResult, connectionTimeout);
+            return ConnectPixels(new Pixel[] { pixel }, requestCancelFunc, onResult);
         }
 
         /// <summary>
@@ -238,9 +232,8 @@ namespace Systemic.Unity.Pixels
         ///                                 it may return true to cancel the connection request.</param>
         /// <param name="onResult">An optional callback that is called when the operation completes
         ///                        successfully (true) or not (false) with an error message.</param>
-        /// <param name="connectionTimeout">The connection timeout in seconds.</param>
         /// <returns>The coroutine running the request.</returns>
-        public static Coroutine ConnectPixels(IEnumerable<Pixel> pixels, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null, float connectionTimeout = DefaultConnectionTimeout)
+        public static Coroutine ConnectPixels(IEnumerable<Pixel> pixels, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null)
         {
             if (pixels == null) throw new System.ArgumentNullException(nameof(pixels));
             if (requestCancelFunc == null) throw new System.ArgumentNullException(nameof(requestCancelFunc));
@@ -282,7 +275,7 @@ namespace Systemic.Unity.Pixels
 
                     // We found the Pixel, try to connect
                     int index = i; // Capture the current value of i
-                    pixel.Connect(connectionTimeout, (_, res, error) => results[index] = res ? "" : error);
+                    pixel.Connect((_, res, error) => results[index] = res ? "" : error);
                 }
 
                 // Wait for all Pixels to connect

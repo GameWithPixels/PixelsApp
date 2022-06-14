@@ -61,7 +61,7 @@ namespace Systemic.Unity.Pixels
         /// Sends a message to the Pixel to update the instance information.
         /// 
         /// On success, this will update the <see cref="faceCount"/>, <see cref="designAndColor"/>,
-        /// <see cref="dataSetHash"/>, <see cref="flashSize"/> and <see cref="firmwareVersionId"/>
+        /// <see cref="dataSetHash"/>, <see cref="availableFlashSize"/> and <see cref="firmwareVersion"/>
         /// properties and raise the <see cref="AppearanceChanged"/> event if the face out or design
         /// and color have changed.
         /// </summary>
@@ -167,12 +167,8 @@ namespace Systemic.Unity.Pixels
         public IEnumerator RenameAsync(string name, OperationResultCallback onResult = null)
         {
             Debug.Log($"Pixel {SafeName}: Renaming to {name}");
-
-            byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(name + "\0");
-            byte[] nameByteMaxSize = new byte[SetName.NameMaxSize];
-            System.Array.Copy(nameBytes, nameByteMaxSize, nameBytes.Length);
-
-            var op = new SendMessageAndWaitForResponseEnumerator<SetName, SetNameAck>(this, new SetName { name = nameByteMaxSize });
+            var bytes = Marshaling.StringToBytes(name, true, SetName.NameMaxSize);
+            var op = new SendMessageAndWaitForResponseEnumerator<SetName, SetNameAck>(this, new SetName { name = bytes });
             yield return op;
             onResult?.Invoke(op.IsSuccess, op.Error);
         }
