@@ -12,245 +12,246 @@ using Systemic.Unity.Pixels.Profiles;
 /// to the proper derived type and access the parameters.
 /// </summary>
 [System.Serializable]
-    public abstract class EditAction
-        : EditObject
+public abstract class EditAction
+    : EditObject
+{
+    [JsonIgnore]
+    public abstract ActionType type { get; }
+    public abstract IAction ToAction(EditDataSet editSet, DataSet set);
+    public abstract EditAction Duplicate();
+    public abstract bool IsSame(EditAction editAction); // Don't want to override Equals
+
+    public virtual void ReplaceAnimation(EditAnimation oldAnimation, EditAnimation newAnimation)
     {
-        [JsonIgnore]
-        public abstract ActionType type { get; }
-        public abstract IAction ToAction(EditDataSet editSet, DataSet set);
-        public abstract EditAction Duplicate();
-        public abstract bool IsSame(EditAction editAction); // Don't want to override Equals
-
-        public virtual void ReplaceAnimation(EditAnimation oldAnimation, EditAnimation newAnimation)
-        {
-            // Base does nothing
-        }
-        public virtual void DeleteAnimation(EditAnimation animation)
-        {
-            // Base does nothing
-        }
-        public virtual bool DependsOnAnimation(EditAnimation animation)
-        {
-            return false;
-        }
-        public virtual void DeleteAudioClip(AudioClips.EditAudioClip clip)
-        {
-            // Base does nothing
-        }
-        public virtual bool DependsOnAudioClip(AudioClips.EditAudioClip clip)
-        {
-            return false;
-        }
-        public virtual IEnumerable<EditAnimation> CollectAnimations()
-        {
-            yield break;
-        }
-        public virtual IEnumerable<AudioClips.EditAudioClip> CollectAudioClips()
-        {
-            yield break;
-        }
-
-        public static EditAction Create(ActionType type)
-        {
-            switch (type)
-            {
-                case ActionType.PlayAnimation:
-                    return new EditActionPlayAnimation();
-                case ActionType.PlayAudioClip:
-                    return new EditActionPlayAudioClip();
-                default:
-                    throw new System.Exception("Unknown condition type");
-            }
-        }
-
-        public static System.Type GetActionType(ActionType type)
-        {
-            switch (type)
-            {
-                case ActionType.PlayAnimation:
-                    return typeof(EditActionPlayAnimation);
-                case ActionType.PlayAudioClip:
-                    return typeof(EditActionPlayAudioClip);
-                default:
-                    throw new System.Exception("Unknown condition type");
-            }
-        }
-    };
-
-    public class EditActionConverter
-        : JsonConverter<EditAction>
+        // Base does nothing
+    }
+    public virtual void DeleteAnimation(EditAnimation animation)
     {
-        public override void WriteJson(JsonWriter writer, EditAction value, JsonSerializer serializer)
+        // Base does nothing
+    }
+    public virtual bool DependsOnAnimation(EditAnimation animation)
+    {
+        return false;
+    }
+    public virtual void DeleteAudioClip(AudioClips.EditAudioClip clip)
+    {
+        // Base does nothing
+    }
+    public virtual bool DependsOnAudioClip(AudioClips.EditAudioClip clip)
+    {
+        return false;
+    }
+    public virtual IEnumerable<EditAnimation> CollectAnimations()
+    {
+        yield break;
+    }
+    public virtual IEnumerable<AudioClips.EditAudioClip> CollectAudioClips()
+    {
+        yield break;
+    }
+
+    public static EditAction Create(ActionType type)
+    {
+        switch (type)
+        {
+            case ActionType.PlayAnimation:
+                return new EditActionPlayAnimation();
+            case ActionType.PlayAudioClip:
+                return new EditActionPlayAudioClip();
+            default:
+                throw new System.Exception("Unknown condition type");
+        }
+    }
+
+    public static System.Type GetActionType(ActionType type)
+    {
+        switch (type)
+        {
+            case ActionType.PlayAnimation:
+                return typeof(EditActionPlayAnimation);
+            case ActionType.PlayAudioClip:
+                return typeof(EditActionPlayAudioClip);
+            default:
+                throw new System.Exception("Unknown condition type");
+        }
+    }
+};
+
+public class EditActionConverter
+    : JsonConverter<EditAction>
+{
+    public override void WriteJson(JsonWriter writer, EditAction value, JsonSerializer serializer)
+    {
+        using (new IgnoreThisConverter(serializer, this))
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("type");
+            serializer.Serialize(writer, value.type);
+            writer.WritePropertyName("data");
+            serializer.Serialize(writer, value);
+            writer.WriteEndObject();
+        }
+    }
+
+    public override EditAction ReadJson(JsonReader reader, System.Type objectType, EditAction existingValue, bool hasExistingValue, JsonSerializer serializer)
+    {
+        if (hasExistingValue)
+            throw(new System.NotImplementedException());
+
+        using (new IgnoreThisConverter(serializer, this))
+        {
+            JObject editAnimObject = JObject.Load(reader);
+            var type = editAnimObject["type"].ToObject<ActionType>();
+            var ret = (EditAction)editAnimObject["data"].ToObject(EditAction.GetActionType(type), serializer);
+            return ret;
+        }
+    }
+}
+
+/// <summary>
+/// Action to play an animation, really! 
+/// </summary>
+[System.Serializable]
+public class EditActionPlayAnimation
+    : EditAction
+{
+    [Name("Lighting Pattern")]
+    public EditAnimation animation;
+    [PlaybackFace, Name("Play on Face")]
+    public int faceIndex = -1;
+    [IntSlider, IntRange(1, 10), Name("Repeat Count")]
+    public int loopCount = 1;
+
+    public override ActionType type { get { return ActionType.PlayAnimation; } }
+    public override IAction ToAction(EditDataSet editSet, DataSet set)
+    {
+        return new ActionPlayAnimation()
+        {
+            animIndex = (byte)editSet.animations.IndexOf(animation),
+            faceIndex = (byte)faceIndex,
+            loopCount = (byte)loopCount,
+        };
+    }
+
+    /// <summary>
+    /// Specialized converter
+    /// </sumary>
+    public class Converter
+        : JsonConverter<EditActionPlayAnimation>
+    {
+        AppDataSet dataSet;
+        public Converter(AppDataSet dataSet)
+        {
+            this.dataSet = dataSet;
+        }
+        public override void WriteJson(JsonWriter writer, EditActionPlayAnimation value, JsonSerializer serializer)
         {
             using (new IgnoreThisConverter(serializer, this))
             {
                 writer.WriteStartObject();
-                writer.WritePropertyName("type");
-                serializer.Serialize(writer, value.type);
-                writer.WritePropertyName("data");
-                serializer.Serialize(writer, value);
+                var animationIndex = dataSet.animations.IndexOf(value.animation);
+                writer.WritePropertyName("animationIndex");
+                serializer.Serialize(writer, animationIndex);
+                writer.WritePropertyName("faceIndex");
+                serializer.Serialize(writer, value.faceIndex);
+                writer.WritePropertyName("loopCount");
+                serializer.Serialize(writer, value.loopCount);
                 writer.WriteEndObject();
             }
         }
 
-        public override EditAction ReadJson(JsonReader reader, System.Type objectType, EditAction existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override EditActionPlayAnimation ReadJson(JsonReader reader, System.Type objectType, EditActionPlayAnimation existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             if (hasExistingValue)
                 throw(new System.NotImplementedException());
 
             using (new IgnoreThisConverter(serializer, this))
             {
-                JObject editAnimObject = JObject.Load(reader);
-                var type = editAnimObject["type"].ToObject<ActionType>();
-                var ret = (EditAction)editAnimObject["data"].ToObject(EditAction.GetActionType(type), serializer);
+                JObject jsonObject = JObject.Load(reader);
+                var ret = new EditActionPlayAnimation();
+                int animationIndex = jsonObject["animationIndex"].Value<int>();
+                if (animationIndex >= 0 && animationIndex < dataSet.animations.Count)
+                    ret.animation = dataSet.animations[animationIndex];
+                else
+                    ret.animation = null;
+                ret.faceIndex = jsonObject["faceIndex"].Value<int>();
+                ret.loopCount = jsonObject["loopCount"].Value<int>();
                 return ret;
             }
         }
     }
 
-    /// <summary>
-    /// Action to play an animation, really! 
-    /// </summary>
-    [System.Serializable]
-    public class EditActionPlayAnimation
-        : EditAction
+    public override EditAction Duplicate()
     {
-        [Name("Lighting Pattern")]
-        public EditAnimation animation;
-        [PlaybackFace, Name("Play on Face")]
-        public int faceIndex = -1;
-        [IntSlider, IntRange(1, 10), Name("Repeat Count")]
-        public int loopCount = 1;
-
-        public override ActionType type { get { return ActionType.PlayAnimation; } }
-        public override IAction ToAction(EditDataSet editSet, DataSet set)
+        return new EditActionPlayAnimation()
         {
-            return new ActionPlayAnimation()
-            {
-                animIndex = (byte)editSet.animations.IndexOf(animation),
-                faceIndex = (byte)faceIndex,
-                loopCount = (byte)loopCount
-            };
+            animation = animation,
+            faceIndex = faceIndex,
+            loopCount = loopCount,
+        };
+    }
+
+    public override bool IsSame(EditAction editAction)
+    {
+        static bool IsSameAnimation(EditAnimation animation1, EditAnimation animation2)
+            => (animation1 == animation2);// || ((animation1 != null) && (animation2 != null) && animation1.IsSame(animation2));
+
+        return (editAction is EditActionPlayAnimation action) && IsSameAnimation(animation, action.animation) && (faceIndex == action.faceIndex) && (loopCount == action.loopCount);
+    }
+
+    public override void ReplaceAnimation(EditAnimation oldAnimation, EditAnimation newAnimation)
+    {
+        if (animation == oldAnimation)
+        {
+            animation = newAnimation;
         }
+    }
 
-        /// <summary>
-        /// Specialized converter
-        /// </sumary>
-        public class Converter
-            : JsonConverter<EditActionPlayAnimation>
+    public override void DeleteAnimation(EditAnimation animation)
+    {
+        if (this.animation == animation)
         {
-            AppDataSet dataSet;
-            public Converter(AppDataSet dataSet)
-            {
-                this.dataSet = dataSet;
-            }
-            public override void WriteJson(JsonWriter writer, EditActionPlayAnimation value, JsonSerializer serializer)
-            {
-                using (new IgnoreThisConverter(serializer, this))
-                {
-                    writer.WriteStartObject();
-                    var animationIndex = dataSet.animations.IndexOf(value.animation);
-                    writer.WritePropertyName("animationIndex");
-                    serializer.Serialize(writer, animationIndex);
-                    writer.WritePropertyName("faceIndex");
-                    serializer.Serialize(writer, value.faceIndex);
-                    writer.WritePropertyName("loopCount");
-                    serializer.Serialize(writer, value.loopCount);
-                    writer.WriteEndObject();
-                }
-            }
+            this.animation = null;
+        }
+    }
 
-            public override EditActionPlayAnimation ReadJson(JsonReader reader, System.Type objectType, EditActionPlayAnimation existingValue, bool hasExistingValue, JsonSerializer serializer)
-            {
-                if (hasExistingValue)
-                    throw(new System.NotImplementedException());
+    public override bool DependsOnAnimation(EditAnimation animation)
+    {
+        return this.animation == animation;
+    }
 
-                using (new IgnoreThisConverter(serializer, this))
-                {
-                    JObject jsonObject = JObject.Load(reader);
-                    var ret = new EditActionPlayAnimation();
-                    int animationIndex = jsonObject["animationIndex"].Value<int>();
-                    if (animationIndex >= 0 && animationIndex < dataSet.animations.Count)
-                        ret.animation = dataSet.animations[animationIndex];
-                    else
-                        ret.animation = null;
-                    ret.faceIndex = jsonObject["faceIndex"].Value<int>();
-                    ret.loopCount = jsonObject["loopCount"].Value<int>();
-                    return ret;
-                }
+    public override IEnumerable<EditAnimation> CollectAnimations()
+    {
+        if (animation != null)
+        {
+            yield return animation;
+        }
+    }
+
+    public override string ToString()
+    {
+        StringBuilder builder = new StringBuilder();
+        if (animation != null)
+        {
+            builder.Append("play \"" + animation.name + "\"");
+            if (loopCount > 1)
+            {
+                builder.Append("x");
+                builder.Append(loopCount);
+            }
+            if (faceIndex != -1)
+            {
+                builder.Append(" on face ");
+                builder.Append(faceIndex + 1);
             }
         }
-
-        public override EditAction Duplicate()
+        else
         {
-            return new EditActionPlayAnimation()
-            {
-                animation = animation,
-                faceIndex = faceIndex,
-                loopCount = loopCount
-            };
+            builder.Append("- Please select a Pattern -");
         }
-
-        public override bool IsSame(EditAction editAction)
-        {
-            static bool IsSameAnimation(EditAnimation animation1, EditAnimation animation2)
-                => (animation1 == animation2);// || ((animation1 != null) && (animation2 != null) && animation1.IsSame(animation2));
-
-            return (editAction is EditActionPlayAnimation action) && IsSameAnimation(animation, action.animation) && (faceIndex == action.faceIndex) && (loopCount == action.loopCount);
-        }
-
-        public override void ReplaceAnimation(EditAnimation oldAnimation, EditAnimation newAnimation)
-        {
-            if (animation == oldAnimation)
-            {
-                animation = newAnimation;
-            }
-        }
-
-        public override void DeleteAnimation(EditAnimation animation)
-        {
-            if (this.animation == animation)
-            {
-                this.animation = null;
-            }
-        }
-
-        public override bool DependsOnAnimation(EditAnimation animation)
-        {
-            return this.animation == animation;
-        }
-
-        public override IEnumerable<EditAnimation> CollectAnimations()
-        {
-            if (animation != null)
-            {
-                yield return animation;
-            }
-        }
-        public override string ToString()
-        {
-            StringBuilder builder = new StringBuilder();
-            if (animation != null)
-            {
-                builder.Append("play \"" + animation.name + "\"");
-                if (loopCount > 1)
-                {
-                    builder.Append("x");
-                    builder.Append(loopCount);
-                }
-                if (faceIndex != -1)
-                {
-                    builder.Append(" on face ");
-                    builder.Append(faceIndex + 1);
-                }
-            }
-            else
-            {
-                builder.Append("- Please select a Pattern -");
-            }
-            return builder.ToString();
-        }
-    };
+        return builder.ToString();
+    }
+};
 
 /// <summary>
 /// Action to play an animation, really! 

@@ -35,7 +35,7 @@ public class UIParameterEditColor : UIParameter
         {
             if (res)
             {
-                var editColor = EditColor.MakeRGB(newColor);
+                var editColor = EditColor.FromColor(newColor);
                 SetColor(editColor);
                 setterAction?.Invoke(editColor);
             }
@@ -75,7 +75,7 @@ public class UIParameterEditColor : UIParameter
                     0xFF);
 
                 // Update
-                var editColor = EditColor.MakeRGB(newColor);
+                var editColor = EditColor.FromColor(newColor);
                 SetColor(editColor, skipText: true);
                 setterAction?.Invoke(editColor);
             }

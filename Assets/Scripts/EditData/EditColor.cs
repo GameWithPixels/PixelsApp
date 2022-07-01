@@ -35,9 +35,9 @@ public struct EditColor
         }
     }
 
-    public static EditColor MakeRGB(Color rgb)
+    public static EditColor FromColor(Color color)
     {
-        return new EditColor() { type = ColorType.RGB, rgbColor = rgb };
+        return new EditColor { type = ColorType.RGB, rgbColor = color };
     }
 
     public uint toColorIndex(ref List<Color> palette)

@@ -13,10 +13,15 @@ using System.Text;
 [System.Serializable]
 public class EditDataSet
 {
-    public List<EditPattern> patterns = new List<EditPattern>();
-    public List<EditPattern> rgbPatterns = new List<EditPattern>();
-    public List<EditAnimation> animations = new List<EditAnimation>();
-    public EditBehavior behavior = null;
+    public readonly List<EditPattern> patterns = new List<EditPattern>();
+    public readonly List<EditPattern> rgbPatterns = new List<EditPattern>();
+    public readonly List<EditAnimation> animations = new List<EditAnimation>();
+    public readonly EditBehavior profile;
+
+    public EditDataSet(EditBehavior profile = null)
+    {
+        this.profile = profile ?? new EditBehavior();
+    }
 
     public int getPatternTrackOffset(EditPattern pattern)
     {
@@ -89,10 +94,7 @@ public class EditDataSet
         }
 
         // Now convert
-        if (behavior != null)
-        {
-            set.behavior = behavior.ToBehavior(this, set);
-        }
+        set.behavior = profile.ToProfile(this, set);
 
         return set;
     }

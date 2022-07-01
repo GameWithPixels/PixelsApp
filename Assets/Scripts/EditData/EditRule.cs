@@ -11,14 +11,22 @@ public class EditRule
     : EditObject
 {
     public EditCondition condition;
-    public List<EditAction> actions = new List<EditAction>();
+    public readonly List<EditAction> actions;
+
+    public EditRule(List<EditAction> actions = null)
+    {
+        this.actions = actions ?? new List<EditAction>();
+    }
 
     public Rule ToRule(EditDataSet editSet, DataSet set)
     {
         // Create our condition
-        var cond = condition.ToCondition(editSet, set);
-        set.conditions.Add(cond);
-        int conditionIndex = set.conditions.Count - 1;
+        int conditionIndex = set.conditions.Count;
+        if (condition != null)
+        {
+            var cond = condition.ToCondition(editSet, set);
+            set.conditions.Add(cond);
+        }
 
         // Create our action
         int actionOffset = set.actions.Count;
@@ -43,16 +51,15 @@ public class EditRule
         {
             actionsCopy.Add(action.Duplicate());
         }
-        return new EditRule()
+        return new EditRule(actionsCopy)
         {
-            condition = condition.Duplicate(),
-            actions = actionsCopy
+            condition = condition?.Duplicate(),
         };
     }
 
     public void CopyTo(EditRule dest)
     {
-        dest.condition = condition.Duplicate();
+        dest.condition = condition?.Duplicate();
         dest.actions.Clear();
         foreach (var action in actions)
         {

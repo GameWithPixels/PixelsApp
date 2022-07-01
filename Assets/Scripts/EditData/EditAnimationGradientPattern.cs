@@ -16,11 +16,14 @@ public class EditAnimationGradientPattern
     {
         get
         {
-            return pattern.duration * speedMultiplier;
+            return pattern?.duration ?? 0 * speedMultiplier;
         }
         set
         {
-            speedMultiplier = value / pattern.duration;
+            if (pattern != null)
+            {
+                speedMultiplier = value / pattern.duration;
+            }
         }
     }
     [GreyscalePattern, Name("LED Pattern")]
@@ -34,32 +37,33 @@ public class EditAnimationGradientPattern
 
     public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
     {
-        var ret = new AnimationGradientPattern();
-        ret.duration = (ushort)(duration * 1000); // stored in milliseconds
-        ret.speedMultiplier256 = (ushort)(this.speedMultiplier * 256.0f);
-        ret.tracksOffset = (ushort)editSet.getPatternTrackOffset(pattern);
-        ret.trackCount = (ushort)pattern.gradients.Count;
-
         // Add gradient
-        ret.gradientTrackOffset = (ushort)bits.rgbTracks.Count;
-        var tempTrack = new EditRGBTrack() { gradient = gradient };
-        var gradientTrack = tempTrack.ToTrack(editSet, bits);
+        int gradientTrackOffset = bits.rgbTracks.Count;
+        var gradientTrack = new EditRGBTrack(gradient).ToTrack(editSet, bits);
         bits.rgbTracks.Add(gradientTrack);
-        ret.overrideWithFace = (byte)(overrideWithFace ? 1 : 0);
 
-        return ret;
+        return new AnimationGradientPattern
+        {
+            duration = (ushort)(duration * 1000), // stored in milliseconds
+            speedMultiplier256 = (ushort)(speedMultiplier * 256.0f),
+            tracksOffset = (ushort)editSet.getPatternTrackOffset(pattern),
+            trackCount = (ushort)pattern?.gradients.Count,
+            gradientTrackOffset = (ushort)gradientTrackOffset,
+            overrideWithFace = (byte)(overrideWithFace ? 1 : 0),
+        };
     }
 
     public override EditAnimation Duplicate()
     {
-        EditAnimationGradientPattern ret = new EditAnimationGradientPattern();
-        ret.name = this.name;
-        ret.pattern = this.pattern;
-        ret.speedMultiplier = this.speedMultiplier;
-        ret.duration = this.duration;
-        ret.gradient = gradient.Duplicate();
-        ret.overrideWithFace = overrideWithFace;
-        return ret;
+        return new EditAnimationGradientPattern
+        {
+            name = name,
+            pattern = pattern,
+            speedMultiplier = speedMultiplier,
+            duration = duration,
+            gradient = gradient?.Duplicate(),
+            overrideWithFace = overrideWithFace,
+        };
     }
 
     public override void ReplacePattern(EditPattern oldPattern, EditPattern newPattern)

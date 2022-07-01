@@ -74,7 +74,7 @@ namespace Presets
             {
                 name = name,
                 description = description,
-                dieAssignments = dieAssignments.Select(a => new EditDieAssignment { die = a.die, behavior = a.behavior }).ToList()
+                dieAssignments = dieAssignments.Select(a => new EditDieAssignment { die = a.die, behavior = a.behavior }).ToList(),
             };
         }
 

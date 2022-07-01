@@ -11,11 +11,11 @@ public class EditBehavior
 {
     public string name;
     public string description;
-    public List<EditRule> rules = new List<EditRule>();
+    public readonly List<EditRule> rules = new List<EditRule>();
 
     public PreviewSettings defaultPreviewSettings = new PreviewSettings() { design = PixelDesignAndColor.V5_Grey };
 
-    public Profile ToBehavior(EditDataSet editSet, DataSet set)
+    public Profile ToProfile(EditDataSet editSet, DataSet set)
     {
         // Add our rules to the set
         int rulesOffset = set.rules.Count;
@@ -28,15 +28,17 @@ public class EditBehavior
         return new Profile()
         {
             rulesOffset = (ushort)rulesOffset,
-            rulesCount = (ushort)rules.Count
+            rulesCount = (ushort)rules.Count,
         };
     }
 
     public EditBehavior Duplicate()
     {
-        var ret = new EditBehavior();
-        ret.name = name;
-        ret.description = description;
+        var ret = new EditBehavior
+        {
+            name = name,
+            description = description
+        };
         foreach (var r in rules)
         {
             ret.rules.Add(r.Duplicate());
@@ -46,21 +48,22 @@ public class EditBehavior
 
     public EditRule AddNewDefaultRule()
     {
-        EditRule ret = new EditRule();
-        ret.condition = new EditConditionFaceCompare()
+        var ret = new EditRule(new List<EditAction>()
         {
-            flags = ConditionFaceCompare_Flags.Equal,
-            faceIndex = 19
-        };
-        ret.actions = new List<EditAction>()
+            new EditActionPlayAnimation()
             {
-                new EditActionPlayAnimation()
-                {
-                    animation = null,
-                    faceIndex = -1,
-                    loopCount = 1
-                }
-            };
+                animation = null,
+                faceIndex = -1,
+                loopCount = 1
+            }
+        })
+        {
+            condition = new EditConditionFaceCompare()
+            {
+                flags = ConditionFaceCompare_Flags.Equal,
+                faceIndex = 19
+            },
+        };
         rules.Add(ret);
         return ret;
     }
@@ -128,15 +131,11 @@ public class EditBehavior
 
     public EditDataSet ToEditSet()
     {
-        // Generate the data to be uploaded
-        var editSet = new EditDataSet
-        {
-            // Grab the behavior
-            behavior = Duplicate()
-        };
+        // Generate the data to be uploaded, based on a copy of the profile
+        var editSet = new EditDataSet(Duplicate());
 
         // And add the animations that this behavior uses
-        var animations = editSet.behavior.CollectAnimations();
+        var animations = editSet.profile.CollectAnimations();
 
         // Add default rules and animations to behavior / set
         if (AppDataSet.Instance.defaultBehavior != null)
@@ -146,11 +145,11 @@ public class EditBehavior
 
             foreach (var rule in AppDataSet.Instance.defaultBehavior.rules)
             {
-                if (!editSet.behavior.rules.Any(r => r.condition.type == rule.condition.type))
+                if (!editSet.profile.rules.Any(r => r.condition.type == rule.condition.type))
                 {
                     var ruleCopy = rule.Duplicate();
                     copiedRules.Add(ruleCopy);
-                    editSet.behavior.rules.Add(ruleCopy);
+                    editSet.profile.rules.Add(ruleCopy);
                 }
             }
 

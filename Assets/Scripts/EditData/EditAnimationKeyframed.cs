@@ -10,45 +10,45 @@ using Systemic.Unity.Pixels.Animations;
 /// Simple list of keyframes for a led
 /// </summary>
 [System.Serializable]
-    public class EditRGBTrack
+public class EditRGBTrack
+{
+    public readonly List<int> ledIndices;
+    public readonly EditRGBGradient gradient;
+
+    public bool empty => gradient.empty;
+    public float duration => gradient.duration;
+    public float firstTime => gradient.firstTime;
+    public float lastTime => gradient.lastTime;
+
+    public EditRGBTrack(EditRGBGradient gradient, List<int> ledIndices = null)
     {
-        public List<int> ledIndices = new List<int>();
-        public EditRGBGradient gradient = new EditRGBGradient();
-
-        public bool empty => gradient.empty;
-        public float duration => gradient.duration;
-        public float firstTime => gradient.firstTime;
-        public float lastTime => gradient.lastTime;
-
-        public EditRGBTrack Duplicate()
-        {
-            var track = new EditRGBTrack();
-            track.ledIndices = new List<int>(ledIndices);
-            track.gradient = gradient.Duplicate();
-            return track;
-        }
-
-        public RGBTrack ToTrack(EditDataSet editSet, DataSet.AnimationBits bits)
-        {
-            RGBTrack ret = new RGBTrack();
-            ret.keyframesOffset = (ushort)bits.rgbKeyframes.Count;
-            ret.keyFrameCount = (byte)gradient.keyframes.Count;
-            ret.ledMask = 0;
-            foreach (int index in ledIndices)
-            {
-                ret.ledMask |= (uint)(1 << index);
-            }
-
-            // Add the keyframes
-            foreach (var editKeyframe in gradient.keyframes)
-            {
-                var kf = editKeyframe.ToRGBKeyframe(editSet, bits);
-                bits.rgbKeyframes.Add(kf);
-            }
-
-            return ret;
-        }
+        this.gradient = gradient ?? new EditRGBGradient();
+        this.ledIndices = ledIndices ?? new List<int>();
     }
+
+    public EditRGBTrack Duplicate()
+    {
+        return new EditRGBTrack(gradient.Duplicate(), new List<int>(ledIndices));
+    }
+
+    public RGBTrack ToTrack(EditDataSet editSet, DataSet.AnimationBits bits)
+    {
+        // Add the keyframes
+        int keyframesOffset = bits.rgbKeyframes.Count;
+        foreach (var editKeyframe in gradient.keyframes)
+        {
+            var kf = editKeyframe.ToRGBKeyframe(editSet, bits);
+            bits.rgbKeyframes.Add(kf);
+        }
+
+        return new RGBTrack
+        {
+            keyframesOffset = (ushort)keyframesOffset,
+            keyFrameCount = (byte)gradient.keyframes.Count,
+            ledMask = (uint)ledIndices.Sum(index => 1 << index)
+        };
+    }
+}
 
 [System.Serializable]
 public class EditAnimationKeyframed
@@ -60,11 +60,14 @@ public class EditAnimationKeyframed
     {
         get
         {
-            return pattern.duration * speedMultiplier;
+            return pattern?.duration ?? 0 * speedMultiplier;
         }
         set
         {
-            speedMultiplier = value / pattern.duration;
+            if (pattern != null)
+            {
+                speedMultiplier = value / pattern.duration;
+            }
         }
     }
     [RGBPattern, Name("LED Pattern")]
@@ -79,10 +82,6 @@ public class EditAnimationKeyframed
 
     public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
     {
-        var ret = new AnimationKeyframed();
-        ret.duration = (ushort)(duration * 1000); // stored in milliseconds
-        ret.speedMultiplier256 = (ushort)(this.speedMultiplier * 256.0f);
-        ret.tracksOffset = (ushort)editSet.getPatternRGBTrackOffset(pattern);
         //// Copy the pattern so we can adjust the hue of the keyframes
         //var patternCopy = pattern.Duplicate();
         //foreach (var t in patternCopy.gradients)
@@ -96,21 +95,27 @@ public class EditAnimationKeyframed
         //    }
         //}
         //var tracks = patternCopy.ToRGBTracks(editSet, bits);
-        ret.trackCount = (ushort)pattern.gradients.Count;
-        ret.flowOrder = flowOrder ? (byte)1 : (byte)0;
-        return ret;
+        return new AnimationKeyframed
+        {
+            duration = (ushort)(duration * 1000), // stored in milliseconds
+            speedMultiplier256 = (ushort)(speedMultiplier * 256.0f),
+            tracksOffset = (ushort)editSet.getPatternRGBTrackOffset(pattern),
+            trackCount = (ushort)pattern.gradients.Count,
+            flowOrder = flowOrder ? (byte)1 : (byte)0,
+        };
     }
 
     public override EditAnimation Duplicate()
     {
-        EditAnimationKeyframed ret = new EditAnimationKeyframed();
-        ret.name = this.name;
-        ret.pattern = this.pattern;
-        ret.flowOrder = this.flowOrder;
-        ret.speedMultiplier = this.speedMultiplier;
-        ret.duration = this.duration;
-        //ret.hueAdjust = this.hueAdjust;
-        return ret;
+        return new EditAnimationKeyframed
+        {
+            name = name,
+            pattern = pattern,
+            flowOrder = flowOrder,
+            speedMultiplier = speedMultiplier,
+            duration = duration,
+            //hueAdjust = hueAdjust;
+        };
     }
 
     public override void ReplacePattern(EditPattern oldPattern, EditPattern newPattern)

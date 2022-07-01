@@ -22,24 +22,26 @@ public class EditAnimationRainbow
     public override AnimationType type { get { return AnimationType.Rainbow; } }
     public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
     {
-        var ret = new AnimationRainbow();
-        ret.duration = (ushort)(this.duration * 1000.0f);
-        ret.faceMask = (uint)this.faces;
-        ret.fade = (byte)(255.0f * fade);
-        ret.count = (byte)count;
-        ret.traveling = traveling ? (byte)1 : (byte)0;
-        return ret;
+        return new AnimationRainbow
+        {
+            duration = (ushort)(duration * 1000.0f),
+            faceMask = (uint)faces,
+            fade = (byte)(255.0f * fade),
+            count = (byte)count,
+            traveling = traveling ? (byte)1 : (byte)0,
+        };
     }
 
     public override EditAnimation Duplicate()
     {
-        EditAnimationRainbow ret = new EditAnimationRainbow();
-        ret.name = this.name;
-        ret.duration = this.duration;
-        ret.faces = this.faces;
-        ret.fade = this.fade;
-        ret.count = this.count;
-        ret.traveling = this.traveling;
-        return ret;
+        return new EditAnimationRainbow
+        {
+            name = name,
+            duration = duration,
+            faces = faces,
+            fade = fade,
+            count = count,
+            traveling = traveling,
+        };
     }
 }

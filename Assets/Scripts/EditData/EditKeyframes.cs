@@ -9,78 +9,77 @@ using Systemic.Unity.Pixels;
 /// Simple animation keyframe, time in seconds and color!
 /// </summary>
 [System.Serializable]
-    public class EditRGBKeyframe
+public class EditRGBKeyframe
+{
+    public float time = -1;
+    public Color32 color;
+
+    public EditRGBKeyframe Duplicate()
     {
-        public float time = -1;
-        public Color32 color;
-
-        public EditRGBKeyframe Duplicate()
-        {
-            var keyframe = new EditRGBKeyframe();
-            keyframe.time = time;
-            keyframe.color = color;
-            return keyframe;
-        }
-
-        public RGBKeyframe ToRGBKeyframe(EditDataSet editSet, DataSet.AnimationBits bits)
-        {
-            RGBKeyframe ret = new RGBKeyframe();
-            // Add the color to the palette if not already there, otherwise grab the color index
-            var colorIndex = EditColor.toColorIndex(ref bits.palette, color);
-            ret.setTimeAndColorIndex((ushort)(time * 1000), (ushort)colorIndex);
-            return ret;
-        }
-
-        public SimpleKeyframe ToKeyframe(EditDataSet editSet, DataSet.AnimationBits bits)
-        {
-            SimpleKeyframe ret = new SimpleKeyframe();
-
-            // Get the intensity from the color and scale
-            ret.setTimeAndIntensity((ushort)(time * 1000), (byte)(ColorUtils.desaturate(color) * 255.0f));
-            return ret;
-        }
-
-        public class EqualityComparer
-            : IEqualityComparer<EditRGBKeyframe>
-        {
-            public bool Equals(EditRGBKeyframe x, EditRGBKeyframe y)
-            {
-                return x.time == y.time && x.color.Equals(y.color);
-            }
-
-            public int GetHashCode(EditRGBKeyframe obj)
-            {
-                return obj.time.GetHashCode() ^ obj.color.GetHashCode();
-            }
-        }
-        public static EqualityComparer DefaultComparer = new EqualityComparer();
+        var keyframe = new EditRGBKeyframe();
+        keyframe.time = time;
+        keyframe.color = color;
+        return keyframe;
     }
 
-    [System.Serializable]
-    public class EditRGBGradient
+    public RGBKeyframe ToRGBKeyframe(EditDataSet editSet, DataSet.AnimationBits bits)
     {
-        public List<EditRGBKeyframe> keyframes = new List<EditRGBKeyframe>();
+        RGBKeyframe ret = new RGBKeyframe();
+        // Add the color to the palette if not already there, otherwise grab the color index
+        var colorIndex = EditColor.toColorIndex(ref bits.palette, color);
+        ret.setTimeAndColorIndex((ushort)(time * 1000), (ushort)colorIndex);
+        return ret;
+    }
 
-        public bool empty => keyframes?.Count == 0;
-        public float duration => keyframes.Count == 0 ? 0 : keyframes.Max(k => k.time);
-        public float firstTime => keyframes.Count == 0 ? 0 : keyframes.First().time;
-        public float lastTime => keyframes.Count == 0 ? 0 : keyframes.Last().time;
+    public SimpleKeyframe ToKeyframe(EditDataSet editSet, DataSet.AnimationBits bits)
+    {
+        SimpleKeyframe ret = new SimpleKeyframe();
+        // Get the intensity from the color and scale
+        ret.setTimeAndIntensity((ushort)(time * 1000), (byte)(ColorUtils.desaturate(color) * 255.0f));
+        return ret;
+    }
 
-        public EditRGBGradient Duplicate()
+    public class EqualityComparer
+        : IEqualityComparer<EditRGBKeyframe>
+    {
+        public bool Equals(EditRGBKeyframe x, EditRGBKeyframe y)
         {
-            var track = new EditRGBGradient();
-            if (keyframes != null)
-            {
-                track.keyframes = new List<EditRGBKeyframe>(keyframes.Count);
-                foreach (var keyframe in keyframes)
-                {
-                    track.keyframes.Add(keyframe.Duplicate());
-                }
-            }
-            return track;
+            return x.time == y.time && x.color.Equals(y.color);
         }
 
+        public int GetHashCode(EditRGBKeyframe obj)
+        {
+            return obj.time.GetHashCode() ^ obj.color.GetHashCode();
+        }
     }
+    public static EqualityComparer DefaultComparer = new EqualityComparer();
+}
+
+[System.Serializable]
+public class EditRGBGradient
+{
+    public List<EditRGBKeyframe> keyframes = new List<EditRGBKeyframe>();
+
+    public bool empty => keyframes?.Count == 0;
+    public float duration => keyframes.Count == 0 ? 0 : keyframes.Max(k => k.time);
+    public float firstTime => keyframes.Count == 0 ? 0 : keyframes.First().time;
+    public float lastTime => keyframes.Count == 0 ? 0 : keyframes.Last().time;
+
+    public EditRGBGradient Duplicate()
+    {
+        var track = new EditRGBGradient();
+        if (keyframes != null)
+        {
+            track.keyframes = new List<EditRGBKeyframe>(keyframes.Count);
+            foreach (var keyframe in keyframes)
+            {
+                track.keyframes.Add(keyframe.Duplicate());
+            }
+        }
+        return track;
+    }
+
+}
 
 /// <summary>
 /// Simple list of keyframes for a led
@@ -89,14 +88,13 @@ using Systemic.Unity.Pixels;
 public class EditPattern
 {
     public string name = "LED Pattern";
-    public List<EditRGBGradient> gradients = new List<EditRGBGradient>();
+    public readonly List<EditRGBGradient> gradients = new List<EditRGBGradient>();
     public float duration => gradients.Count > 0 ? gradients.Max(g => g.duration) : 1.0f;
 
     public EditPattern Duplicate()
     {
         var track = new EditPattern();
         track.name = name;
-        track.gradients = new List<EditRGBGradient>();
         foreach (var g in gradients)
         {
             track.gradients.Add(g.Duplicate());
@@ -106,22 +104,23 @@ public class EditPattern
 
     public RGBTrack[] ToRGBTracks(EditDataSet editSet, DataSet.AnimationBits bits)
     {
-        RGBTrack[] ret = new RGBTrack[gradients.Count];
+        var ret = new RGBTrack[gradients.Count];
         for (int i = 0; i < gradients.Count; ++i)
         {
-            RGBTrack t = new RGBTrack();
-            t.keyframesOffset = (ushort)bits.rgbKeyframes.Count;
-            t.keyFrameCount = (byte)gradients[i].keyframes.Count;
-            t.ledMask = 0;
-            t.ledMask = (uint)(1 << i);
-
             // Add the keyframes
+            int keyframesOffset = bits.rgbKeyframes.Count;
             foreach (var editKeyframe in gradients[i].keyframes)
             {
                 var kf = editKeyframe.ToRGBKeyframe(editSet, bits);
                 bits.rgbKeyframes.Add(kf);
             }
-            ret[i] = t;
+
+            ret[i] = new RGBTrack
+            {
+                keyframesOffset = (ushort)keyframesOffset,
+                keyFrameCount = (byte)gradients[i].keyframes.Count,
+                ledMask = (uint)(1 << i),
+            };
         }
 
         return ret;
@@ -129,22 +128,23 @@ public class EditPattern
 
     public Track[] ToTracks(EditDataSet editSet, DataSet.AnimationBits bits)
     {
-        Track[] ret = new Track[gradients.Count];
+        var ret = new Track[gradients.Count];
         for (int i = 0; i < gradients.Count; ++i)
         {
-            Track t = new Track();
-            t.keyframesOffset = (ushort)bits.keyframes.Count;
-            t.keyFrameCount = (byte)gradients[i].keyframes.Count;
-            t.ledMask = 0;
-            t.ledMask = (uint)(1 << i);
-
             // Add the keyframes
+            int keyframesOffset = bits.keyframes.Count;
             foreach (var editKeyframe in gradients[i].keyframes)
             {
                 var kf = editKeyframe.ToKeyframe(editSet, bits);
                 bits.keyframes.Add(kf);
             }
-            ret[i] = t;
+
+            ret[i] = new Track
+            {
+                keyframesOffset = (ushort)keyframesOffset,
+                keyFrameCount = (byte)gradients[i].keyframes.Count,
+                ledMask = (uint)(1 << i),
+            };
         }
 
         return ret;

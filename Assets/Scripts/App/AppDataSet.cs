@@ -152,7 +152,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         var newAnim = new EditAnimationSimple
         {
             duration = 3.0f,
-            color = EditColor.MakeRGB(new Color32(0xFF, 0x30, 0x00, 0xFF)),
+            color = EditColor.FromColor(new Color32(0xFF, 0x30, 0x00, 0xFF)),
             faces = 0b11111111111111111111,
             name = "New Lighting Pattern"
         };
@@ -250,21 +250,21 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     {
         var newBehavior = new EditBehavior();
         newBehavior.name = "New Profile";
-        newBehavior.rules.Add(new EditRule()
+        newBehavior.rules.Add(new EditRule(new List<EditAction>()
+        {
+            new EditActionPlayAnimation()
+            {
+                animation = null,
+                faceIndex = 0,
+                loopCount = 1
+            }
+        })
         {
             condition = new EditConditionFaceCompare()
             {
                 flags = ConditionFaceCompare_Flags.Equal,
                 faceIndex = 19
             },
-            actions = new List<EditAction> () {
-                new EditActionPlayAnimation()
-                {
-                    animation = null,
-                    faceIndex = 0,
-                    loopCount = 1
-                }
-            }
         });
         behaviors.Add(newBehavior);
         return newBehavior;
@@ -463,9 +463,9 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         data.patterns.AddRange(set.patterns);
         data.patterns.AddRange(set.rgbPatterns);
         data.animations.AddRange(set.animations);
-        if (set.behavior != null)
+        if (set.profile != null)
         {
-            data.behaviors.Add(set.behavior);
+            data.behaviors.Add(set.profile);
         }
     }
     
@@ -510,31 +510,37 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         
         EditAnimationSimple simpleAnim = new EditAnimationSimple();
         simpleAnim.duration = 1.0f;
-        simpleAnim.color = EditColor.MakeRGB(Color.blue);
+        simpleAnim.color = EditColor.FromColor(Color.blue);
         simpleAnim.faces = 0b11111111111111111111;
         simpleAnim.name = "Simple Anim 1";
         ret.animations.Add(simpleAnim);
 
         EditBehavior behavior = new EditBehavior();
-        behavior.rules.Add(new EditRule() {
+        behavior.rules.Add(new EditRule(new List<EditAction>()
+        {
+            new EditActionPlayAnimation() { animation = simpleAnim, faceIndex = 0, loopCount = 1 }
+        }) {
             condition = new EditConditionRolling(),
-            actions = new List<EditAction> () { new EditActionPlayAnimation() { animation = simpleAnim, faceIndex = 0, loopCount = 1 }}
         });
-        behavior.rules.Add(new EditRule() {
+        behavior.rules.Add(new EditRule(new List<EditAction>()
+        {
+            new EditActionPlayAnimation() { animation = simpleAnim, faceIndex = 19, loopCount = 1 }
+        }) {
             condition = new EditConditionFaceCompare()
             {
                 faceIndex = 19,
                 flags = ConditionFaceCompare_Flags.Equal
             },
-            actions = new List<EditAction> () { new EditActionPlayAnimation() { animation = simpleAnim, faceIndex = 19, loopCount = 1 }}
         });
-        behavior.rules.Add(new EditRule() {
+        behavior.rules.Add(new EditRule(new List<EditAction>()
+        {
+            new EditActionPlayAnimation() { animation = simpleAnim, faceIndex = 2, loopCount = 1 }
+        }) {
             condition = new EditConditionFaceCompare()
             {
                 faceIndex = 0,
                 flags = ConditionFaceCompare_Flags.Less | ConditionFaceCompare_Flags.Equal | ConditionFaceCompare_Flags.Greater
             },
-            actions = new List<EditAction> () { new EditActionPlayAnimation() { animation = simpleAnim, faceIndex = 2, loopCount = 1 }}
         });
         ret.behaviors.Add(behavior);
 

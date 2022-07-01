@@ -21,25 +21,27 @@ public class EditAnimationGradient
 
     public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
     {
-        var ret = new AnimationGradient();
-        ret.duration = (ushort)(this.duration * 1000.0f);
-        ret.faceMask = (uint)this.faces;
-
         // Add gradient
-        ret.gradientTrackOffset = (ushort)bits.rgbTracks.Count;
-        var tempTrack = new EditRGBTrack() { gradient = gradient };
-        var gradientTrack = tempTrack.ToTrack(editSet, bits);
+        int gradientTrackOffset = bits.rgbTracks.Count;
+        var gradientTrack = new EditRGBTrack(gradient).ToTrack(editSet, bits);
         bits.rgbTracks.Add(gradientTrack);
-        return ret;
+
+        return new AnimationGradient
+        {
+            duration = (ushort)(duration * 1000.0f),
+            faceMask = (uint)faces,
+            gradientTrackOffset = (ushort)gradientTrackOffset,
+        };
     }
 
     public override EditAnimation Duplicate()
     {
-        EditAnimationGradient ret = new EditAnimationGradient();
-        ret.name = this.name;
-        ret.duration = this.duration;
-        ret.faces = this.faces;
-        ret.gradient = gradient.Duplicate();
-        return ret;
+        return new EditAnimationGradient
+        {
+            name = name,
+            duration = duration,
+            faces = faces,
+            gradient = gradient.Duplicate(),
+        };
     }
 }
