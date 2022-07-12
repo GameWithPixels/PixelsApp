@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace Systemic.Unity.Pixels.Profiles
 {
     /// <summary>
-    /// A behavior's rule, with a condition and a list of actions.
+    /// A profile's rule, with a condition and a list of actions.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]

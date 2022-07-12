@@ -80,11 +80,11 @@ namespace Systemic.Unity.Pixels
         public string systemId { get; protected set; }
 
         /// <summary>
-        /// Gets the number of faces for the Pixel.
+        /// Gets the number of LEDs for the Pixel.
         ///
         /// This value is set when the Pixel is being scanned or once when connected.
         /// </summary>
-        public int faceCount { get; protected set; }
+        public int ledCount { get; protected set; }
 
         /// <summary>
         /// Gets the Pixel combination of design and color.
@@ -165,7 +165,7 @@ namespace Systemic.Unity.Pixels
         ///
         /// This value is set when the Pixel is being scanned or when connected.
         /// </summary>
-        public uint deviceId { get; protected set; }
+        public uint pixelId { get; protected set; }
 
         #endregion
 
@@ -378,30 +378,30 @@ namespace Systemic.Unity.Pixels
                     + $" current dataset hash {message.dataSetHash:X08}, firmware build is {System.DateTime.FromFileTimeUtc(message.buildTimestamp)}");
 
                 // Update instance
-                bool appearanceChanged = faceCount != message.faceCount || designAndColor != message.designAndColor;
-                faceCount = message.faceCount;
+                bool appearanceChanged = ledCount != message.ledCount || designAndColor != message.designAndColor;
+                ledCount = message.ledCount;
                 designAndColor = message.designAndColor;
                 dataSetHash = message.dataSetHash;
                 availableFlashSize = message.availableFlashSize;
-                deviceId = message.deviceId;
+                pixelId = message.pixelId;
                 buildTimestamp = message.buildTimestamp;
 
                 if (appearanceChanged)
                 {
                     // Notify
-                    AppearanceChanged?.Invoke(this, faceCount, designAndColor);
+                    AppearanceChanged?.Invoke(this, ledCount, designAndColor);
                 }
             }
 
             void ProcessRollStateMessage(RollState message)
             {
-                Debug.Log($"Pixel {SafeName}: State is {message.state}, {message.face}");
+                Debug.Log($"Pixel {SafeName}: State is {message.state}, {message.faceIndex}");
 
-                if ((message.state != rollState) || (message.face != face))
+                if ((message.state != rollState) || (message.faceIndex != face))
                 {
                     // Update instance
                     rollState = message.state;
-                    face = message.face;
+                    face = message.faceIndex;
 
                     // Notify
                     RollStateChanged?.Invoke(this, rollState, face + 1);

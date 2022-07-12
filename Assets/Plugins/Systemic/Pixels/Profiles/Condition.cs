@@ -73,7 +73,7 @@ namespace Systemic.Unity.Pixels.Profiles
     {
         public ConditionType type { get; set; } = ConditionType.Rolling;
         public byte padding1;
-        public ushort repeatPeriodMs; // o means do NOT repeat
+        public ushort repeatPeriodMs; // 0 means do NOT repeat
     };
 
     /// <summary>
@@ -95,7 +95,7 @@ namespace Systemic.Unity.Pixels.Profiles
     /// value is greater than the parameter, less, or equal, or any combination
     /// </summary>
     [System.Flags]
-    public enum ConditionFaceCompare_Flags : byte
+    public enum FaceCompareFlags : byte
     {
         Less    = 1 << 0,
         Equal   = 1 << 1,
@@ -112,7 +112,7 @@ namespace Systemic.Unity.Pixels.Profiles
     {
         public ConditionType type { get; set; } = ConditionType.FaceCompare;
         public byte faceIndex;
-        public ConditionFaceCompare_Flags flags;
+        public FaceCompareFlags flags;
         public byte paddingFlags;
     };
 
@@ -120,7 +120,7 @@ namespace Systemic.Unity.Pixels.Profiles
     /// Indicate whether the condition should trigger on Hello, Goodbye or both
     /// </summary>
     [System.Flags]
-    public enum ConditionHelloGoodbye_Flags : byte
+    public enum HelloGoodbyeFlags : byte
     {
         Hello      = 1 << 0,
         Goodbye    = 1 << 1
@@ -128,23 +128,23 @@ namespace Systemic.Unity.Pixels.Profiles
 
     /// <summary>
     /// Condition that triggers on a life state event
-    /// </sumary>
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionHelloGoodbye
         : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.HelloGoodbye;
-        public ConditionHelloGoodbye_Flags flags;
+        public HelloGoodbyeFlags flags;
         public byte padding1;
         public byte padding2;
     };
 
     /// <summary>
     /// Indicates when the condition should trigger, connected!, disconnected! or both
-    /// </sumary>
+    /// </summary>
     [System.Flags]
-    public enum ConditionConnectionState_Flags : byte
+    public enum ConnectionStateFlags : byte
     {
         Connected      = 1 << 0,
         Disconnected   = 1 << 1,
@@ -152,23 +152,23 @@ namespace Systemic.Unity.Pixels.Profiles
 
     /// <summary>
     /// Condition that triggers on connection events
-    /// </sumary>
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionConnectionState
         : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.ConnectionState;
-        public ConditionConnectionState_Flags flags;
+        public ConnectionStateFlags flags;
         public byte padding1;
         public byte padding2;
     };
 
     /// <summary>
     /// Indicates which battery event the condition should trigger on
-    /// </sumary>
+    /// </summary>
     [System.Flags]
-    public enum ConditionBatteryState_Flags : byte
+    public enum BatteryStateFlags : byte
     {
         Ok        = 1 << 0,
         Low       = 1 << 1,
@@ -178,14 +178,14 @@ namespace Systemic.Unity.Pixels.Profiles
 
     /// <summary>
     /// Condition that triggers on battery state events
-    /// </sumary>
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class ConditionBatteryState
         : ICondition
     {
         public ConditionType type { get; set; } = ConditionType.BatteryState;
-        public ConditionBatteryState_Flags flags;
+        public BatteryStateFlags flags;
         public ushort repeatPeriodMs;
     };
 }

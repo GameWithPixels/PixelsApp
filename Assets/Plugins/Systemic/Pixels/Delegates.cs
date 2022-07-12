@@ -51,9 +51,9 @@ namespace Systemic.Unity.Pixels
     /// Delegate for Pixel appearance setting changes.
     /// </summary>
     /// <param name="pixel">The source of the event.</param>
-    /// <param name="faceCount"></param>
-    /// <param name="design"></param>
-    public delegate void AppearanceChangedEventHandler(Pixel pixel, int faceCount, PixelDesignAndColor design);
+    /// <param name="ledCount">Number of LEDs on the die.</param>
+    /// <param name="design">Design and coloring of the die.</param>
+    public delegate void AppearanceChangedEventHandler(Pixel pixel, int ledCount, PixelDesignAndColor design);
 
     /// <summary>
     /// Delegate for Pixel roll events.

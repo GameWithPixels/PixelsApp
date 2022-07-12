@@ -36,7 +36,7 @@ namespace Systemic.Unity.Pixels
 
             if (sendMsg.IsSuccess)
             {
-                Debug.Log($"Pixel {name}: ready for sending data");
+                Debug.Log($"Pixel {name}: ready for receiving data");
 
                 // Then transfer data
                 ushort offset = 0;
@@ -228,8 +228,8 @@ namespace Systemic.Unity.Pixels
             //builder.AppendLine("animations: " + prepareDie.animationCount + ", " + prepareDie.animationSize);
             //builder.AppendLine("conditions: " + prepareDie.conditionCount + ", " + prepareDie.conditionSize);
             //builder.AppendLine("actions: " + prepareDie.actionCount + ", " + prepareDie.actionSize);
-            //builder.AppendLine("rules: " + prepareDie.ruleCount + " * " + Marshal.SizeOf<Behaviors.Rule>());
-            //builder.AppendLine("behavior: " + Marshal.SizeOf<Behaviors.Behavior>());
+            //builder.AppendLine("rules: " + prepareDie.ruleCount + " * " + Marshal.SizeOf<Profiles.Rule>());
+            //builder.AppendLine("profile: " + Marshal.SizeOf<Profiles.Profile>());
             //Debug.Log($"Pixel {name}: {builder}");
             //Debug.Log($"Pixel {name}: Animation Data size: {set.ComputeDataSetDataSize()}");
 
@@ -241,24 +241,25 @@ namespace Systemic.Unity.Pixels
             {
                 if (waitForMsg.Message.result != 0)
                 {
-                    var setData = dataSet.ToByteArray();
+                    var data = dataSet.ToByteArray();
+                    Debug.Assert(data.Length == dataSet.ComputeDataSetDataSize());
                     //StringBuilder hexdumpBuilder = new StringBuilder();
-                    //for (int i = 0; i < setData.Length; ++i)
+                    //for (int i = 0; i < data.Length; ++i)
                     //{
                     //    if (i % 8 == 0)
                     //    {
                     //        hexdumpBuilder.AppendLine();
                     //    }
-                    //    hexdumpBuilder.Append(setData[i].ToString("X02") + " ");
+                    //    hexdumpBuilder.Append(data[i].ToString("X02") + " ");
                     //}
                     //Debug.Log($"Pixel {name}: Dump => {hexdumpBuilder}");
 
                     // Upload data
-                    var hash = DataSet.ComputeHash(setData);
+                    var hash = DataSet.ComputeHash(data);
                     Debug.Log($"Pixel {name}: ready to receive dataset, byte array should be:"
-                        + $" {dataSet.ComputeDataSetDataSize()} bytes and hash 0x{hash:X8}");
+                        + $" {data.Length} bytes and hash 0x{hash:X8}");
                     yield return InternalUploadDataSetAsync(
-                        MessageType.TransferAnimationSetFinished, setData, err => error = err, onProgress);
+                        MessageType.TransferAnimationSetFinished, data, err => error = err, onProgress);
                 }
                 else
                 {
@@ -282,9 +283,9 @@ namespace Systemic.Unity.Pixels
         }
 
         /// <summary>
-        /// Asynchronously plays the LEDs animations for the given data set.
+        /// Asynchronously plays the (only) LEDs animation included in the given data set.
         /// </summary>
-        /// <param name="testAnimSet">The data set containing the animations to play.</param>
+        /// <param name="testAnimSet">The data set containing just one animation to play.</param>
         /// <param name="onResult">An optional callback that is called when the operation completes
         ///                        successfully (true) or not (false) with an error message.</param>
         /// <param name="onProgress">An optional callback that is called as the operation progresses
@@ -293,11 +294,14 @@ namespace Systemic.Unity.Pixels
         public IEnumerator PlayTestAnimationAsync(DataSet testAnimSet, OperationResultCallback onResult = null, OperationProgressCallback onProgress = null)
         {
             if (testAnimSet == null) throw new System.ArgumentNullException(nameof(testAnimSet));
+            if (testAnimSet.getAnimationCount() < 1) throw new System.ArgumentException(nameof(testAnimSet), "Need one animation");
 
             // Keep name locally in case our game object gets destroyed along the way
             string name = SafeName;
 
             // Prepare the Pixel
+            var data = testAnimSet.ToTestAnimationByteArray();
+            uint hash = DataSet.ComputeHash(data);
             var prepareDie = new TransferTestAnimationSet
             {
                 paletteSize = testAnimSet.animationBits.getPaletteSize(),
@@ -306,12 +310,9 @@ namespace Systemic.Unity.Pixels
                 keyFrameCount = testAnimSet.animationBits.getKeyframeCount(),
                 trackCount = testAnimSet.animationBits.getTrackCount(),
                 animationSize = (ushort)Marshal.SizeOf(testAnimSet.animations[0].GetType()),
-            };
+                hash = hash,
+        };
 
-            var setData = testAnimSet.ToTestAnimationByteArray();
-            uint hash = DataSet.ComputeHash(setData);
-
-            prepareDie.hash = hash;
             // Debug.Log($"Pixel {name}: Animation Data to be sent:");
             // Debug.Log("palette: " + prepareDie.paletteSize * Marshal.SizeOf<byte>());
             // Debug.Log("rgb keyframes: " + prepareDie.rgbKeyFrameCount + " * " + Marshal.SizeOf<Animations.RGBKeyframe>());
@@ -329,9 +330,9 @@ namespace Systemic.Unity.Pixels
                     case TransferTestAnimationSetAckType.Download:
                         // Upload data
                         Debug.Log($"Pixel {name}: ready to receive test dataset, byte array should be:"
-                            + $" {setData.Length} bytes and hash 0x{hash:X8}");
+                            + $" {data.Length} bytes and hash 0x{hash:X8}");
                         yield return InternalUploadDataSetAsync(
-                            MessageType.TransferTestAnimationSetFinished, setData, err => error = err, onProgress);
+                            MessageType.TransferTestAnimationSetFinished, data, err => error = err, onProgress);
                         break;
 
                     case TransferTestAnimationSetAckType.UpToDate:

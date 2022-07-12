@@ -31,9 +31,9 @@ public class UIParameterPlaybackFace
         currentFace = initialValue;
         
         // Look for decorating attributes
-        int faceCount = 20;
-        string[] values = new string[faceCount];
-        for (int i = 0; i < faceCount; ++i)
+        int ledCount = 20;
+        string[] values = new string[ledCount];
+        for (int i = 0; i < ledCount; ++i)
         {
             values[i] = (i + 1).ToString();
         }

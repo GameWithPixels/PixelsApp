@@ -28,7 +28,7 @@ public class EditRGBKeyframe
         RGBKeyframe ret = new RGBKeyframe();
         // Add the color to the palette if not already there, otherwise grab the color index
         var colorIndex = EditColor.toColorIndex(ref bits.palette, color);
-        ret.setTimeAndColorIndex((ushort)(time * 1000), (ushort)colorIndex);
+        ret.setTimeAndColorIndex(time, (ushort)colorIndex);
         return ret;
     }
 
@@ -36,7 +36,7 @@ public class EditRGBKeyframe
     {
         SimpleKeyframe ret = new SimpleKeyframe();
         // Get the intensity from the color and scale
-        ret.setTimeAndIntensity((ushort)(time * 1000), (byte)(ColorUtils.desaturate(color) * 255.0f));
+        ret.setTimeAndIntensity(time, (byte)(ColorUtils.desaturate(color) * 255.0f));
         return ret;
     }
 

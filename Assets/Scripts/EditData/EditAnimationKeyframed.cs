@@ -80,7 +80,7 @@ public class EditAnimationKeyframed
 
     public override AnimationType type => AnimationType.Keyframed;
 
-    public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
+    public override IAnimationPreset ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
     {
         //// Copy the pattern so we can adjust the hue of the keyframes
         //var patternCopy = pattern.Duplicate();

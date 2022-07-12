@@ -19,7 +19,7 @@ public class EditAnimationSimple
     public float fade = 0.1f;
 
     public override AnimationType type { get { return AnimationType.Simple; } }
-    public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
+    public override IAnimationPreset ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
     {
         return new AnimationSimple
         {

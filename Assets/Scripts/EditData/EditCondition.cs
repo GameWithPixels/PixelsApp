@@ -215,7 +215,7 @@ public class EditConditionFaceCompare
     : EditCondition
 {
     [Bitfield, Name("Comparison")]
-    public ConditionFaceCompare_Flags flags;
+    public FaceCompareFlags flags;
     [FaceIndex, IntRange(0, 19), Name("Than")]
     public int faceIndex;
 
@@ -246,19 +246,19 @@ public class EditConditionFaceCompare
         {
             StringBuilder builder = new StringBuilder();
             builder.Append("roll is ");
-            if (flags == (ConditionFaceCompare_Flags.Less | ConditionFaceCompare_Flags.Equal | ConditionFaceCompare_Flags.Greater))
+            if (flags == (FaceCompareFlags.Less | FaceCompareFlags.Equal | FaceCompareFlags.Greater))
             {
                 builder.Append("any");
             }
-            else if (flags == (ConditionFaceCompare_Flags.Less | ConditionFaceCompare_Flags.Greater))
+            else if (flags == (FaceCompareFlags.Less | FaceCompareFlags.Greater))
             {
                 builder.Append("not equal to ");
                 builder.Append(faceIndex + 1);
             }
-            else if ((flags & ConditionFaceCompare_Flags.Less) != 0)
+            else if ((flags & FaceCompareFlags.Less) != 0)
             {
                 builder.Append("less");
-                if ((flags & ConditionFaceCompare_Flags.Equal) != 0)
+                if ((flags & FaceCompareFlags.Equal) != 0)
                 {
                     builder.Append(" or equal to ");
                 }
@@ -268,10 +268,10 @@ public class EditConditionFaceCompare
                 }
                 builder.Append(faceIndex + 1);
             }
-            else if ((flags & ConditionFaceCompare_Flags.Greater) != 0)
+            else if ((flags & FaceCompareFlags.Greater) != 0)
             {
                 builder.Append("greater");
-                if ((flags & ConditionFaceCompare_Flags.Equal) != 0)
+                if ((flags & FaceCompareFlags.Equal) != 0)
                 {
                     builder.Append(" or equal to ");
                 }
@@ -281,7 +281,7 @@ public class EditConditionFaceCompare
                 }
                 builder.Append(faceIndex + 1);
             }
-            else if (flags == ConditionFaceCompare_Flags.Equal)
+            else if (flags == FaceCompareFlags.Equal)
             {
                 builder.Append("equal to ");
                 builder.Append(faceIndex + 1);
@@ -303,7 +303,7 @@ public class EditConditionHelloGoodbye
     : EditCondition
 {
     [Bitfield, Name("Hello / Goodbye")]
-    public ConditionHelloGoodbye_Flags flags;
+    public HelloGoodbyeFlags flags;
 
     public override ConditionType type { get { return ConditionType.HelloGoodbye; } }
     public override ICondition ToCondition(EditDataSet editSet, DataSet set)
@@ -331,12 +331,12 @@ public class EditConditionHelloGoodbye
             StringBuilder builder = new StringBuilder();
             builder.Append("die is ");
             string or = "";
-            if ((flags & ConditionHelloGoodbye_Flags.Hello) != 0)
+            if ((flags & HelloGoodbyeFlags.Hello) != 0)
             {
                 builder.Append("waking up");
                 or = " or ";
             }
-            if ((flags & ConditionHelloGoodbye_Flags.Goodbye) != 0)
+            if ((flags & HelloGoodbyeFlags.Goodbye) != 0)
             {
                 builder.Append(or + "going to sleep");
             }
@@ -357,7 +357,7 @@ public class EditConditionConnectionState
     : EditCondition
 {
     [Bitfield, Name("Connection Event")]
-    public ConditionConnectionState_Flags flags;
+    public ConnectionStateFlags flags;
 
     public override ConditionType type { get { return ConditionType.ConnectionState; } }
     public override ICondition ToCondition(EditDataSet editSet, DataSet set)
@@ -385,12 +385,12 @@ public class EditConditionConnectionState
             StringBuilder builder = new StringBuilder();
             builder.Append("die is ");
             string or = "";
-            if ((flags & ConditionConnectionState_Flags.Connected) != 0)
+            if ((flags & ConnectionStateFlags.Connected) != 0)
             {
                 builder.Append("connected");
                 or = " or ";
             }
-            if ((flags & ConditionConnectionState_Flags.Disconnected) != 0)
+            if ((flags & ConnectionStateFlags.Disconnected) != 0)
             {
                 builder.Append(or + "disconnect");
             }
@@ -411,7 +411,7 @@ public class EditConditionBatteryState
     : EditCondition
 {
     [Bitfield, Name("Battery State")]
-    public ConditionBatteryState_Flags flags;
+    public BatteryStateFlags flags;
     [Slider, FloatRange(5.0f, 60.0f, 1.0f), Units("sec")]
     public float recheckAfter = 1.0f;
 
@@ -443,22 +443,22 @@ public class EditConditionBatteryState
             StringBuilder builder = new StringBuilder();
             builder.Append("battery is ");
             string or = "";
-            if ((flags & ConditionBatteryState_Flags.Ok) != 0)
+            if ((flags & BatteryStateFlags.Ok) != 0)
             {
                 builder.Append("ok");
                 or = " or ";
             }
-            if ((flags & ConditionBatteryState_Flags.Low) != 0)
+            if ((flags & BatteryStateFlags.Low) != 0)
             {
                 builder.Append(or + "low");
                 or = " or ";
             }
-            if ((flags & ConditionBatteryState_Flags.Charging) != 0)
+            if ((flags & BatteryStateFlags.Charging) != 0)
             {
                 builder.Append(or + "charing");
                 or = " or ";
             }
-            if ((flags & ConditionBatteryState_Flags.Done) != 0)
+            if ((flags & BatteryStateFlags.Done) != 0)
             {
                 builder.Append(or + "done charging");
             }

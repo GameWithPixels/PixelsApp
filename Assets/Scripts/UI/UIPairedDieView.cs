@@ -207,7 +207,7 @@ public class UIPairedDieView : MonoBehaviour
         UpdateState();
     }
 
-    void OnAppearanceChanged(Pixel die, int newFaceCount, PixelDesignAndColor newDesign)
+    void OnAppearanceChanged(Pixel die, int newLedCount, PixelDesignAndColor newDesign)
     {
         this.die.designAndColor = newDesign;
         if (dieRenderer != null)
@@ -234,7 +234,7 @@ public class UIPairedDieView : MonoBehaviour
         bool saveUpdatedData = false;
         if (die.designAndColor != die.die.designAndColor)
         {
-            OnAppearanceChanged(die.die, die.die.faceCount, die.die.designAndColor);
+            OnAppearanceChanged(die.die, die.die.ledCount, die.die.designAndColor);
             saveUpdatedData = true;
         }
 

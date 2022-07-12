@@ -8,7 +8,7 @@ namespace Systemic.Unity.Pixels.Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class AnimationRainbow
-        : IAnimation
+        : IAnimationPreset
     {
         // face -> led:
         //  0   1   2   3   4    5  6    7  8    9 10   11 12   13 14   15  16  17  18 19
@@ -16,7 +16,6 @@ namespace Systemic.Unity.Pixels.Animations
         // led -> face:
         // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
         // 17, 1, 19, 13, 3, 10, 8, 5, 15, 7, 9, 11, 14, 4, 12, 0, 18, 2, 16, 6
-        public static int[] faceIndices = new int[] { 17, 1, 19, 13, 3, 10, 8, 5, 15, 7, 9, 11, 14, 4, 12, 0, 18, 2, 16, 6 };
         public AnimationType type { get; set; } = AnimationType.Rainbow;
         public byte padding_type { get; set; }
         public ushort duration { get; set; }
@@ -38,7 +37,7 @@ namespace Systemic.Unity.Pixels.Animations
     public class AnimationInstanceRainbow
         : AnimationInstance
     {
-        public AnimationInstanceRainbow(IAnimation animation, DataSet.AnimationBits bits)
+        public AnimationInstanceRainbow(IAnimationPreset animation, DataSet.AnimationBits bits)
             : base(animation, bits)
         {
         }
@@ -69,12 +68,12 @@ namespace Systemic.Unity.Pixels.Animations
             if (preset.traveling != 0)
             {
                 // Fill the indices and colors for the anim controller to know how to update LEDs
-                for (int i = 0; i < 20; ++i)
+                for (int i = 0; i < Constants.MaxLedsCount; ++i)
                 {
                     if ((preset.faceMask & (1 << i)) != 0)
                     {
-                        retIndices[retCount] = AnimationRainbow.faceIndices[i];
-                        retColors[retCount] = GammaUtils.Gamma(ColorUIntUtils.RainbowWheel((byte)((wheelPos + i * 256 / 20) % 256), intensity));
+                        retIndices[retCount] = Constants.getFaceIndex(i);
+                        retColors[retCount] = GammaUtils.Gamma(ColorUIntUtils.RainbowWheel((byte)((wheelPos + i * 256 / Constants.MaxLedsCount) % 256), intensity));
                         retCount++;
                     }
                 }
@@ -85,7 +84,7 @@ namespace Systemic.Unity.Pixels.Animations
                 uint color = GammaUtils.Gamma(ColorUIntUtils.RainbowWheel((byte)wheelPos, intensity));
 
                 // Fill the indices and colors for the anim controller to know how to update LEDs
-                for (int i = 0; i < 20; ++i)
+                for (int i = 0; i < Constants.MaxLedsCount; ++i)
                 {
                     if ((preset.faceMask & (1 << i)) != 0)
                     {
@@ -103,7 +102,7 @@ namespace Systemic.Unity.Pixels.Animations
         {
             var preset = getPreset();
             int retCount = 0;
-            for (int i = 0; i < 20; ++i)
+            for (int i = 0; i < Constants.MaxLedsCount; ++i)
             {
                 if ((preset.faceMask & (1 << i)) != 0)
                 {

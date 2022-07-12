@@ -70,7 +70,7 @@ namespace Systemic.Unity.Pixels
 
         /// <summary>
         /// Starts scanning for Pixel dice.
-        /// </sumary>
+        /// </summary>
         public static void ScanForPixels()
         {
             InternalBehaviour.Create();
@@ -83,7 +83,7 @@ namespace Systemic.Unity.Pixels
 
         /// <summary>
         /// Stops scanning for Pixels when called as many times as <see cref="ScanForPixels"/>.
-        /// </sumary>
+        /// </summary>
         /// <param name="forceCancel">If true stops scanning regardless of the number of scan calls that were made.</param>
         public static void CancelScanning(bool forceCancel = false)
         {

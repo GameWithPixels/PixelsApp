@@ -207,7 +207,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                 {
                     name = die.name,
                     systemId = die.systemId,
-                    faceCount = die.faceCount,
+                    faceCount = die.ledCount,
                     designAndColor = die.designAndColor,
                 };
                 editDie.SetDie(die);

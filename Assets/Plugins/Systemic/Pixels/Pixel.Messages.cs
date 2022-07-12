@@ -60,7 +60,7 @@ namespace Systemic.Unity.Pixels
         /// <summary>
         /// Sends a message to the Pixel to update the instance information.
         /// 
-        /// On success, this will update the <see cref="faceCount"/>, <see cref="designAndColor"/>,
+        /// On success, this will update the <see cref="ledCount"/>, <see cref="designAndColor"/>,
         /// <see cref="dataSetHash"/>, <see cref="availableFlashSize"/> and <see cref="firmwareVersion"/>
         /// properties and raise the <see cref="AppearanceChanged"/> event if the face out or design
         /// and color have changed.
@@ -150,7 +150,7 @@ namespace Systemic.Unity.Pixels
                     if (this.designAndColor != designAndColor)
                     {
                         this.designAndColor = designAndColor;
-                        AppearanceChanged?.Invoke(this, faceCount, this.designAndColor);
+                        AppearanceChanged?.Invoke(this, ledCount, this.designAndColor);
                     }
                 });
             yield return op;
@@ -221,7 +221,7 @@ namespace Systemic.Unity.Pixels
         /// <param name="face"></param>
         public void CalibrateFace(int face)
         {
-            PostMessage(new CalibrateFace() { face = (byte)face });
+            PostMessage(new CalibrateFace() { faceIndex = (byte)face });
         }
 
         /// <summary>

@@ -41,8 +41,8 @@ namespace Systemic.Unity.Pixels.Animations
 
             // Fill the return arrays
             int currentCount = 0;
-            for (int i = 0; i < 20; ++i)
-            { // <-- should come from somewhere!
+            for (int i = 0; i < Constants.MaxLedsCount; ++i)
+            {
                 if ((ledMask & (1 << i)) != 0)
                 {
                     retIndices[currentCount] = i;
@@ -102,13 +102,13 @@ namespace Systemic.Unity.Pixels.Animations
 
         /// <summary>
         /// Extracts the LED indices from the led bit mask
-        /// </sumary>
+        /// </summary>
         public int extractLEDIndices(int[] retIndices)
         {
             // Fill the return arrays
             int currentCount = 0;
-            for (int i = 0; i < 20; ++i)
-            { // <-- 20 should come from somewhere...
+            for (int i = 0; i < Constants.MaxLedsCount; ++i)
+            {
                 if ((ledMask & (1 << i)) != 0)
                 {
                     retIndices[currentCount] = i;
@@ -121,7 +121,7 @@ namespace Systemic.Unity.Pixels.Animations
 
         public bool Equals(RGBTrack other)
         {
-            return keyframesOffset == other.keyframesOffset && keyFrameCount == other.keyFrameCount;
+            return keyframesOffset == other.keyframesOffset && keyFrameCount == other.keyFrameCount && ledMask == other.ledMask;
         }
 
     }
@@ -133,9 +133,8 @@ namespace Systemic.Unity.Pixels.Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class AnimationKeyframed
-        : IAnimation
+        : IAnimationPreset
     {
-        public static int[] faceIndices = new int[] { 17, 1, 19, 13, 3, 10, 8, 5, 15, 7, 9, 11, 14, 4, 12, 0, 18, 2, 16, 6 };
         public AnimationType type { get; set; } = AnimationType.Keyframed;
         public byte padding_type { get; set; } // to keep duration 16-bit aligned
         public ushort duration { get; set; } // in ms
@@ -185,8 +184,8 @@ namespace Systemic.Unity.Pixels.Animations
             // The assumption is that led indices don't overlap between tracks of a single animation,
             // so there will always be enough room in the return arrays.
             int totalCount = 0;
-            var indices = new int[20];
-            var colors = new uint[20];
+            var indices = new int[Constants.MaxLedsCount];
+            var colors = new uint[Constants.MaxLedsCount];
             for (int i = 0; i < preset.trackCount; ++i)
             {
                 var track = animationBits.getRGBTrack((ushort)(preset.tracksOffset + i));
@@ -196,7 +195,7 @@ namespace Systemic.Unity.Pixels.Animations
                     if (preset.flowOrder != 0)
                     {
                         // Use reverse lookup so that the indices are actually led Indices, not face indices
-                        retIndices[totalCount + j] = AnimationKeyframed.faceIndices[indices[j]];
+                        retIndices[totalCount + j] = Constants.getFaceIndex(indices[j]);
                     }
                     else
                     {
@@ -216,7 +215,7 @@ namespace Systemic.Unity.Pixels.Animations
             // The assumption is that led indices don't overlap between tracks of a single animation,
             // so there will always be enough room in the return arrays.
             int totalCount = 0;
-            var indices = new int[20];
+            var indices = new int[Constants.MaxLedsCount];
             for (int i = 0; i < preset.trackCount; ++i)
             {
                 var track = animationBits.getRGBTrack((ushort)(preset.tracksOffset + i));

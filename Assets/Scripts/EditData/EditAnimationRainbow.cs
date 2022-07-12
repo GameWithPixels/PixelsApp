@@ -20,7 +20,7 @@ public class EditAnimationRainbow
     public bool traveling = true;
 
     public override AnimationType type { get { return AnimationType.Rainbow; } }
-    public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
+    public override IAnimationPreset ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
     {
         return new AnimationRainbow
         {

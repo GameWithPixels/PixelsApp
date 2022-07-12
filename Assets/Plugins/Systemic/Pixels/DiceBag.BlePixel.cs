@@ -28,12 +28,12 @@ namespace Systemic.Unity.Pixels
 
             /// <summary>
             /// This data structure mirrors CustomManufacturerData in firmware/bluetooth/bluetooth_stack.cpp
-            /// </sumary>
+            /// </summary>
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
             struct CustomManufacturerData
             {
                 // Pixel type identification
-                public byte faceCount; // Which kind of dice this is
+                public byte ledCount; // Number of LEDs
                 public PixelDesignAndColor designAndColor; // Physical look, also only 8 bits
 
                 // Current state
@@ -44,26 +44,26 @@ namespace Systemic.Unity.Pixels
 
             /// <summary>
             /// This data structure mirrors CustomServiceData in firmware/bluetooth/bluetooth_stack.cpp
-            /// </sumary>
+            /// </summary>
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
             struct CustomServiceData
             {
-                public uint deviceId;
+                public uint pixelId;
                 public uint buildTimestamp;
             };
 
             /// <summary>
             /// Older version of the CustomManufacturerData (was named CustomAdvertisingData in firmware code)
-            /// </sumary>
+            /// </summary>
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
             struct CustomAdvertisingData
             {
                 // Pixel type identification
+                public byte ledCount; // Number of LEDs
                 public PixelDesignAndColor designAndColor; // Physical look, also only 8 bits
-                public byte faceCount; // Which kind of dice this is
 
                 // Device ID
-                public uint deviceId;
+                public uint pixelId;
 
                 // Current state
                 public PixelRollState rollState; // Indicates whether the dice is being shaken
@@ -142,8 +142,8 @@ namespace Systemic.Unity.Pixels
                     // Marshall the data into the struct we expect
                     if (isManufData || isOldAdvData)
                     {
-                        CustomManufacturerData manufData;
-                        CustomServiceData servData = new CustomServiceData();
+                        var manufData = new CustomManufacturerData();
+                        var servData = new CustomServiceData();
 
                         if (isManufData)
                         {
@@ -192,20 +192,22 @@ namespace Systemic.Unity.Pixels
                             // Marshal data to an object
                             var ptr = Marshal.AllocHGlobal(size);
                             Marshal.Copy(arr, 0, ptr, size);
-                            var advData1 = Marshal.PtrToStructure<CustomAdvertisingData>(ptr);
+                            var advData = Marshal.PtrToStructure<CustomAdvertisingData>(ptr);
                             Marshal.FreeHGlobal(ptr);
 
-                            manufData.faceCount = advData1.faceCount;
-                            manufData.designAndColor = advData1.designAndColor;
-                            manufData.rollState = advData1.rollState;
-                            manufData.currentFace = advData1.currentFace;
-                            manufData.batteryLevel = advData1.batteryLevel;
+                            manufData.ledCount = advData.ledCount;
+                            manufData.designAndColor = advData.designAndColor;
+                            manufData.rollState = advData.rollState;
+                            manufData.currentFace = advData.currentFace;
+                            manufData.batteryLevel = advData.batteryLevel;
+
+                            servData.pixelId = advData.pixelId;
                         }
 
                         // Update Pixel data
-                        bool appearanceChanged = faceCount != manufData.faceCount || designAndColor != manufData.designAndColor;
+                        bool appearanceChanged = ledCount != manufData.ledCount || designAndColor != manufData.designAndColor;
                         bool rollStateChanged = rollState != manufData.rollState || face != manufData.currentFace;
-                        faceCount = manufData.faceCount;
+                        ledCount = manufData.ledCount;
                         designAndColor = manufData.designAndColor;
                         rollState = manufData.rollState;
                         face = manufData.currentFace;
@@ -215,13 +217,13 @@ namespace Systemic.Unity.Pixels
                         batteryLevel = newBatteryLevel;
                         isCharging = null;
 
-                        deviceId = servData.deviceId;
+                        pixelId = servData.pixelId;
                         buildTimestamp = servData.buildTimestamp;
 
                         // Run callbacks
                         if (appearanceChanged)
                         {
-                            AppearanceChanged?.Invoke(this, faceCount, designAndColor);
+                            AppearanceChanged?.Invoke(this, ledCount, designAndColor);
                         }
                         if (rollStateChanged)
                         {

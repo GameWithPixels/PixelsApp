@@ -8,7 +8,7 @@ namespace Systemic.Unity.Pixels.Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class AnimationGradient
-        : IAnimation
+        : IAnimationPreset
     {
         public AnimationType type { get; set; } = AnimationType.Gradient;
         public byte padding_type { get; set; }
@@ -29,7 +29,7 @@ namespace Systemic.Unity.Pixels.Animations
     public class AnimationInstanceGradient
         : AnimationInstance
     {
-        public AnimationInstanceGradient(IAnimation animation, DataSet.AnimationBits bits)
+        public AnimationInstanceGradient(IAnimationPreset animation, DataSet.AnimationBits bits)
             : base(animation, bits)
         {
         }
@@ -46,7 +46,7 @@ namespace Systemic.Unity.Pixels.Animations
 
             // Fill the indices and colors for the anim controller to know how to update leds
             int retCount = 0;
-            for (int i = 0; i < 20; ++i)
+            for (int i = 0; i < Constants.MaxLedsCount; ++i)
             {
                 if ((preset.faceMask & (1 << i)) != 0)
                 {
@@ -62,7 +62,7 @@ namespace Systemic.Unity.Pixels.Animations
         {
             var preset = getPreset();
             int retCount = 0;
-            for (int i = 0; i < 20; ++i)
+            for (int i = 0; i < Constants.MaxLedsCount; ++i)
             {
                 if ((preset.faceMask & (1 << i)) != 0)
                 {

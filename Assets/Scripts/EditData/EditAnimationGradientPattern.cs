@@ -35,7 +35,7 @@ public class EditAnimationGradientPattern
 
     public override AnimationType type => AnimationType.GradientPattern;
 
-    public override IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
+    public override IAnimationPreset ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
     {
         // Add gradient
         int gradientTrackOffset = bits.rgbTracks.Count;

@@ -336,7 +336,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         {
             condition = new EditConditionFaceCompare()
             {
-                flags = ConditionFaceCompare_Flags.Equal,
+                flags = FaceCompareFlags.Equal,
                 faceIndex = 19
             },
         });
@@ -603,7 +603,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             condition = new EditConditionFaceCompare()
             {
                 faceIndex = 19,
-                flags = ConditionFaceCompare_Flags.Equal
+                flags = FaceCompareFlags.Equal
             },
         });
         profile.rules.Add(new EditRule(new List<EditAction>()
@@ -613,7 +613,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             condition = new EditConditionFaceCompare()
             {
                 faceIndex = 0,
-                flags = ConditionFaceCompare_Flags.Less | ConditionFaceCompare_Flags.Equal | ConditionFaceCompare_Flags.Greater
+                flags = FaceCompareFlags.Less | FaceCompareFlags.Equal | FaceCompareFlags.Greater
             },
         });
         ret.profiles.Add(profile);

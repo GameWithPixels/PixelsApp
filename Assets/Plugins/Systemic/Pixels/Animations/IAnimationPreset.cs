@@ -27,7 +27,7 @@ namespace Systemic.Unity.Pixels.Animations
     /// Base class for animation presets. All presets have a few properties in common.
     /// Presets are stored in flash, so do not have methods or vtables or anything like that.
     /// </summary>
-    public interface IAnimation
+    public interface IAnimationPreset
     {
         AnimationType type { get; set; }
         byte padding_type { get; set; } // to keep duration 16-bit aligned

@@ -94,7 +94,7 @@ public class EditDataSet
         }
 
         // Now convert
-        set.behavior = profile.ToProfile(this, set);
+        set.profile = profile.ToProfile(this, set);
 
         return set;
     }

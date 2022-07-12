@@ -60,7 +60,7 @@ public class EditProfile
         {
             condition = new EditConditionFaceCompare()
             {
-                flags = ConditionFaceCompare_Flags.Equal,
+                flags = FaceCompareFlags.Equal,
                 faceIndex = 19
             },
         };

@@ -18,11 +18,11 @@ namespace Systemic.Unity.Pixels.Messages
     internal class IAmADieMarshaledDataBeforeBuildTimestamp
     {
         public MessageType type;
-        public byte faceCount; // Which kind of dice this is
+        public byte ledCount; // Which kind of dice this is
         public PixelDesignAndColor designAndColor; // Physical look
         public byte padding;
         public uint dataSetHash;
-        public uint deviceId; // A unique identifier
+        public uint pixelId; // A unique identifier
         public ushort flashSize;
     }
 
@@ -31,11 +31,11 @@ namespace Systemic.Unity.Pixels.Messages
     {
         public MessageType type { get; set; } = MessageType.IAmADie;
 
-        public byte faceCount; // Which kind of dice this is
+        public byte ledCount; // Which kind of dice this is
         public PixelDesignAndColor designAndColor; // Physical look
         public byte padding;
         public uint dataSetHash;
-        public uint deviceId; // A unique identifier
+        public uint pixelId; // A unique identifier
         public ushort availableFlashSize; // Available flash memory size for storing settings
         public uint buildTimestamp; // Firmware build timestamp
     }
@@ -45,7 +45,7 @@ namespace Systemic.Unity.Pixels.Messages
     {
         public MessageType type { get; set; } = MessageType.RollState;
         public PixelRollState state;
-        public byte face;
+        public byte faceIndex;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -339,7 +339,7 @@ namespace Systemic.Unity.Pixels.Messages
     public class CalibrateFace : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.CalibrateFace;
-        public byte face;
+        public byte faceIndex;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -406,7 +406,7 @@ namespace Systemic.Unity.Pixels.Messages
     public class PrintNormals : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.PrintNormals;
-        public byte face;
+        public byte faceIndex;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

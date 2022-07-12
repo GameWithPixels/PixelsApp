@@ -27,7 +27,7 @@ package com.systemic.bluetoothle;
 //! \defgroup Android_Java
 //! @brief An Android Java package that provides a simplified access to Bluetooth
 //!        Low Energy peripherals.
-//! 
+//!
 //! @see com.systemic.bluetoothle namespace.
 
 import java.util.ArrayList;
@@ -74,9 +74,9 @@ import com.unity3d.player.UnityPlayer;
  * It relies on Nordic's Android-BLE-Library library for most of the work.
  * @see https://github.com/NordicSemiconductor/Android-BLE-Library
  */
-public class Peripheral
+public final class Peripheral
 {
-	private static final String TAG = "systemic";
+    private static final String TAG = "SystemicGames";
 
     /**
      * @brief Interface for most BLE request callbacks.
@@ -99,7 +99,7 @@ public class Peripheral
 	public interface ReadValueRequestCallback extends DataReceivedCallback, FailCallback, InvalidRequestCallback {}
 
     //public enum ConnectionStatus
-    //{ 
+    //{
     //    Disconnected(0), Connected(1);
     //    private final int value;
     //    private ConnectionStatus(int value) { this.value = value; }
@@ -109,7 +109,7 @@ public class Peripheral
     /**
      * @brief Implements Nordic's BleManager class.
      */
-    private class ClientManager extends BleManager
+    private final class ClientManager extends BleManager
     {
         /**
          * @brief Implements Nordic's BleManagerGattCallback class.
@@ -117,7 +117,7 @@ public class Peripheral
         private class GattCallback extends BleManagerGattCallback
         {
             private BluetoothGatt _gatt;
-            
+
             public GattCallback()
             {
             }
@@ -126,7 +126,7 @@ public class Peripheral
             {
                 return _gatt == null ? null : _gatt.getService(serviceUuid);
             }
-            
+
             public List<BluetoothGattService> getServices()
             {
                 return _gatt == null ? null : _gatt.getServices();
@@ -171,7 +171,7 @@ public class Peripheral
                 _gatt = null;
             }
         }
-    
+
         private GattCallback _callback;
 
         public ClientManager(ConnectionObserver connectionObserver)
@@ -185,7 +185,7 @@ public class Peripheral
         {
             return _callback.getService(serviceUuid);
         }
-        
+
         public List<BluetoothGattService> getServices()
         {
             return _callback.getServices();
@@ -399,14 +399,22 @@ public class Peripheral
     //! @{
 
     /**
+     * @brief Gets the Bluetooth address of the peripheral.
+     *
+     * @return The Bluetooth address, or null if the call failed.
+     */
+    public String getAddress()
+    {
+        return _device.getAddress();
+    }
+
+    /**
      * @brief Gets the name of the peripheral.
      *
      * @return The name, or null if the call failed.
      */
     public String getName()
     {
-        Log.v(TAG, "==> getName");
-
         return _device.getName();
     }
 

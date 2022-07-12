@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Systemic.Unity.Pixels.Animations
 {
@@ -34,9 +35,11 @@ namespace Systemic.Unity.Pixels.Animations
             return bits.getColor32(colorIndex());
         }
 
-        public void setTimeAndColorIndex(ushort timeInMS, ushort colorIndex)
+        public void setTimeAndColorIndex(float time, ushort colorIndex)
         {
-            timeAndColor = (ushort)(((((uint)timeInMS / 20) & 0b111111111) << 7) |
+            //TODO check colorIndex < 128
+            uint time50th = (uint)(Mathf.Round(Mathf.Max(0, time) * 1000) / 20);
+            timeAndColor = (ushort)(((time50th & 0b111111111) << 7) |
                            ((uint)colorIndex & 0b1111111));
         }
 

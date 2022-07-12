@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Systemic.Unity.Pixels.Animations
 {
@@ -29,9 +30,10 @@ namespace Systemic.Unity.Pixels.Animations
             return (byte)((timeAndIntensity & 0b01111111) * 2); // Scale it to 0 -> 255
         }
 
-        public void setTimeAndIntensity(ushort timeInMS, byte intensity)
+        public void setTimeAndIntensity(float time, byte intensity)
         {
-            timeAndIntensity = (ushort)(((((uint)timeInMS / 20) & 0b111111111) << 7) |
+            uint time50th = (uint)(Mathf.Round(Mathf.Max(0, time) * 1000) / 20);
+            timeAndIntensity = (ushort)(((time50th & 0b111111111) << 7) |
                            ((uint)(intensity / 2) & 0b1111111));
         }
 

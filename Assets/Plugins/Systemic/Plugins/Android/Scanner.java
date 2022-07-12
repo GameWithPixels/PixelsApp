@@ -46,7 +46,7 @@ public final class Scanner
         public void onScanFailed(String error);
     }
 
-	private static String TAG = "systemic";
+    private static String TAG = "SystemicGames";
     private static ScanCallback _scanCallback;
     private static Object _scanSync = new Object();
 
@@ -127,6 +127,7 @@ public final class Scanner
     /**
      * @brief Gets a ScanCallback instance that notify scan results to user code.
      */
+    @NonNull
     private static ScanCallback createCallback(final ScannerCallback callback)
     {
         return new ScanCallback()
@@ -152,6 +153,7 @@ public final class Scanner
                 callback.onScanFailed(errorToString(errorCode));
             }
 
+            @NonNull
             private String errorToString(final int errorCode)
             {
                 switch (errorCode)
@@ -170,10 +172,13 @@ public final class Scanner
                 return "Unknown error";
             }
 
-            private void NotifyScanResult(final ScanResult scanResult)
+            private void NotifyScanResult(@NonNull final ScanResult scanResult)
             {
                 BluetoothDevice device = scanResult.getDevice();
-                if (device != null)
+                // We should get only BLE devices
+                if ((device != null)
+                        && ((device.getType() == BluetoothDevice.DEVICE_TYPE_LE)
+                        || (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
                 {
                     long address = 0, shift = 0;
                     String[] octets = device.getAddress().split(":");

@@ -98,14 +98,14 @@ namespace Systemic.Unity.BluetoothLE
         {
             public string Name => ScannedPeripheral?.Name;
             public ScannedPeripheral ScannedPeripheral;
+            public PeripheralState State;
             public NativePeripheralHandle NativeHandle;
             public Guid[] RequiredServices;
-            public Action<ScannedPeripheral, bool> ConnectionEvent;
-            public PeripheralState State;
+            public Action<ScannedPeripheral, bool> ConnStatusChangedCallback;
         }
 
         // All scanned peripherals, key is the peripheral SystemId, items are never removed except on shutdown
-        static readonly Dictionary<string, PeripheralInfo> _peripherals = new Dictionary<string, PeripheralInfo>();
+        static readonly Dictionary<string, PeripheralInfo> _peripheralsInfo = new Dictionary<string, PeripheralInfo>();
 
         /// <summary>
         /// The default timeout value (in seconds) for requests send to a BLE peripheral.
@@ -137,12 +137,13 @@ namespace Systemic.Unity.BluetoothLE
             {
                 EnsureRunningOnMainThread();
 
-                return _peripherals.Values
+                return _peripheralsInfo.Values
                     .Select(pinf => pinf.ScannedPeripheral)
                     .ToArray();
             }
         }
 
+        //TODO ReadyPeripherals ??
         /// <summary>
         /// Gets the list of peripherals to which <see cref="Central"/> is connected.
         /// </summary>
@@ -152,7 +153,7 @@ namespace Systemic.Unity.BluetoothLE
             {
                 EnsureRunningOnMainThread();
 
-                return _peripherals.Values
+                return _peripheralsInfo.Values
                     .Where(pinf => pinf.State == PeripheralState.Ready)
                     .Select(pinf => pinf.ScannedPeripheral)
                     .ToArray();
@@ -216,7 +217,7 @@ namespace Systemic.Unity.BluetoothLE
             Debug.Log("[BLE] Shutting down");
 
             // Reset states
-            _peripherals.Clear();
+            _peripheralsInfo.Clear();
             IsScanning = IsReady = false;
 
             // Shutdown native interface and destroy companion mono behaviour
@@ -259,12 +260,13 @@ namespace Systemic.Unity.BluetoothLE
                     Debug.Log($"[BLE:{scannedPeripheral.Name}] Peripheral discovered with address={scannedPeripheral.BluetoothAddress}, RSSI={scannedPeripheral.Rssi})");
 
                     // Keep track of discovered peripherals
-                    if (!_peripherals.TryGetValue(scannedPeripheral.SystemId, out PeripheralInfo pinf))
+                    if (!_peripheralsInfo.TryGetValue(scannedPeripheral.SystemId, out PeripheralInfo pinf))
                     {
-                        _peripherals[scannedPeripheral.SystemId] = pinf = new PeripheralInfo();
+                        _peripheralsInfo[scannedPeripheral.SystemId] = pinf = new PeripheralInfo();
                     }
                     pinf.ScannedPeripheral = scannedPeripheral;
                     pinf.RequiredServices = requiredServices;
+                    //TODO pinf.State = PeripheralState.Disconnected;
 
                     // Notify
                     PeripheralDiscovered?.Invoke(scannedPeripheral);
@@ -332,13 +334,16 @@ namespace Systemic.Unity.BluetoothLE
         /// </returns>
         public static RequestEnumerator ConnectPeripheralAsync(ScannedPeripheral peripheral, Action<ScannedPeripheral, bool> onConnectionEvent, float timeoutSec = 0)
         {
-            //TODO what happens if a connect request is already being processed
             if (timeoutSec < 0) throw new ArgumentException(nameof(timeoutSec) + " must be greater or equal to zero", nameof(timeoutSec));
 
             EnsureRunningOnMainThread();
 
             // Get peripheral state
             PeripheralInfo pinf = GetPeripheralInfo(peripheral);
+
+            //TODO handle case when another connection request for the same device is already under way
+            //TODO reject if state is not disconnected?
+            //Debug.Assert(pinf?.ConnStatusChangedCallback == null);
 
             // We need a valid peripheral
             if (!pinf.NativeHandle.IsValid)
@@ -373,7 +378,7 @@ namespace Systemic.Unity.BluetoothLE
                     Debug.Assert(pinf.NativeHandle.IsValid); // Already checked by RequestEnumerator
 
                     Debug.Log($"[BLE:{pinf.Name}] Connecting with timeout of {timeoutSec}s...");
-                    pinf.ConnectionEvent = onConnectionEvent;
+                    pinf.ConnStatusChangedCallback = onConnectionEvent;
                     Connect(pinf, onResult);
 
                     static void Connect(PeripheralInfo pinf, NativeRequestResultCallback onResult)
@@ -455,7 +460,7 @@ namespace Systemic.Unity.BluetoothLE
                     pinf.State = PeripheralState.Disconnected;
 
                     // Notify
-                    pinf.ConnectionEvent?.Invoke(pinf.ScannedPeripheral, false);
+                    pinf.ConnStatusChangedCallback?.Invoke(pinf.ScannedPeripheral, false);
                 }
             }
 
@@ -470,7 +475,7 @@ namespace Systemic.Unity.BluetoothLE
                     pinf.State = PeripheralState.Ready;
 
                     // Notify
-                    pinf.ConnectionEvent?.Invoke(pinf.ScannedPeripheral, true);
+                    pinf.ConnStatusChangedCallback?.Invoke(pinf.ScannedPeripheral, true);
                 }
                 else if (pinf.NativeHandle.IsValid)
                 {
@@ -830,7 +835,7 @@ namespace Systemic.Unity.BluetoothLE
         {
             if (peripheral == null) throw new ArgumentNullException(nameof(peripheral));
 
-            _peripherals.TryGetValue(peripheral.SystemId, out PeripheralInfo pinf);
+            _peripheralsInfo.TryGetValue(peripheral.SystemId, out PeripheralInfo pinf);
             return pinf ?? throw new ArgumentException(nameof(peripheral), $"No peripheral found with SystemId={peripheral.SystemId}");
         }
 
@@ -924,7 +929,7 @@ namespace Systemic.Unity.BluetoothLE
             InternalBehaviour.Instance?.EnqueueAction(() =>
             {
                 Debug.Assert(pinf.ScannedPeripheral != null);
-                if (_peripherals.ContainsKey(pinf.ScannedPeripheral?.SystemId))
+                if (_peripheralsInfo.ContainsKey(pinf.ScannedPeripheral?.SystemId))
                 {
                     action();
                 }

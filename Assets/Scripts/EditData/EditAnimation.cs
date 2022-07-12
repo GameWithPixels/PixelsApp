@@ -22,7 +22,7 @@ public abstract class EditAnimation
     [JsonIgnore]
     public abstract AnimationType type { get; }
 
-    public abstract IAnimation ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits);
+    public abstract IAnimationPreset ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits);
     public abstract EditAnimation Duplicate();
     public virtual void ReplacePattern(EditPattern oldPattern, EditPattern newPattern)
     {

@@ -78,11 +78,11 @@ namespace Systemic.Unity.Pixels.Messages
 
                                 ret = new IAmADie
                                 {
-                                    faceCount = baseMsg.faceCount,
+                                    ledCount = baseMsg.ledCount,
                                     designAndColor = baseMsg.designAndColor,
                                     padding = baseMsg.padding,
                                     dataSetHash = baseMsg.dataSetHash,
-                                    deviceId = baseMsg.deviceId,
+                                    pixelId = baseMsg.pixelId,
                                     availableFlashSize = baseMsg.flashSize,
                                     buildTimestamp = timestamp,
                                 };

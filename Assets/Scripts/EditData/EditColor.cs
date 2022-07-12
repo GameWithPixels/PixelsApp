@@ -47,9 +47,9 @@ public struct EditColor
             case ColorType.RGB:
                 return EditColor.toColorIndex(ref palette, rgbColor);
             case ColorType.Face:
-                return DataSet.AnimationBits.PALETTE_COLOR_FROM_FACE;
+                return Constants.PaletteColorFromFace;
             case ColorType.Random:
-                return DataSet.AnimationBits.PALETTE_COLOR_FROM_RANDOM;
+                return Constants.PaletteColorFromRandom;
             default:
                 throw new System.NotImplementedException();
         }

@@ -7,7 +7,7 @@ namespace Systemic.Unity.Pixels.Animations
     /// </summary>
     public abstract class AnimationInstance
     {
-        public IAnimation animationPreset;
+        public IAnimationPreset animationPreset;
         public DataSet.AnimationBits animationBits;
         public int startTime; //ms
         public byte remapFace;
@@ -15,7 +15,7 @@ namespace Systemic.Unity.Pixels.Animations
 
         protected DataSet set;
 
-        public AnimationInstance(IAnimation animation, DataSet.AnimationBits bits)
+        public AnimationInstance(IAnimationPreset animation, DataSet.AnimationBits bits)
         {
             animationPreset = animation;
             animationBits = bits;

@@ -9,7 +9,7 @@ namespace Systemic.Unity.Pixels.Animations
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public class AnimationFadeCandy
-        : IAnimation
+        : IAnimationPreset
     {
         public AnimationType type { get; set; } = AnimationType.Gradient;
         public byte padding_type { get; set; }
@@ -70,7 +70,7 @@ namespace Systemic.Unity.Pixels.Animations
         public MovingSphere[] spheres;
         public int sphereCount;
 
-        public AnimationInstanceFadeCandy(IAnimation animation, DataSet.AnimationBits bits)
+        public AnimationInstanceFadeCandy(IAnimationPreset animation, DataSet.AnimationBits bits)
             : base(animation, bits)
         {
         }
@@ -110,8 +110,8 @@ namespace Systemic.Unity.Pixels.Animations
             //uint color = gradient.evaluateColor(animationBits, gradientTime);
 
             // Fill the indices and colors for the anim controller to know how to update leds
-            int retCount = 20;
-            for (int i = 0; i < 20; ++i)
+            int retCount = Constants.MaxLedsCount;
+            for (int i = 0; i < Constants.MaxLedsCount; ++i)
             {
                 retIndices[i] = i;
                 retColors[i] = 0;
@@ -143,7 +143,7 @@ namespace Systemic.Unity.Pixels.Animations
         public override int stop(int[] retIndices)
         {
             int retCount = 0;
-            for (int i = 0; i < 20; ++i)
+            for (int i = 0; i < Constants.MaxLedsCount; ++i)
             {
                 retIndices[retCount] = i;
                 retCount++;
