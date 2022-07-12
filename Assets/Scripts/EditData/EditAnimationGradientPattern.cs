@@ -16,7 +16,7 @@ public class EditAnimationGradientPattern
     {
         get
         {
-            return pattern?.duration ?? 0 * speedMultiplier;
+            return (pattern?.duration ?? 0) * speedMultiplier;
         }
         set
         {
@@ -60,7 +60,6 @@ public class EditAnimationGradientPattern
             name = name,
             pattern = pattern,
             speedMultiplier = speedMultiplier,
-            duration = duration,
             gradient = gradient?.Duplicate(),
             overrideWithFace = overrideWithFace,
         };
@@ -85,7 +84,7 @@ public class EditAnimationGradientPattern
     public class Converter
         : JsonConverter<EditAnimationGradientPattern>
     {
-        AppDataSet dataSet;
+        readonly AppDataSet dataSet;
         public Converter(AppDataSet dataSet)
         {
             this.dataSet = dataSet;
@@ -102,8 +101,8 @@ public class EditAnimationGradientPattern
                 serializer.Serialize(writer, patternIndex);
                 writer.WritePropertyName("speedMultiplier");
                 serializer.Serialize(writer, value.speedMultiplier);
-                writer.WritePropertyName("duration");
-                serializer.Serialize(writer, value.duration);
+                //writer.WritePropertyName("duration");
+                //serializer.Serialize(writer, value.duration);
                 writer.WritePropertyName("gradient");
                 serializer.Serialize(writer, value.gradient);
                 writer.WritePropertyName("overrideWithFace");
@@ -128,7 +127,7 @@ public class EditAnimationGradientPattern
                 else
                     ret.pattern = AppDataSet.Instance.AddNewDefaultPattern();
                 ret.speedMultiplier = jsonObject["speedMultiplier"].Value<float>();
-                ret.duration = jsonObject["duration"].Value<float>();
+                //ret.duration = jsonObject["duration"].Value<float>();
                 ret.gradient = jsonObject["gradient"].ToObject<EditRGBGradient>();
                 if (jsonObject["overrideWithFace"] != null)
                 {

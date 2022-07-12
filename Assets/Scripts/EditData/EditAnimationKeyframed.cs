@@ -60,7 +60,7 @@ public class EditAnimationKeyframed
     {
         get
         {
-            return pattern?.duration ?? 0 * speedMultiplier;
+            return (pattern?.duration ?? 0) * speedMultiplier;
         }
         set
         {
@@ -113,7 +113,6 @@ public class EditAnimationKeyframed
             pattern = pattern,
             flowOrder = flowOrder,
             speedMultiplier = speedMultiplier,
-            duration = duration,
             //hueAdjust = hueAdjust;
         };
     }
@@ -137,7 +136,7 @@ public class EditAnimationKeyframed
     public class Converter
         : JsonConverter<EditAnimationKeyframed>
     {
-        AppDataSet dataSet;
+        readonly AppDataSet dataSet;
         public Converter(AppDataSet dataSet)
         {
             this.dataSet = dataSet;
@@ -154,8 +153,8 @@ public class EditAnimationKeyframed
                 serializer.Serialize(writer, patternIndex);
                 writer.WritePropertyName("speedMultiplier");
                 serializer.Serialize(writer, value.speedMultiplier);
-                writer.WritePropertyName("duration");
-                serializer.Serialize(writer, value.duration);
+                //writer.WritePropertyName("duration");
+                //serializer.Serialize(writer, value.duration);
                 //writer.WritePropertyName("hueAdjust");
                 //serializer.Serialize(writer, value.hueAdjust);
                 writer.WriteEndObject();
@@ -178,7 +177,7 @@ public class EditAnimationKeyframed
                 else
                     ret.pattern = AppDataSet.Instance.AddNewDefaultPattern();
                 ret.speedMultiplier = jsonObject["speedMultiplier"].Value<float>();
-                ret.duration = jsonObject["duration"].Value<float>();
+                //ret.duration = jsonObject["duration"].Value<float>();
                 //ret.hueAdjust = jsonObject["hueAdjust"].Value<float>();
                 return ret;
             }

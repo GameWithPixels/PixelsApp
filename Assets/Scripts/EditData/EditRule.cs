@@ -46,12 +46,7 @@ public class EditRule
 
     public EditRule Duplicate()
     {
-        var actionsCopy = new List<EditAction>();
-        foreach (var action in actions)
-        {
-            actionsCopy.Add(action.Duplicate());
-        }
-        return new EditRule(actionsCopy)
+        return new EditRule(actions.Select(action => action.Duplicate()).ToList())
         {
             condition = condition?.Duplicate(),
         };

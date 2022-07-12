@@ -11,9 +11,14 @@ public class EditBehavior
 {
     public string name;
     public string description;
-    public readonly List<EditRule> rules = new List<EditRule>();
+    public readonly List<EditRule> rules;
 
-    public PreviewSettings defaultPreviewSettings = new PreviewSettings() { design = PixelDesignAndColor.V5_Grey };
+    public readonly PreviewSettings defaultPreviewSettings = new PreviewSettings() { design = PixelDesignAndColor.V5_Grey };
+
+    public EditBehavior(List<EditRule> rules = null)
+    {
+        this.rules = rules ?? new List<EditRule>();
+    }
 
     public Profile ToProfile(EditDataSet editSet, DataSet set)
     {
@@ -34,16 +39,11 @@ public class EditBehavior
 
     public EditBehavior Duplicate()
     {
-        var ret = new EditBehavior
+        return new EditBehavior(rules.Select(r => r.Duplicate()).ToList())
         {
             name = name,
-            description = description
+            description = description,
         };
-        foreach (var r in rules)
-        {
-            ret.rules.Add(r.Duplicate());
-        }
-        return ret;
     }
 
     public EditRule AddNewDefaultRule()
@@ -145,7 +145,8 @@ public class EditBehavior
 
             foreach (var rule in AppDataSet.Instance.defaultBehavior.rules)
             {
-                if (!editSet.profile.rules.Any(r => r.condition.type == rule.condition.type))
+                if (rule.condition != null &&
+                    !editSet.profile.rules.Any(r => r.condition?.type == rule.condition.type))
                 {
                     var ruleCopy = rule.Duplicate();
                     copiedRules.Add(ruleCopy);

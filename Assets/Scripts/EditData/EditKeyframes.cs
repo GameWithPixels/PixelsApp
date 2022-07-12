@@ -16,10 +16,11 @@ public class EditRGBKeyframe
 
     public EditRGBKeyframe Duplicate()
     {
-        var keyframe = new EditRGBKeyframe();
-        keyframe.time = time;
-        keyframe.color = color;
-        return keyframe;
+        return new EditRGBKeyframe
+        {
+            time = time,
+            color = color
+        };
     }
 
     public RGBKeyframe ToRGBKeyframe(EditDataSet editSet, DataSet.AnimationBits bits)

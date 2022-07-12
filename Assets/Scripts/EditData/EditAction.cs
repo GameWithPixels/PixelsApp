@@ -139,7 +139,7 @@ public class EditActionPlayAnimation
     public class Converter
         : JsonConverter<EditActionPlayAnimation>
     {
-        AppDataSet dataSet;
+        readonly AppDataSet dataSet;
         public Converter(AppDataSet dataSet)
         {
             this.dataSet = dataSet;
@@ -277,7 +277,7 @@ public class EditActionPlayAudioClip
     public class Converter
         : JsonConverter<EditActionPlayAudioClip>
     {
-        AppDataSet dataSet;
+        readonly AppDataSet dataSet;
         public Converter(AppDataSet dataSet)
         {
             this.dataSet = dataSet;
