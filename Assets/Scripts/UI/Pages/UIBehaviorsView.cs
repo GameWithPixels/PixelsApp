@@ -37,22 +37,22 @@ public class UIBehaviorsView
         }
     }
 
-    UIBehaviorToken CreateBehaviorToken(EditBehavior behavior)
+    UIBehaviorToken CreateBehaviorToken(EditProfile profile)
     {
         // Create the gameObject
         var ret = GameObject.Instantiate<UIBehaviorToken>(behaviorTokenPrefab, Vector3.zero, Quaternion.identity, contentRoot.transform);
         spacer.SetAsLastSibling();
 
         // When we click on the pattern main button, go to the edit page
-        ret.onClick.AddListener(() => NavigationManager.Instance.GoToPage(UIPage.PageId.Behavior, behavior));
-        ret.onEdit.AddListener(() => NavigationManager.Instance.GoToPage(UIPage.PageId.Behavior, behavior));
-        ret.onDuplicate.AddListener(() => DuplicateBehavior(behavior));
-        ret.onRemove.AddListener(() => DeleteBehavior(behavior));
-        ret.onExpand.AddListener(() => ExpandBehavior(behavior));
+        ret.onClick.AddListener(() => NavigationManager.Instance.GoToPage(UIPage.PageId.Behavior, profile));
+        ret.onEdit.AddListener(() => NavigationManager.Instance.GoToPage(UIPage.PageId.Behavior, profile));
+        ret.onDuplicate.AddListener(() => DuplicateBehavior(profile));
+        ret.onRemove.AddListener(() => DeleteBehavior(profile));
+        ret.onExpand.AddListener(() => ExpandBehavior(profile));
 
         addBehaviorButton.transform.SetAsLastSibling();
         // Initialize it
-        ret.Setup(behavior);
+        ret.Setup(profile);
         return ret;
     }
 
@@ -70,7 +70,7 @@ public class UIBehaviorsView
     {
         // Assume all behavior will be destroyed
        var toDestroy = new List<UIBehaviorToken>(behaviors);
-        foreach (var bh in AppDataSet.Instance.behaviors)
+        foreach (var bh in AppDataSet.Instance.profiles)
         {
             int prevIndex = toDestroy.FindIndex(a => a.editBehavior == bh);
             if (prevIndex == -1)
@@ -96,31 +96,31 @@ public class UIBehaviorsView
     void AddNewBehavior()
     {
         // Create a new default behavior
-        var newBehavior = AppDataSet.Instance.AddNewDefaultBehavior();
+        var newBehavior = AppDataSet.Instance.AddNewDefaultProfile();
         AppDataSet.Instance.SaveData();
         NavigationManager.Instance.GoToPage(UIPage.PageId.Behavior, newBehavior);
     }
 
-    void DuplicateBehavior(EditBehavior behavior)
+    void DuplicateBehavior(EditProfile profile)
     {
-        AppDataSet.Instance.DuplicateBehavior(behavior);
-        behaviors.Find(p => p.editBehavior == behavior).Expand(false);
+        AppDataSet.Instance.DuplicateProfile(profile);
+        behaviors.Find(p => p.editBehavior == profile).Expand(false);
         AppDataSet.Instance.SaveData();
         RefreshView();
     }
 
-    void DeleteBehavior(EditBehavior behavior)
+    void DeleteBehavior(EditProfile profile)
     {
-        PixelsApp.Instance.ShowDialogBox("Delete Profile?", "Are you sure you want to delete " + behavior.name + "?", "Ok", "Cancel", res =>
+        PixelsApp.Instance.ShowDialogBox("Delete Profile?", "Are you sure you want to delete " + profile.name + "?", "Ok", "Cancel", res =>
         {
             if (res)
             {
-                var dependentPresets = AppDataSet.Instance.CollectPresetsForBehavior(behavior);
+                var dependentPresets = AppDataSet.Instance.CollectPresetsForBehavior(profile);
                 if (dependentPresets.Any())
                 {
                     StringBuilder builder = new StringBuilder();
                     builder.Append("The following presets depend on ");
-                    builder.Append(behavior.name);
+                    builder.Append(profile.name);
                     builder.AppendLine(":");
                     foreach (var b in dependentPresets)
                     {
@@ -133,7 +133,7 @@ public class UIBehaviorsView
                     {
                         if (res2)
                         {
-                            AppDataSet.Instance.DeleteBehavior(behavior);
+                            AppDataSet.Instance.DeleteProfile(profile);
                             AppDataSet.Instance.SaveData();
                             RefreshView();
                         }
@@ -141,7 +141,7 @@ public class UIBehaviorsView
                 }
                 else
                 {
-                    AppDataSet.Instance.DeleteBehavior(behavior);
+                    AppDataSet.Instance.DeleteProfile(profile);
                     AppDataSet.Instance.SaveData();
                     RefreshView();
                 }
@@ -149,11 +149,11 @@ public class UIBehaviorsView
         });
     }
 
-    void ExpandBehavior(EditBehavior behavior)
+    void ExpandBehavior(EditProfile profile)
     {
         foreach (var uip in behaviors)
         {
-            if (uip.editBehavior == behavior)
+            if (uip.editBehavior == profile)
             {
                 uip.Expand(!uip.isExpanded);
             }

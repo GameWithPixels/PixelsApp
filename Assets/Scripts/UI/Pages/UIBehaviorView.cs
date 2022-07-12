@@ -16,7 +16,7 @@ public class UIBehaviorView
     public RectTransform spacer;
     public Button activateButton;
 
-    public EditBehavior editBehavior { get; private set; }
+    public EditProfile editBehavior { get; private set; }
     public SingleDiceRenderer dieRenderer { get; private set; }
 
     [Header("Prefabs")]
@@ -24,7 +24,7 @@ public class UIBehaviorView
 
     public class Context
     {
-        public EditBehavior behavior;
+        public EditProfile behavior;
         public Presets.EditPreset parentPreset;
         public Presets.EditDieAssignment dieAssignment;
     }
@@ -36,7 +36,7 @@ public class UIBehaviorView
     public override void Enter(object context)
     {
         gameObject.SetActive(true);
-        var bhv = context as EditBehavior;
+        var bhv = context as EditProfile;
         if (bhv != null)
         {
             SetupHeader(false, false, bhv.name, SetName);
@@ -93,9 +93,9 @@ public class UIBehaviorView
         gameObject.SetActive(false);
     }
 
-    void Setup(EditBehavior behavior)
+    void Setup(EditProfile profile)
     {
-        editBehavior = behavior;
+        editBehavior = profile;
         dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(editBehavior.defaultPreviewSettings.design, 300);
         if (dieRenderer != null)
         {

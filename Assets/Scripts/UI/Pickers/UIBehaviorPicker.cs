@@ -14,8 +14,8 @@ public class UIBehaviorPicker : MonoBehaviour
     [Header("Prefabs")]
     public UIBehaviorPickerBehaviorToken behaviorTokenPrefab;
 
-    EditBehavior currentBehavior;
-    System.Action<bool, EditBehavior> closeAction;
+    EditProfile currentBehavior;
+    System.Action<bool, EditProfile> closeAction;
 
     // The list of controls we have created to display dice
     List<UIBehaviorPickerBehaviorToken> behaviors = new List<UIBehaviorPickerBehaviorToken>();
@@ -25,7 +25,7 @@ public class UIBehaviorPicker : MonoBehaviour
     /// <summary>
     /// Invoke the die picker
     /// </sumary>
-    public void Show(string title, EditBehavior previousBehavior, System.Action<bool, EditBehavior> closeAction)
+    public void Show(string title, EditProfile previousBehavior, System.Action<bool, EditProfile> closeAction)
     {
         if (isShown)
         {
@@ -33,7 +33,7 @@ public class UIBehaviorPicker : MonoBehaviour
             ForceHide();
         }
 
-        foreach (var behavior in AppDataSet.Instance.behaviors)
+        foreach (var behavior in AppDataSet.Instance.profiles)
         {
             // New pattern
             var newBehaviorUI = CreateBehaviorToken(behavior);
@@ -48,7 +48,7 @@ public class UIBehaviorPicker : MonoBehaviour
         this.closeAction = closeAction;
     }
 
-    UIBehaviorPickerBehaviorToken CreateBehaviorToken(EditBehavior behavior)
+    UIBehaviorPickerBehaviorToken CreateBehaviorToken(EditProfile profile)
     {
         // Create the gameObject
         var ret = GameObject.Instantiate<UIBehaviorPickerBehaviorToken>(behaviorTokenPrefab, contentRoot.transform);
@@ -57,7 +57,7 @@ public class UIBehaviorPicker : MonoBehaviour
         ret.onClick.AddListener(() => Hide(true, ret.editBehavior));
 
         // Initialize it
-        ret.Setup(behavior);
+        ret.Setup(profile);
         return ret;
     }
 
@@ -75,7 +75,7 @@ public class UIBehaviorPicker : MonoBehaviour
         backButton.onClick.AddListener(Back);
     }
 
-    void Hide(bool result, EditBehavior behavior)
+    void Hide(bool result, EditProfile profile)
     {
         foreach (var uibehavior in behaviors)
         {
@@ -84,7 +84,7 @@ public class UIBehaviorPicker : MonoBehaviour
         behaviors.Clear();
 
         gameObject.SetActive(false);
-        closeAction?.Invoke(result, behavior);
+        closeAction?.Invoke(result, profile);
         closeAction = null;
     }
 

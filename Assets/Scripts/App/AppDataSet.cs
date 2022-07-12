@@ -28,9 +28,9 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         public List<EditAudioClip> audioClips = new List<EditAudioClip>();
         public List<EditPattern> patterns = new List<EditPattern>();
         public List<EditAnimation> animations = new List<EditAnimation>();
-        public List<EditBehavior> behaviors = new List<EditBehavior>();
+        public List<EditProfile> behaviors = new List<EditProfile>();
         public List<EditPreset> presets = new List<EditPreset>();
-        public EditBehavior defaultBehavior = null;
+        public EditProfile defaultBehavior = null;
         public uint nextAudioClipUniqueId = 0;
 
         public void Clear()
@@ -54,9 +54,9 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     public List<EditAudioClip> audioClips => data.audioClips;
     public List<EditPattern> patterns => data.patterns;
     public List<EditAnimation> animations => data.animations;
-    public List<EditBehavior> behaviors => data.behaviors;
+    public List<EditProfile> profiles => data.behaviors;
     public List<EditPreset> presets => data.presets;
-    public EditBehavior defaultBehavior { get { return data.defaultBehavior; } set { data.defaultBehavior = value; } }
+    public EditProfile defaultProfile { get { return data.defaultBehavior; } set { data.defaultBehavior = value; } }
 
     void OnEnable()
     {
@@ -137,26 +137,26 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         return ret;
     }
 
-    public EditDataSet ExtractEditSetForProfile(EditBehavior behavior)
+    public EditDataSet ExtractEditSetForProfile(EditProfile profile)
     {
-        if (!behaviors.Contains(behavior))
+        if (!profiles.Contains(profile))
         {
-            throw new System.ArgumentException(nameof(behavior), "Behavior not in AppDataSet");
+            throw new System.ArgumentException(nameof(profile), "Profile not in AppDataSet");
         }
 
         // Generate the data to be uploaded, based on a copy of the profile
-        var editSet = new EditDataSet(behavior.Duplicate());
+        var editSet = new EditDataSet(profile.Duplicate());
 
-        // And add the animations that this behavior uses
+        // And add the animations that the given profile uses
         var animations = editSet.profile.CollectAnimations();
 
-        // Add default rules and animations to behavior / set
-        if (defaultBehavior != null)
+        // Add default rules and animations to profile / set
+        if (defaultProfile != null)
         {
             // Rules that are in fact copied over
             var copiedRules = new List<EditRule>();
 
-            foreach (var rule in defaultBehavior.rules)
+            foreach (var rule in defaultProfile.rules)
             {
                 if (rule.condition != null &&
                     !editSet.profile.rules.Any(r => r.condition?.type == rule.condition.type))
@@ -171,7 +171,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             var copiedAnims = new Dictionary<EditAnimation, EditAnimation>();
 
             // Add animations used by default rules
-            foreach (var editAnim in defaultBehavior.CollectAnimations())
+            foreach (var editAnim in defaultProfile.CollectAnimations())
             {
                 foreach (var copiedRule in copiedRules)
                 {
@@ -243,9 +243,9 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
     public void ReplaceAnimation(EditAnimation oldAnimation, EditAnimation newAnimation)
     {
-        foreach (var behavior in behaviors)
+        foreach (var profile in profiles)
         {
-            behavior.ReplaceAnimation(oldAnimation, newAnimation);
+            profile.ReplaceAnimation(oldAnimation, newAnimation);
         }
         int oldAnimIndex = animations.IndexOf(oldAnimation);
         animations[oldAnimIndex] = newAnimation;
@@ -253,9 +253,9 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
     public void DeleteAnimation(EditAnimation animation)
     {
-        foreach (var behavior in behaviors)
+        foreach (var profile in profiles)
         {
-            behavior.DeleteAnimation(animation);
+            profile.DeleteAnimation(animation);
         }
         animations.Remove(animation);
     }
@@ -309,22 +309,22 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         return animations.Where(b => b.DependsOnPattern(pattern, out bool _));
     }
 
-    public IEnumerable<EditBehavior> CollectBehaviorsForAnimation(EditAnimation anim)
+    public IEnumerable<EditProfile> CollectProfilesForAnimation(EditAnimation anim)
     {
-        return behaviors.Where(b => b.DependsOnAnimation(anim));
+        return profiles.Where(b => b.DependsOnAnimation(anim));
     }
 
     public IEnumerable<EditPreset> CollectPresetsForAnimation(EditAnimation anim)
     {
-        var behaviors = CollectBehaviorsForAnimation(anim);
-        return presets.Where(p => p.dieAssignments.Any(da => behaviors.Contains(da.behavior)));
+        var profiles = CollectProfilesForAnimation(anim);
+        return presets.Where(p => p.dieAssignments.Any(da => profiles.Contains(da.behavior)));
     }
 
-    public EditBehavior AddNewDefaultBehavior()
+    public EditProfile AddNewDefaultProfile()
     {
-        var newBehavior = new EditBehavior();
-        newBehavior.name = "New Profile";
-        newBehavior.rules.Add(new EditRule(new List<EditAction>()
+        var newProfile = new EditProfile();
+        newProfile.name = "New Profile";
+        newProfile.rules.Add(new EditRule(new List<EditAction>()
         {
             new EditActionPlayAnimation()
             {
@@ -340,29 +340,29 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
                 faceIndex = 19
             },
         });
-        behaviors.Add(newBehavior);
-        return newBehavior;
+        profiles.Add(newProfile);
+        return newProfile;
     }
 
-    public EditBehavior DuplicateBehavior(EditBehavior behavior)
+    public EditProfile DuplicateProfile(EditProfile profile)
     {
-        var newBehavior = behavior.Duplicate();
-        behaviors.Add(newBehavior);
-        return newBehavior;
+        var newProfile = profile.Duplicate();
+        profiles.Add(newProfile);
+        return newProfile;
     }
 
-    public void DeleteBehavior(EditBehavior behavior)
+    public void DeleteProfile(EditProfile profile)
     {
         foreach (var preset in presets)
         {
-            preset.DeleteBehavior(behavior);
+            preset.DeleteProfile(profile);
         }
-        behaviors.Remove(behavior);
+        profiles.Remove(profile);
     }
 
-    public IEnumerable<EditPreset> CollectPresetsForBehavior(EditBehavior behavior)
+    public IEnumerable<EditPreset> CollectPresetsForBehavior(EditProfile profile)
     {
-        return presets.Where(b => b.DependsOnBehavior(behavior));
+        return presets.Where(b => b.DependsOnProfile(profile));
     }
 
     public bool CheckDependency(EditDie die)
@@ -437,22 +437,22 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
     public void DeleteAudioClip(EditAudioClip clip)
     {
-        foreach (var behavior in behaviors)
+        foreach (var profile in profiles)
         {
-            behavior.DeleteAudioClip(clip);
+            profile.DeleteAudioClip(clip);
         }
         audioClips.Remove(clip);
     }
 
-    public IEnumerable<EditBehavior> CollectBehaviorsForAudioClip(EditAudioClip clip)
+    public IEnumerable<EditProfile> CollectProfilesForAudioClip(EditAudioClip clip)
     {
-        return behaviors.Where(b => b.DependsOnAudioClip(clip));
+        return profiles.Where(b => b.DependsOnAudioClip(clip));
     }
 
     public IEnumerable<EditPreset> CollectPresetsForAudioClip(EditAudioClip clip)
     {
-        var behaviors = CollectBehaviorsForAudioClip(clip).ToList();
-        return presets.Where(p => p.dieAssignments.Any(da => behaviors.Contains(da.behavior)));
+        var profiles = CollectProfilesForAudioClip(clip).ToList();
+        return presets.Where(p => p.dieAssignments.Any(da => profiles.Contains(da.behavior)));
     }
 
     /// <summary>
@@ -589,14 +589,14 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         simpleAnim.name = "Simple Anim 1";
         ret.animations.Add(simpleAnim);
 
-        EditBehavior behavior = new EditBehavior();
-        behavior.rules.Add(new EditRule(new List<EditAction>()
+        EditProfile profile = new EditProfile();
+        profile.rules.Add(new EditRule(new List<EditAction>()
         {
             new EditActionPlayAnimation() { animation = simpleAnim, faceIndex = 0, loopCount = 1 }
         }) {
             condition = new EditConditionRolling(),
         });
-        behavior.rules.Add(new EditRule(new List<EditAction>()
+        profile.rules.Add(new EditRule(new List<EditAction>()
         {
             new EditActionPlayAnimation() { animation = simpleAnim, faceIndex = 19, loopCount = 1 }
         }) {
@@ -606,7 +606,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
                 flags = ConditionFaceCompare_Flags.Equal
             },
         });
-        behavior.rules.Add(new EditRule(new List<EditAction>()
+        profile.rules.Add(new EditRule(new List<EditAction>()
         {
             new EditActionPlayAnimation() { animation = simpleAnim, faceIndex = 2, loopCount = 1 }
         }) {
@@ -616,7 +616,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
                 flags = ConditionFaceCompare_Flags.Less | ConditionFaceCompare_Flags.Equal | ConditionFaceCompare_Flags.Greater
             },
         });
-        ret.behaviors.Add(behavior);
+        ret.profiles.Add(profile);
 
         ret.presets.Add(new EditPreset()
         {
@@ -626,12 +626,12 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
                 new EditDieAssignment()
                 {
                     die = die0,
-                    behavior = behavior
+                    behavior = profile
                 },
                 new EditDieAssignment()
                 {
                     die = die1,
-                    behavior = behavior
+                    behavior = profile
                 }
             }
         });

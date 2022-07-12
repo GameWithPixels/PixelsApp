@@ -12,7 +12,7 @@ namespace Presets
         : EditObject
     {
         public EditDie die;
-        public EditBehavior behavior;
+        public EditProfile behavior;
     }
 
     class EditDieAssignmentConverter
@@ -33,7 +33,7 @@ namespace Presets
             else
                 serializer.Serialize(writer, (ulong)0);
             writer.WritePropertyName("behaviorIndex");
-            serializer.Serialize(writer, dataSet.behaviors.IndexOf(value.behavior));
+            serializer.Serialize(writer, dataSet.profiles.IndexOf(value.behavior));
             writer.WriteEndObject();
         }
 
@@ -47,8 +47,8 @@ namespace Presets
             var systemId = jsonObject["systemId"]?.ToObject<string>();
             ret.die = dataSet.GetEditDie(systemId);
             int behaviorIndex = jsonObject["behaviorIndex"].Value<int>();
-            if (behaviorIndex >= 0 && behaviorIndex < dataSet.behaviors.Count)
-                ret.behavior = dataSet.behaviors[behaviorIndex];
+            if (behaviorIndex >= 0 && behaviorIndex < dataSet.profiles.Count)
+                ret.behavior = dataSet.profiles[behaviorIndex];
             else
                 ret.behavior = null;
             return ret;
@@ -78,20 +78,20 @@ namespace Presets
             };
         }
 
-        public void DeleteBehavior(EditBehavior behavior)
+        public void DeleteProfile(EditProfile profile)
         {
             foreach (var ass in dieAssignments)
             {
-                if (ass.behavior == behavior)
+                if (ass.behavior == profile)
                 {
                     ass.behavior = null;
                 }
             }
         }
 
-        public bool DependsOnBehavior(EditBehavior behavior)
+        public bool DependsOnProfile(EditProfile profile)
         {
-            return dieAssignments.Any(d => d.behavior == behavior);
+            return dieAssignments.Any(d => d.behavior == profile);
         }
 
         public void DeleteDie(EditDie die)

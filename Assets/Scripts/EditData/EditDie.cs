@@ -14,7 +14,7 @@ public class EditDie
     public int currentBehaviorIndex;
 
     [JsonIgnore]
-    public EditBehavior currentBehavior;
+    public EditProfile currentBehavior;
 
     [JsonIgnore]
     public Pixel die { get; private set; }
@@ -43,13 +43,13 @@ public class EditDie
 
     public void OnBeforeSerialize()
     {
-        currentBehaviorIndex = AppDataSet.Instance.behaviors.IndexOf(currentBehavior);
+        currentBehaviorIndex = AppDataSet.Instance.profiles.IndexOf(currentBehavior);
     }
 
     public void OnAfterDeserialize()
     {
-        if (currentBehaviorIndex >= 0 && currentBehaviorIndex < AppDataSet.Instance.behaviors.Count)
-            currentBehavior = AppDataSet.Instance.behaviors[currentBehaviorIndex];
+        if (currentBehaviorIndex >= 0 && currentBehaviorIndex < AppDataSet.Instance.profiles.Count)
+            currentBehavior = AppDataSet.Instance.profiles[currentBehaviorIndex];
         else
             currentBehavior = null;
     }

@@ -19,7 +19,7 @@ public class UIBehaviorPickerBehaviorToken : MonoBehaviour
     public Color defaultFrameColor;
     public Color selectedColor;
 
-    public EditBehavior editBehavior { get; private set; }
+    public EditProfile editBehavior { get; private set; }
     public SingleDiceRenderer dieRenderer { get; private set; }
     public bool selected { get; private set; }
 
@@ -27,9 +27,9 @@ public class UIBehaviorPickerBehaviorToken : MonoBehaviour
 
     bool visible = true;
 
-    public void Setup(EditBehavior behavior)
+    public void Setup(EditProfile profile)
     {
-        this.editBehavior = behavior;
+        this.editBehavior = profile;
         this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(editBehavior.defaultPreviewSettings.design);
         if (dieRenderer != null)
         {
@@ -38,8 +38,8 @@ public class UIBehaviorPickerBehaviorToken : MonoBehaviour
             dieRenderer.SetAnimations(this.editBehavior.CollectAnimations());
             dieRenderer.Play(true);
         }
-        nameText.text = behavior.name;
-        descriptionText.text = behavior.description;
+        nameText.text = profile.name;
+        descriptionText.text = profile.description;
         SetSelected(false);
     }
 

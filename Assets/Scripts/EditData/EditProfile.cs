@@ -6,7 +6,7 @@ using Systemic.Unity.Pixels.Animations;
 using Systemic.Unity.Pixels.Profiles;
 
 [System.Serializable]
-public class EditBehavior
+public class EditProfile
     : EditObject
 {
     public string name;
@@ -15,7 +15,7 @@ public class EditBehavior
 
     public readonly PreviewSettings defaultPreviewSettings = new PreviewSettings() { design = PixelDesignAndColor.V5_Grey };
 
-    public EditBehavior(List<EditRule> rules = null)
+    public EditProfile(List<EditRule> rules = null)
     {
         this.rules = rules ?? new List<EditRule>();
     }
@@ -37,9 +37,9 @@ public class EditBehavior
         };
     }
 
-    public EditBehavior Duplicate()
+    public EditProfile Duplicate()
     {
-        return new EditBehavior(rules.Select(r => r.Duplicate()).ToList())
+        return new EditProfile(rules.Select(r => r.Duplicate()).ToList())
         {
             name = name,
             description = description,

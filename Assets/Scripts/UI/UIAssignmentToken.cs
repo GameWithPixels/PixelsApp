@@ -73,7 +73,7 @@ public class UIAssignmentToken : MonoBehaviour
         }
     }
 
-    void OnBehaviorSelected(bool result, EditBehavior newBehavior)
+    void OnBehaviorSelected(bool result, EditProfile newBehavior)
     {
         if (result && newBehavior != editAssignment.behavior)
         {

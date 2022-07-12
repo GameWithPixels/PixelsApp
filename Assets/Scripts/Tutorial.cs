@@ -163,7 +163,7 @@ public class Tutorial : SingletonMonoBehaviour<Tutorial>
                                     d => new Presets.EditDieAssignment
                                     {
                                         die = d,
-                                        behavior = AppDataSet.Instance.behaviors?.FirstOrDefault(),
+                                        behavior = AppDataSet.Instance.profiles?.FirstOrDefault(),
                                     }).ToList();
 
                                 poolTutorialRoot.gameObject.SetActive(true);

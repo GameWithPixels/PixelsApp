@@ -68,7 +68,7 @@ public class UIHomePage
         dismissMessagesButton.onClick.AddListener(CloseWhatsNew);
         editPresetsButton.onClick.AddListener(() => NavigationManager.Instance.GoToRoot(UIPage.PageId.Presets));
         editProfilesButton.onClick.AddListener(() => NavigationManager.Instance.GoToRoot(UIPage.PageId.Behaviors));
-        PixelsApp.Instance.onDieBehaviorUpdatedEvent += (_, __) => UpdatePresetAndBehaviorStatuses();
+        PixelsApp.Instance.onDieProfileUpdatedEvent += (_, __) => UpdatePresetAndProfileStatuses();
     }
 
     UIHomePresetToken CreatePresetToken(EditPreset preset)
@@ -92,7 +92,7 @@ public class UIHomePage
         GameObject.Destroy(die.gameObject);
     }
 
-    UIHomeBehaviorToken CreateBehaviorToken(EditBehavior behavior)
+    UIHomeBehaviorToken CreateBehaviorToken(EditProfile profile)
     {
         // Create the gameObject
         var ret = GameObject.Instantiate<UIHomeBehaviorToken>(behaviorTokenPrefab, Vector3.zero, Quaternion.identity, behaviorsRoot.transform);
@@ -100,11 +100,11 @@ public class UIHomePage
         // When we click on the pattern main button, go to the edit page
         ret.onClick.AddListener(() =>
         {
-            ActivateBehavior(behavior);
+            ActivateBehavior(profile);
         });
 
         // Initialize it
-        ret.Setup(behavior);
+        ret.Setup(profile);
         return ret;
     }
 
@@ -143,7 +143,7 @@ public class UIHomePage
 
         // Assume all behaviors will be destroyed
         var toDestroy2 = new List<UIHomeBehaviorToken>(behaviors);
-        foreach (var behavior in AppDataSet.Instance.behaviors)
+        foreach (var behavior in AppDataSet.Instance.profiles)
         {
             int prevIndex = toDestroy2.FindIndex(a => a.editBehavior == behavior);
             if (prevIndex == -1)
@@ -165,7 +165,7 @@ public class UIHomePage
             DestroyBehaviorToken(uibehavior);
         }
 
-        UpdatePresetAndBehaviorStatuses();
+        UpdatePresetAndProfileStatuses();
     }
 
     void ActivatePreset(Presets.EditPreset editPreset)
@@ -184,20 +184,20 @@ public class UIHomePage
                     {
                         if (res2)
                         {
-                            UpdatePresetAndBehaviorStatuses();
+                            UpdatePresetAndProfileStatuses();
                         }
                     });
                 }
             });
     }
 
-    void ActivateBehavior(EditBehavior behavior)
+    void ActivateBehavior(EditProfile profile)
     {
-        PixelsApp.Instance.ActivateBehavior(behavior, (die, res) =>
+        PixelsApp.Instance.ActivateBehavior(profile, (die, res) =>
         {
             if (res)
             {
-                UpdatePresetAndBehaviorStatuses();
+                UpdatePresetAndProfileStatuses();
             }
         });
     }
@@ -208,7 +208,7 @@ public class UIHomePage
         AppSettings.Instance.SetDisplayWhatsNew(false);
     }
 
-    void UpdatePresetAndBehaviorStatuses()
+    void UpdatePresetAndProfileStatuses()
     {
         foreach (var uipresetToken in presets)
         {

@@ -18,7 +18,7 @@ public class UIHomeBehaviorToken : MonoBehaviour
     [Header("Prefabs")]
     public UIHomeConnectedDieToken connectedDiePrefab;
 
-    public EditBehavior editBehavior { get; private set; }
+    public EditProfile editBehavior { get; private set; }
     public SingleDiceRenderer dieRenderer { get; private set; }
 
     public Button.ButtonClickedEvent onClick => mainButton.onClick;
@@ -27,15 +27,15 @@ public class UIHomeBehaviorToken : MonoBehaviour
 
     bool visible = true;
 
-    public void Setup(EditBehavior behavior)
+    public void Setup(EditProfile profile)
     {
-        this.editBehavior = behavior;
-        this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(behavior.defaultPreviewSettings.design);
+        this.editBehavior = profile;
+        this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(profile.defaultPreviewSettings.design);
         if (dieRenderer != null)
         {
             behaviorRenderImage.texture = dieRenderer.renderTexture;
         }
-        behaviorNameText.text = behavior.name;
+        behaviorNameText.text = profile.name;
 
         dieRenderer.SetAuto(true);
         dieRenderer.SetAnimations(this.editBehavior.CollectAnimations());

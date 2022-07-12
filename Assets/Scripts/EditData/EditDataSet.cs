@@ -16,11 +16,11 @@ public class EditDataSet
     public readonly List<EditPattern> patterns = new List<EditPattern>();
     public readonly List<EditPattern> rgbPatterns = new List<EditPattern>();
     public readonly List<EditAnimation> animations = new List<EditAnimation>();
-    public readonly EditBehavior profile;
+    public readonly EditProfile profile;
 
-    public EditDataSet(EditBehavior profile = null)
+    public EditDataSet(EditProfile profile = null)
     {
-        this.profile = profile ?? new EditBehavior();
+        this.profile = profile ?? new EditProfile();
     }
 
     public int getPatternTrackOffset(EditPattern pattern)

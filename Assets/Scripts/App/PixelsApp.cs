@@ -25,8 +25,8 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
     public UIPatternPicker patternPicker;
     public UIAudioClipPicker audioClipPicker;
 
-    public delegate void OnDieBehaviorUpdatedEvent(EditDie die, EditBehavior behavior);
-    public OnDieBehaviorUpdatedEvent onDieBehaviorUpdatedEvent;
+    public delegate void OnDieProfileUpdatedEvent(EditDie die, EditProfile profile);
+    public OnDieProfileUpdatedEvent onDieProfileUpdatedEvent;
 
     [Header("Controls")]
     public UIMainMenu mainMenu;
@@ -81,7 +81,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         return ret;
     }
 
-    public bool ShowBehaviorPicker(string title, EditBehavior previousBehavior, System.Action<bool, EditBehavior> closeAction)
+    public bool ShowBehaviorPicker(string title, EditProfile previousBehavior, System.Action<bool, EditProfile> closeAction)
     {
         bool ret = !behaviorPicker.isShown;
         if (ret)
@@ -311,15 +311,15 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         }
     }
 
-    public void ActivateBehavior(EditBehavior behavior, System.Action<EditDie, bool> callback = null)
+    public void ActivateBehavior(EditProfile profile, System.Action<EditDie, bool> callback = null)
     {
         // Select the die
         ShowDiePicker("Select Die", null, null, (res, selectedDie) =>
         {
             if (res)
             {
-                // Attempt to activate the behavior on the die
-                UploadBehavior(behavior, selectedDie, (res2) =>
+                // Attempt to activate the profile on the die
+                UploadProfile(profile, selectedDie, (res2) =>
                 {
                     callback?.Invoke(selectedDie, res2);
                 });
@@ -332,7 +332,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         UpdateDieDataSet(editDieAssignment.behavior, editDieAssignment.die, callback);
     }
 
-    public void UpdateDieDataSet(EditBehavior behavior, EditDie editDie, System.Action<bool> callback = null)
+    public void UpdateDieDataSet(EditProfile profile, EditDie editDie, System.Action<bool> callback = null)
     {
         // Make sure the die is ready!
         ShowProgrammingBox($"Connecting to {editDie.name}...");
@@ -341,7 +341,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         {
             if (gameObject.activeInHierarchy)
             {
-                // Upload the behavior data
+                // Upload the profile data
                 StartCoroutine(UploadCr());
 
                 IEnumerator UploadCr()
@@ -353,7 +353,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                     try
                     {
                         // The die is ready to be uploaded to
-                        var dataSet = AppDataSet.Instance.ExtractEditSetForProfile(behavior).ToDataSet();
+                        var dataSet = AppDataSet.Instance.ExtractEditSetForProfile(profile).ToDataSet();
 
                         // Get the hash directly from the die
                         yield return editDie.die.UpdateInfoAsync((res, err) => (success, error) = (res, err));
@@ -396,8 +396,8 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                                         }
                                         else
                                         {
-                                            editDie.currentBehavior = behavior;
-                                            onDieBehaviorUpdatedEvent?.Invoke(editDie, editDie.currentBehavior);
+                                            editDie.currentBehavior = profile;
+                                            onDieProfileUpdatedEvent?.Invoke(editDie, editDie.currentBehavior);
                                             success = true;
                                         }
                                     }
@@ -415,7 +415,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                             {
                                 Debug.Log($"Die {editDie.name} already has preset with hash 0x{hash:X8} programmed");
                                 errorTitle = "Profile already Programmed";
-                                error = $"Die {editDie.name} already has profile \"{behavior.name}\" programmed";
+                                error = $"Die {editDie.name} already has profile \"{profile.name}\" programmed";
                                 success = true;
                             }
                         }
@@ -434,7 +434,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                     {
                         if (!success)
                         {
-                            Debug.LogError($"Error sending data set {behavior.name} to die {editDie.name}: {errorTitle}, {error}");
+                            Debug.LogError($"Error sending data set {profile.name} to die {editDie.name}: {errorTitle}, {error}");
                         }
 
                         // We may still have a message to show even if the operation was successful
@@ -490,9 +490,9 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         }
     }
 
-    public void UploadBehavior(EditBehavior behavior, EditDie die, System.Action<bool> callback = null)
+    public void UploadProfile(EditProfile profile, EditDie die, System.Action<bool> callback = null)
     {
-        UpdateDieDataSet(behavior, die, (res) =>
+        UpdateDieDataSet(profile, die, (res) =>
         {
             if (res)
             {
@@ -808,7 +808,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         {
             if (editDie.currentBehavior != null)
             {
-                onDieBehaviorUpdatedEvent?.Invoke(editDie, editDie.currentBehavior);
+                onDieProfileUpdatedEvent?.Invoke(editDie, editDie.currentBehavior);
             }
         }
     }

@@ -43,11 +43,11 @@ public class UIMainMenu : MonoBehaviour
         disableOnDeviceButton.onClick.AddListener(() =>
         {
             Hide();
-            if (AppDataSet.Instance.defaultBehavior == null)
+            if (AppDataSet.Instance.defaultProfile == null)
             {
-                AppDataSet.Instance.defaultBehavior = new EditBehavior();
+                AppDataSet.Instance.defaultProfile = new EditProfile();
             }
-            GoToPage(UIPage.PageId.Behavior, AppDataSet.Instance.defaultBehavior);
+            GoToPage(UIPage.PageId.Behavior, AppDataSet.Instance.defaultProfile);
         });
         importPatternButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.ImportPattern(); });
         restoreSettingsButton.onClick.AddListener(() => { Hide(); PixelsApp.Instance.RestoreDefaultSettings(); });

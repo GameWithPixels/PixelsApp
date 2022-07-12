@@ -27,7 +27,7 @@ public class UIBehaviorToken : MonoBehaviour
     public Sprite backgroundSprite;
     public Sprite expandedSprite;
 
-    public EditBehavior editBehavior { get; private set; }
+    public EditProfile editBehavior { get; private set; }
     public SingleDiceRenderer dieRenderer { get; private set; }
 
     public Button.ButtonClickedEvent onClick => mainButton.onClick;
@@ -42,7 +42,7 @@ public class UIBehaviorToken : MonoBehaviour
     bool visible = true;
 
 
-    public void Setup(EditBehavior bh)
+    public void Setup(EditProfile bh)
     {
         this.editBehavior = bh;
         this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(bh.defaultPreviewSettings.design);

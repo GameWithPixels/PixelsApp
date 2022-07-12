@@ -13,14 +13,14 @@ public class ActiveBehaviorMonitor : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        PixelsApp.Instance.onDieBehaviorUpdatedEvent += OnBehaviorDownloadedEvent;
+        PixelsApp.Instance.onDieProfileUpdatedEvent += OnProfileDownloadedEvent;
     }
 
-    void OnBehaviorDownloadedEvent(EditDie editDie, EditBehavior behavior)
+    void OnProfileDownloadedEvent(EditDie editDie, EditProfile profile)
     {
         // Check whether we should stay connected to some of the dice
         var toDisconnect = new List<EditDie>(connectedDice);
-        if (behavior.CollectAudioClips().Any())
+        if (profile.CollectAudioClips().Any())
         {
             // This die assignment uses a behavior that has audio clips, so stay connected to the die
             if (connectedDice.Contains(editDie))
