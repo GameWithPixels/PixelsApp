@@ -353,7 +353,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                     try
                     {
                         // The die is ready to be uploaded to
-                        var dataSet = behavior.ToEditSet().ToDataSet();
+                        var dataSet = AppDataSet.Instance.ExtractEditSetForProfile(behavior).ToDataSet();
 
                         // Get the hash directly from the die
                         yield return editDie.die.UpdateInfoAsync((res, err) => (success, error) = (res, err));
