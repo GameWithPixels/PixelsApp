@@ -246,6 +246,7 @@ GameObject:
   - component: {fileID: 4981382673408412107}
   - component: {fileID: 8752008037728677858}
   - component: {fileID: 2591575801196377080}
+  - component: {fileID: 7822004449926207225}
   m_Layer: 5
   m_Name: Disconnect
   m_TagString: Untagged
@@ -382,6 +383,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7822004449926207225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3047318270367708950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabledColor: {r: 0.3064935, g: 0.3220779, b: 0.4, a: 0.69803923}
+  menuText: {fileID: 980779028608882265}
+  menuIcon: {fileID: 5604536496129430469}
 --- !u!1 &3163808451211717118
 GameObject:
   m_ObjectHideFlags: 0
@@ -539,7 +555,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3163808451211717118}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
   m_Name: 
@@ -1520,6 +1536,7 @@ GameObject:
   - component: {fileID: 6405598939494771328}
   - component: {fileID: 3314541903339357364}
   - component: {fileID: 4586153783329675193}
+  - component: {fileID: 3782611716416614482}
   m_Layer: 5
   m_Name: Forget Die
   m_TagString: Untagged
@@ -1656,6 +1673,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3782611716416614482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6405598939494771334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabledColor: {r: 0.3064935, g: 0.3220779, b: 0.4, a: 0.69803923}
+  menuText: {fileID: 5741875876623413121}
+  menuIcon: {fileID: 5741875877191216475}
 --- !u!1 &6405598939608825417
 GameObject:
   m_ObjectHideFlags: 0
@@ -2519,7 +2551,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6405598941077064071}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
   m_Name: 
@@ -2684,7 +2716,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6405598941288236727}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
   m_Name: 
@@ -2705,6 +2737,7 @@ GameObject:
   - component: {fileID: 8084991968941947473}
   - component: {fileID: 3060993706749846190}
   - component: {fileID: 509640138681156464}
+  - component: {fileID: 5981841630967721804}
   m_Layer: 5
   m_Name: Flash
   m_TagString: Untagged
@@ -2841,6 +2874,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5981841630967721804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6739893673924064852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabledColor: {r: 0.3064935, g: 0.3220779, b: 0.4, a: 0.69803923}
+  menuText: {fileID: 1260748387938563139}
+  menuIcon: {fileID: 1174982147448342819}
 --- !u!1 &7398189661165948911
 GameObject:
   m_ObjectHideFlags: 0
@@ -3408,7 +3456,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9155582381126098599}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 543742228c814574b87435fcbc6619c7, type: 3}
   m_Name: 

@@ -70,7 +70,6 @@ public class UIPairedDieToken : MonoBehaviour
 
     void OnForget()
     {
-        OnToggle();
         PixelsApp.Instance.ShowDialogBox(
             "Forget " + die.name + "?",
             "Are you sure you want to remove it from your dice bag?",
@@ -112,7 +111,6 @@ public class UIPairedDieToken : MonoBehaviour
 
     void OnRename()
     {
-        OnToggle();
         if (die.die?.isReady ?? false)
         {
             var newName = Names.GetRandomName();
@@ -131,7 +129,6 @@ public class UIPairedDieToken : MonoBehaviour
 
     void OnCalibrate()
     {
-        OnToggle();
         if (die.die != null)
         {
             die.die.StartCalibration();
@@ -140,7 +137,6 @@ public class UIPairedDieToken : MonoBehaviour
 
     void OnSetDesign()
     {
-        OnToggle();
         if (die.die?.isReady ?? false)
         {
             PixelsApp.Instance.ShowEnumPicker("Select Design", die.designAndColor, (res, newDesign) =>
@@ -167,16 +163,14 @@ public class UIPairedDieToken : MonoBehaviour
 
     void OnPing()
     {
-        OnToggle();
         if (die.die?.isReady ?? false)
         {
-            StartCoroutine(die.die.BlinkLEDsAsync(Color.yellow, 3, null));
+            StartCoroutine(die.die.BlinkLEDsAsync(Color.yellow, 3));
         }
     }
 
     void OnReset()
     {
-        OnToggle();
         if (die.die?.isReady ?? false)
         {
             die.die.ResetParameters();
@@ -185,7 +179,6 @@ public class UIPairedDieToken : MonoBehaviour
 
     void OnDisconnect()
     {
-        OnToggle();
         if (die.die != null && !die.die.isAvailable)
         {
             DiceBag.DisconnectPixel(die.die, forceDisconnect: true);
@@ -194,16 +187,37 @@ public class UIPairedDieToken : MonoBehaviour
 
     IEnumerator RefreshInfo()
     {
+        var menuEntries = new[]
+        {
+            statsButton,
+            renameButton,
+            forgetButton,
+            resetButton,
+            calibrateButton,
+            setDesignButton,
+            pingButton,
+            disconnectButton
+        }
+        .Select(btn => btn.transform.GetComponent<PoolDieMenuEntry>())
+        .ToArray();
+
         while (true)
         {
+            bool ready = die.die?.isReady ?? false;
+            foreach (var e in menuEntries)
+            {
+                e.EnableMenuEntry(ready);
+            }
+
             // Die might be destroyed (-> null) or change state at any time
-            while (die.die?.isReady ?? false)
+            while (ready)
             {
                 // Fetch battery level
                 yield return die.die.UpdateBatteryLevelAsync();
 
                 // Fetch RSSI
-                if (die.die)
+                ready = die.die?.isReady ?? false;
+                if (ready)
                 {
                     yield return die.die.UpdateRssiAsync();
                     yield return new WaitForSeconds(3.0f);
