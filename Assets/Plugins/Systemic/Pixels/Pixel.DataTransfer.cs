@@ -242,7 +242,7 @@ namespace Systemic.Unity.Pixels
                 if (waitForMsg.Message.result != 0)
                 {
                     var data = dataSet.ToByteArray();
-                    Debug.Assert(data.Length == dataSet.ComputeDataSetDataSize());
+                    Debug.Assert(data.Length == dataSet.ComputeDataSetByteSize());
                     //StringBuilder hexdumpBuilder = new StringBuilder();
                     //for (int i = 0; i < data.Length; ++i)
                     //{
@@ -300,7 +300,7 @@ namespace Systemic.Unity.Pixels
             string name = SafeName;
 
             // Prepare the Pixel
-            var data = testAnimSet.ToTestAnimationByteArray();
+            var data = testAnimSet.ToSingleAnimationByteArray();
             uint hash = DataSet.ComputeHash(data);
             var prepareDie = new TransferTestAnimationSet
             {

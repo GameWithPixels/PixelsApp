@@ -72,7 +72,7 @@ namespace Systemic.Unity.Pixels
             };
 
             // Error message on timeout
-            const string _connectTimeoutErrorMessage = "Timeout trying to connect, Pixel may be out of range or turned off";
+            const string _connectTimeoutErrorMessage = "Timeout trying to connect, Pixel may be out of range, turned off or connected to another device";
 
             // The underlying BLE device
             Peripheral _peripheral;

@@ -129,15 +129,15 @@ namespace Systemic.Unity.Pixels.Animations
         public List<Profiles.Rule> rules = new List<Profiles.Rule>();
         public Profiles.Profile profile = null; //TODO null??
 
-        public int ComputeDataSetDataSize()
+        public int ComputeDataSetByteSize()
         {
             return animationBits.ComputeDataSize() +
                 roundUpTo4(animations.Count * Marshal.SizeOf<ushort>()) + // offsets
-                animations.Sum((anim) => Marshal.SizeOf(anim.GetType())) + // actual animations
+                animations.Sum((anim) => Marshal.SizeOf(anim.GetType())) + // animations data
                 roundUpTo4(conditions.Count * Marshal.SizeOf<ushort>()) + // offsets
-                conditions.Sum((cond) => Marshal.SizeOf(cond.GetType())) + // actual conditions
+                conditions.Sum((cond) => Marshal.SizeOf(cond.GetType())) + // conditions data
                 roundUpTo4(actions.Count * Marshal.SizeOf<ushort>()) + // offsets
-                actions.Sum((action) => Marshal.SizeOf(action.GetType())) + // actual actions
+                actions.Sum((action) => Marshal.SizeOf(action.GetType())) + // actions data
                 rules.Count * Marshal.SizeOf<Profiles.Rule>() +
                 Marshal.SizeOf<Profiles.Profile>();
         }
@@ -183,14 +183,15 @@ namespace Systemic.Unity.Pixels.Animations
         public ushort getRuleCount() => (ushort)rules.Count;
         public Profiles.Profile getProfile() => profile;
 
-        public byte[] ToTestAnimationByteArray()
+        public byte[] ToSingleAnimationByteArray()
         {
             Debug.Assert(animations.Count == 1);
             if (animationBits.palette.Count > 127)
             {
-                Debug.LogError("Profile has more than 127 colors: " + animationBits.palette.Count);
+                Debug.LogError("Palette has more than 127 colors: " + animationBits.palette.Count);
             }
 
+            // Compute size of animation bits + animation
             int size = animationBits.ComputeDataSize() + Marshal.SizeOf(animations[0].GetType());
             System.IntPtr ptr = Marshal.AllocHGlobal(size);
             for (int i = 0; i < size; ++i)
@@ -198,46 +199,39 @@ namespace Systemic.Unity.Pixels.Animations
                 Marshal.WriteByte(ptr + i, 0);
             }
 
+            // Copy animation bits
             System.IntPtr current = animationBits.WriteBytes(ptr);
+
+            // Copy animation
             Marshal.StructureToPtr(animations[0], current, false);
 
+            // Copy data to byte array
             byte[] ret = new byte[size];
             Marshal.Copy(ptr, ret, 0, size);
             Marshal.FreeHGlobal(ptr);
             return ret;
         }
 
-        public byte[] ToByteArray()
+        public byte[] ToAnimationsByteArray()
         {
+            Debug.Assert(animations.Count >= 1);
             if (animationBits.palette.Count > 127)
             {
-                Debug.LogError("Profile has more than 127 colors: " + animationBits.palette.Count);
+                Debug.LogError("Palette has more than 127 colors: " + animationBits.palette.Count);
             }
 
-            int size = ComputeDataSetDataSize();
+            // Compute size of animation bits + animations
+            int size = animationBits.ComputeDataSize() + Marshal.SizeOf(animations[0].GetType());
             System.IntPtr ptr = Marshal.AllocHGlobal(size);
             for (int i = 0; i < size; ++i)
             {
                 Marshal.WriteByte(ptr + i, 0);
             }
 
-            WriteBytes(ptr);
+            // Copy animation bits
+            System.IntPtr current = animationBits.WriteBytes(ptr);
 
-            byte[] ret = new byte[size];
-            Marshal.Copy(ptr, ret, 0, size);
-            Marshal.FreeHGlobal(ptr);
-
-            return ret;
-        }
-
-        public System.IntPtr WriteBytes(System.IntPtr ptr)
-        {
-            // Copy palette
-            System.IntPtr current = ptr;
-            current = animationBits.WriteBytes(current);
-
-            // Copy animations
-            // Offsets first
+            // Copy animations, offsets first
             short offset = 0;
             var currentCopy = current;
             foreach (var anim in animations)
@@ -257,8 +251,62 @@ namespace Systemic.Unity.Pixels.Animations
                 current += Marshal.SizeOf(anim.GetType());
             }
 
-            // Copy conditions
-            // Offsets first
+            // Copy data to byte array
+            byte[] ret = new byte[size];
+            Marshal.Copy(ptr, ret, 0, size);
+            Marshal.FreeHGlobal(ptr);
+            return ret;
+        }
+
+        public byte[] ToByteArray()
+        {
+            if (animationBits.palette.Count > 127)
+            {
+                Debug.LogError("Palette has more than 127 colors: " + animationBits.palette.Count);
+            }
+
+            int size = ComputeDataSetByteSize();
+            System.IntPtr ptr = Marshal.AllocHGlobal(size);
+            for (int i = 0; i < size; ++i)
+            {
+                Marshal.WriteByte(ptr + i, 0);
+            }
+            WriteBytes(ptr);
+
+            // Copy data to byte array
+            byte[] ret = new byte[size];
+            Marshal.Copy(ptr, ret, 0, size);
+            Marshal.FreeHGlobal(ptr);
+            return ret;
+        }
+
+        public System.IntPtr WriteBytes(System.IntPtr ptr)
+        {
+            // Copy animation bits
+            System.IntPtr current = ptr;
+            current = animationBits.WriteBytes(current);
+
+            // Copy animations, offsets first
+            short offset = 0;
+            var currentCopy = current;
+            foreach (var anim in animations)
+            {
+                Marshal.WriteInt16(current, offset);
+                current += Marshal.SizeOf<ushort>();
+                offset += (short)Marshal.SizeOf(anim.GetType());
+            }
+
+            // Round up to nearest multiple of 4
+            current = currentCopy + roundUpTo4(animations.Count * Marshal.SizeOf<ushort>());
+
+            // Then animations
+            foreach (var anim in animations)
+            {
+                Marshal.StructureToPtr(anim, current, false);
+                current += Marshal.SizeOf(anim.GetType());
+            }
+
+            // Copy conditions, offsets first
             offset = 0;
             currentCopy = current;
             foreach (var cond in conditions)
@@ -278,8 +326,7 @@ namespace Systemic.Unity.Pixels.Animations
                 current += Marshal.SizeOf(cond.GetType());
             }
 
-            // Copy actions
-            // Offsets first
+            // Copy actions, offsets first
             offset = 0;
             currentCopy = current;
             foreach (var action in actions)

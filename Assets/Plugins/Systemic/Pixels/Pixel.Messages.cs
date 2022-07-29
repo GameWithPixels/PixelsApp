@@ -191,16 +191,19 @@ namespace Systemic.Unity.Pixels
         /// </summary>
         /// <param name="color">The desired color for the LEDs.</param>
         /// <param name="count">The number of blinks.</param>
+        /// <param name="duration">Duration of the animation in seconds.</param>
         /// <param name="onResult">An optional callback that is called when the operation completes
         ///                        successfully (true) or not (false) with an error message.</param>
         /// <returns>An enumerator meant to be run as a coroutine.</returns>
-        public IEnumerator BlinkLEDsAsync(Color color, int count = 3, OperationResultCallback onResult = null)
+        public IEnumerator BlinkLEDsAsync(Color color, int count = 3, float duration = 1, float fade = 0.5f, OperationResultCallback onResult = null)
         {
             Color32 color32 = color;
             var msg = new Blink
             {
                 color = (uint)((color32.r << 16) + (color32.g << 8) + color32.b),
                 flashCount = (byte)count,
+                duration = (ushort)(1000 * duration),
+                fade = (byte)(255 * fade),
             };
             var op = new SendMessageAndWaitForResponseEnumerator<Blink, BlinkFinished>(this, msg);
             yield return op;

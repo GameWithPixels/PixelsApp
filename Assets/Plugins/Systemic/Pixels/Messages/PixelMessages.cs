@@ -255,7 +255,9 @@ namespace Systemic.Unity.Pixels.Messages
     {
         public MessageType type { get; set; } = MessageType.Blink;
         public byte flashCount;
+        public ushort duration;
         public uint color;
+        public byte fade;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
