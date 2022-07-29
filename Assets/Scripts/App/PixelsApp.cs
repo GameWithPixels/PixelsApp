@@ -269,8 +269,13 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
             if (calleeGameObject.activeInHierarchy)
             {
-                // Connect to dice that are scanned and available
-                var toConnect = dice.Where(ed => ed.die?.isAvailable ?? false).ToArray();
+                // Connect to dice that are scanned and available, notify for other dice
+                var toConnect = dice.Where(ed => ed.die).ToArray();
+                foreach (var editDie in dice.Except(toConnect))
+                {
+                    onFailed?.Invoke(editDie, "Pixel is unavailable, it may be out of range, turned off or connected to another device");
+                }
+
                 if (toConnect.Length > 0)
                 {
                     yield return DiceBag.ConnectPixels(toConnect.Select(ed => ed.die), () => !calleeGameObject.activeInHierarchy,
