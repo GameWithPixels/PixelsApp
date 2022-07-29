@@ -372,7 +372,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                             {
                                 // We need to upload the dataset first
                                 Debug.Log($"Uploading dataset to die {editDie.name}");
-                                var dataSetDataSize = dataSet.ComputeDataSetDataSize();
+                                var dataSetDataSize = dataSet.ComputeDataSetByteSize();
 
                                 Debug.Log($"Dataset size: {dataSetDataSize} bytes");
                                 UpdateProgrammingBox(0.0f, $"Uploading data to {editDie.name}...");
