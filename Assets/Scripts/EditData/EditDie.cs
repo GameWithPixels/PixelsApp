@@ -9,7 +9,7 @@ public class EditDie
     public string name;
     //public ulong deviceId;
     public string systemId;
-    public int faceCount; // Which kind of dice this is
+    public int ledCount; // Which kind of dice this is
     public PixelDesignAndColor designAndColor; // Physical look
     public int currentBehaviorIndex;
 
