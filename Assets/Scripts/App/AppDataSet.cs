@@ -101,7 +101,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
         {
             foreach (var assignement in pr.dieAssignments)
             {
-                if (string.IsNullOrEmpty(assignement.die.systemId))
+                if (assignement.die != null && string.IsNullOrEmpty(assignement.die.systemId))
                 {
                     assignement.die = null;
                 }
@@ -116,9 +116,13 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
 
     public EditDataSet ExtractEditSetForAnimation(EditAnimation animation)
     {
-        EditDataSet ret = new EditDataSet();
+        // The EditDataSet that will only contain the given animation and its patterns
+        var ret = new EditDataSet();
+
+        // Add the single animation we need
         ret.animations.Add(animation);
 
+        // Include all patterns used by the animations
         foreach (var pattern in patterns)
         {
             if (animation.DependsOnPattern(pattern, out bool asRGB))
@@ -144,7 +148,8 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             throw new System.ArgumentException(nameof(profile), "Profile not in AppDataSet");
         }
 
-        // Generate the data to be uploaded, based on a copy of the profile
+        // The EditDataSet that will only contain the animations and their patterns
+        // for the given profile
         var editSet = new EditDataSet(profile.Duplicate());
 
         // And add the animations that the given profile uses
@@ -190,8 +195,10 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             }
         }
 
+        // Copy our animations list to the resulting EditDataSet
         editSet.animations.AddRange(animations);
 
+        // Include all patterns used by the animations
         foreach (var pattern in patterns)
         {
             bool asRGB = false;
