@@ -241,12 +241,12 @@ namespace Systemic.Unity.Pixels
                         {
                             // Timeout sending message, we stop here (the call to base.MoveNext() will return false now)
                             IsTimeout = true;
-                            Error = $"Timeout while sending for message of type {typeof(TMsg)}";
+                            Error = $"Timeout while sending message of type {typeof(TMsg).Name}";
                         }
                         else
                         {
                             // Done sending message
-                            Error = $"Failed to send message of type {typeof(TMsg)}, {_sendMessage.Error}";
+                            Error = $"Failed to send message of type {typeof(TMsg).Name}, {_sendMessage.Error}";
                         }
                     }
                     _sendMessage = null;
