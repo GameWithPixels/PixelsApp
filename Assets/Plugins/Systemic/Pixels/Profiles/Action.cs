@@ -7,11 +7,8 @@ namespace Systemic.Unity.Pixels.Profiles
     /// </summary>
     public enum ActionType : byte
     {
-        //TODO [SkipEnumValue]
         Unknown = 0,
-        //TODO [Name("Trigger Pattern")]
         PlayAnimation,
-        //TODO [Name("Play Audio Clip")]
         PlayAudioClip,
     };
 

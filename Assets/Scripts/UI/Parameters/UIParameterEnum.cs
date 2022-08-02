@@ -9,11 +9,6 @@ public class SkipEnumValueAttribute
 {
 }
 
-public class AdvancedEnumValueAttribute
-    : System.Attribute
-{    
-}
-
 public class DropdowndAttribute
     : System.Attribute
 {
@@ -29,38 +24,50 @@ public class UIParameterEnum : UIParameter
 
     public static string GetNameAttribute(object enumVal, string fallback)
     {
-        var type = enumVal.GetType();
-        var memInfo = type.GetMember(enumVal.ToString());
-        var attributes = memInfo[0].GetCustomAttributes(typeof(NameAttribute), false);
-        return (attributes.Length > 0) ? ((NameAttribute)attributes[0]).name : fallback;
+        var nameAndOrder = EnumDisplayInfo.GetDisplayNameOf(enumVal);
+        if (nameAndOrder.HasValue)
+        {
+            return nameAndOrder.Value.Name;
+        }
+        else
+        {
+            var type = enumVal.GetType();
+            var memInfo = type.GetMember(enumVal.ToString());
+            var attributes = memInfo[0].GetCustomAttributes(typeof(NameAttribute), false);
+            return (attributes.Length > 0) ? ((NameAttribute)attributes[0]).name : fallback;
+        }
     }
 
     public static bool ShouldSkipValue(object enumVal)
     {
-        var type = enumVal.GetType();
-        var memInfo = type.GetMember(enumVal.ToString());
-        var skipAttribute = memInfo[0].GetCustomAttributes(typeof(SkipEnumValueAttribute), false);
-        if (skipAttribute.Length > 0)
+        var nameAndOrder = EnumDisplayInfo.GetDisplayNameOf(enumVal);
+        if (nameAndOrder.HasValue)
         {
-            return true;
+            return nameAndOrder.Value.Name == null;
         }
         else
         {
-            var advAttribute = memInfo[0].GetCustomAttributes(typeof(AdvancedEnumValueAttribute), false);
-            if (advAttribute.Length > 0 && Application.platform != RuntimePlatform.WindowsEditor)
-            {
-                return true;
-            }
+            var type = enumVal.GetType();
+            var memInfo = type.GetMember(enumVal.ToString());
+            var skipAttribute = memInfo[0].GetCustomAttributes(typeof(SkipEnumValueAttribute), false);
+            return skipAttribute.Length > 0;
         }
-        return false;
     }
 
     public static int? GetValueDisplayOrder(object enumVal)
     {
-        var type = enumVal.GetType();
-        var memInfo = type.GetMember(enumVal.ToString());
-        var orderAttribute = memInfo[0].GetCustomAttributes(typeof(DisplayOrderAttribute), false);
-        return (orderAttribute.FirstOrDefault() as DisplayOrderAttribute)?.Order;
+        var nameAndOrder = EnumDisplayInfo.GetDisplayNameOf(enumVal);
+        if (nameAndOrder.HasValue)
+        {
+            return nameAndOrder.Value.Order;
+        }
+        else
+        {
+            var type = enumVal.GetType();
+            var memInfo = type.GetMember(enumVal.ToString());
+            var orderAttribute = memInfo[0].GetCustomAttributes(typeof(DisplayOrderAttribute), false);
+            return (orderAttribute.FirstOrDefault() as DisplayOrderAttribute)?.Order;
+        }
     }
 
     public override bool CanEdit(System.Type parameterType, IEnumerable<object> attributes = null)

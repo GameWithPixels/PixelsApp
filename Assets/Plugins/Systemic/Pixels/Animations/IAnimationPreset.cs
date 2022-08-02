@@ -9,17 +9,11 @@ namespace Systemic.Unity.Pixels.Animations
     /// </summary>
     public enum AnimationType : byte
     {
-        //TODO [SkipEnumValue]
         Unknown = 0,
-        //TODO [Name("Simple Flashes")][DisplayOrder(0)]
         Simple,
-        //TODO [Name("Colorful Rainbow")][DisplayOrder(1)]
         Rainbow,
-        //TODO [Name("Color LED Pattern")][DisplayOrder(3)]
         Keyframed,
-        //TODO [Name("Gradient LED Pattern")][DisplayOrder(4)]
         GradientPattern,
-        //TODO [Name("Simple Gradient")][DisplayOrder(2)]
         Gradient,
     };
 

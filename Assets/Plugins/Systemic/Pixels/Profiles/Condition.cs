@@ -7,23 +7,14 @@ namespace Systemic.Unity.Pixels.Profiles
     /// </summary>
     public enum ConditionType : byte
     {
-        //TODO [SkipEnumValue]
         Unknown = 0,
-        //TODO [Name("Pixel wakes up / sleeps")]
         HelloGoodbye,
-        //TODO [Name("Pixel is picked up")]
         Handling,
-        //TODO [Name("Pixel is rolling")]
         Rolling,
-        //TODO [Name("Pixel roll is...")]
         FaceCompare,
-        //TODO [Name("Pixel is crooked")]
         Crooked,
-        //TODO [Name("Bluetooth Event...")]
         ConnectionState,
-        //TODO [Name("Battery Event...")]
         BatteryState,
-        //TODO [Name("Pixel is idle for...")]
         Idle,
     };
 
