@@ -97,12 +97,14 @@ public class UIPairedDieToken : MonoBehaviour
                         {
                             if (res2)
                             {
+                                OnToggle();
                                 PixelsApp.Instance.ForgetDie(die);
                             }
                         });
                     }
                     else
                     {
+                        OnToggle();
                         PixelsApp.Instance.ForgetDie(die);
                     }
                 }
@@ -181,6 +183,7 @@ public class UIPairedDieToken : MonoBehaviour
     {
         if (die.die != null && !die.die.isAvailable)
         {
+            OnToggle();
             DiceBag.DisconnectPixel(die.die, forceDisconnect: true);
         }
     }
@@ -199,11 +202,14 @@ public class UIPairedDieToken : MonoBehaviour
             disconnectButton
         }
         .Select(btn => btn.transform.GetComponent<PoolDieMenuEntry>())
+        .Where(e => e != null)
         .ToArray();
+
+        bool IsReady() => die.die?.isReady ?? false;
 
         while (true)
         {
-            bool ready = die.die?.isReady ?? false;
+            bool ready = IsReady();
             foreach (var e in menuEntries)
             {
                 e.EnableMenuEntry(ready);
@@ -216,11 +222,13 @@ public class UIPairedDieToken : MonoBehaviour
                 yield return die.die.UpdateBatteryLevelAsync();
 
                 // Fetch RSSI
-                ready = die.die?.isReady ?? false;
+                ready = IsReady();
                 if (ready)
                 {
                     yield return die.die.UpdateRssiAsync();
                     yield return new WaitForSeconds(3.0f);
+
+                    ready = IsReady();
                 }
             }
 
