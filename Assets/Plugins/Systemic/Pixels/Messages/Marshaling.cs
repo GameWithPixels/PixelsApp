@@ -298,20 +298,16 @@ namespace Systemic.Unity.Pixels.Messages
             return Encoding.UTF8.GetString(strData, 0, zeroIndex >= 0 ? zeroIndex : strSize);
         }
 
-        public static byte[] StringToBytes(string str, bool withZeroTerminator = false, int maxSize = -1)
+        public static byte[] StringToBytes(string str, int arraySize, bool withZeroTerminator = false)
         {
             if (withZeroTerminator)
             {
                 str += "\0";
             }
             byte[] bytes = Encoding.UTF8.GetBytes(str);
-            if (maxSize >= 0 && maxSize < bytes.Length)
-            {
-                byte[] lessBytes = new byte[maxSize];
-                System.Array.Copy(bytes, lessBytes, maxSize - (withZeroTerminator ? 1 : 0));
-                bytes = lessBytes;
-            }
-            return bytes;
+            byte[] outArray = new byte[arraySize];
+            System.Array.Copy(bytes, outArray, Mathf.Min(bytes.Length, arraySize - (withZeroTerminator ? 1 : 0)));
+            return outArray;
         }
 
         static readonly Dictionary<System.Type, MessageType> _messageTypes = new Dictionary<System.Type, MessageType>();

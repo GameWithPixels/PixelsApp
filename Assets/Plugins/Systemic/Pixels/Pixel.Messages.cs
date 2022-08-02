@@ -167,7 +167,7 @@ namespace Systemic.Unity.Pixels
         public IEnumerator RenameAsync(string name, OperationResultCallback onResult = null)
         {
             Debug.Log($"Pixel {SafeName}: Renaming to {name}");
-            var bytes = Marshaling.StringToBytes(name, true, SetName.NameMaxSize);
+            var bytes = Marshaling.StringToBytes(name, SetName.NameMaxSize, true);
             var op = new SendMessageAndWaitForResponseEnumerator<SetName, SetNameAck>(this, new SetName { name = bytes });
             yield return op;
             onResult?.Invoke(op.IsSuccess, op.Error);
