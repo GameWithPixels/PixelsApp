@@ -12,6 +12,7 @@ public class UIPairedDieView : MonoBehaviour
     [Header("Controls")]
     public RawImage dieRenderImage;
     public Text dieNameText;
+    public Text dieFaceText;
     public Text firmwareIDText;
     public UIDieLargeBatteryView batteryView;
     public UIDieLargeSignalView signalView;
@@ -81,12 +82,14 @@ public class UIPairedDieView : MonoBehaviour
             disconnectedTextRoot.gameObject.SetActive(false);
             errorTextRoot.gameObject.SetActive(false);
             firmwareIDText.text = "Firmware: Unavailable";
+            dieFaceText.text = "";
         }
         else
         {
             firmwareIDText.text = $"Firmware: {die.die.buildDateTime}";
             batteryView.SetLevel(die.die.batteryLevel, die.die.isCharging);
             signalView.SetRssi(die.die.rssi);
+            dieFaceText.text = $"Face {die.die.face + 1} up";
             switch (die.die.lastError)
             {
                 case PixelError.None:
@@ -201,6 +204,11 @@ public class UIPairedDieView : MonoBehaviour
         UpdateState();
     }
 
+    void OnRollStateChanged(Pixel pixel, PixelRollState rollState, int face)
+    {
+        UpdateState();
+    }
+
     void OnNameChanged(Pixel die, string newName)
     {
         this.die.name = die.name;
@@ -230,6 +238,7 @@ public class UIPairedDieView : MonoBehaviour
         die.die.AppearanceChanged += OnAppearanceChanged;
         die.die.BatteryLevelChanged += OnBatteryLevelChanged;
         die.die.RssiChanged += OnRssiChanged;
+        die.die.RollStateChanged += OnRollStateChanged;
 
         bool saveUpdatedData = false;
         if (die.designAndColor != die.die.designAndColor)
@@ -253,10 +262,11 @@ public class UIPairedDieView : MonoBehaviour
     void OnDieWillBeLost(EditDie editDie)
     {
         editDie.die.ConnectionStateChanged -= OnConnectionStateChanged;
+        editDie.die.ErrorEncountered -= OnError;
         editDie.die.AppearanceChanged -= OnAppearanceChanged;
         editDie.die.BatteryLevelChanged -= OnBatteryLevelChanged;
         editDie.die.RssiChanged -= OnRssiChanged;
-        editDie.die.ErrorEncountered -= OnError;
+        editDie.die.RollStateChanged -= OnRollStateChanged;
     }
 
     void Update()

@@ -12,6 +12,7 @@ public class UIDiscoveredDieView : MonoBehaviour
     public Image backgroundImage;
     public RawImage dieRenderImage;
     public Text dieNameText;
+    public Text dieFaceText;
     public UIDieLargeBatteryView batteryView;
     public UIDieLargeSignalView signalView;
     public Button selectButton;
@@ -43,6 +44,8 @@ public class UIDiscoveredDieView : MonoBehaviour
         signalView.SetRssi(die.rssi);
         die.BatteryLevelChanged += OnBatteryLevelChanged;
         die.RssiChanged += OnRssiChanged;
+        die.RollStateChanged += OnRollStateChanged;
+        SetFace(die.face);
         SetSelected(false);
     }
 
@@ -52,6 +55,11 @@ public class UIDiscoveredDieView : MonoBehaviour
         backgroundImage.sprite = selected ? backgroundSelectedSprite : backgroundUnselectedSprite;
         toggleImage.gameObject.SetActive(selected);
         onSelected?.Invoke(this, selected);
+    }
+
+    void SetFace(int face)
+    {
+        dieFaceText.text = $"Face {face + 1} up";
     }
 
     void Awake()
@@ -69,6 +77,7 @@ public class UIDiscoveredDieView : MonoBehaviour
     {
         die.BatteryLevelChanged -= OnBatteryLevelChanged;
         die.RssiChanged -= OnRssiChanged;
+        die.RollStateChanged -= OnRollStateChanged;
         if (this.dieRenderer != null)
         {
             DiceRendererManager.Instance.DestroyDiceRenderer(this.dieRenderer);
@@ -86,4 +95,8 @@ public class UIDiscoveredDieView : MonoBehaviour
         signalView.SetRssi(rssi);
     }
 
+    void OnRollStateChanged(Pixel pixel, PixelRollState rollState, int face)
+    {
+        SetFace(face);
+    }
 }

@@ -189,7 +189,7 @@ namespace Systemic.Unity.Pixels
         /// <summary>
         /// Event raised when the Pixel roll state changes.
         /// </summary>
-        public RollStateChangedEventHandler RollStateChanged;
+        public RollStateChangedEventHandler RollStateChanged; //TODO change to face number rather than index
 
         /// <summary>
         /// Event raised when the battery level reported by the Pixel changes.
@@ -404,7 +404,7 @@ namespace Systemic.Unity.Pixels
                     face = message.faceIndex;
 
                     // Notify
-                    RollStateChanged?.Invoke(this, rollState, face + 1);
+                    RollStateChanged?.Invoke(this, rollState, face);
                 }
             }
 
