@@ -33,6 +33,11 @@ public class SingleDiceRenderer : DiceRenderer
         dieCamera.targetTexture = renderTexture;
 
         // Instantiate the proper type of dice
+        if ((int)variant >= diceVariantPrefabs.Count)
+        {
+            Debug.LogError("Unsupported Pixel design value: " + variant);
+            variant = PixelDesignAndColor.Unknown;
+        }
         die = GameObject.Instantiate<DiceRendererDice>(diceVariantPrefabs[(int)variant], Vector3.zero, Quaternion.identity, dieRoot.transform);
     }
 

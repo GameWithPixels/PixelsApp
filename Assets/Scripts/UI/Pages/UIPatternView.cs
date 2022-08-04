@@ -180,7 +180,7 @@ public class UIPatternView
                 previewDie.die.SetLEDAnimatorMode();
                 yield return new WaitForSeconds(0.5f); //TODO add acknowledge from die instead
 
-                PixelsApp.Instance.ShowProgrammingBox("Uploading animation to " + name);
+                PixelsApp.Instance.ShowProgrammingBox("Uploading animation to " + previewDie.name);
 
                 string error = null;
                 try
