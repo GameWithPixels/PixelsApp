@@ -167,7 +167,7 @@ public class UIPairedDieToken : MonoBehaviour
     {
         if (die.die?.isReady ?? false)
         {
-            StartCoroutine(die.die.BlinkLEDsAsync(Color.yellow, 3));
+            StartCoroutine(die.die.BlinkLEDsAsync(Color.yellow / 3, 3));
         }
     }
 

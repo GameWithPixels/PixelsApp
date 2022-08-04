@@ -707,7 +707,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Flash
+  m_Text: Blink
 --- !u!1 &4396064523251597244
 GameObject:
   m_ObjectHideFlags: 0
@@ -2723,7 +2723,7 @@ GameObject:
   - component: {fileID: 509640138681156464}
   - component: {fileID: 5981841630967721804}
   m_Layer: 5
-  m_Name: Flash
+  m_Name: Blink
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
