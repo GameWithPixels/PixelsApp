@@ -89,7 +89,7 @@ public class UIPairedDieView : MonoBehaviour
             firmwareIDText.text = $"Firmware: {die.die.buildDateTime}";
             batteryView.SetLevel(die.die.batteryLevel, die.die.isCharging);
             signalView.SetRssi(die.die.rssi);
-            dieFaceText.text = $"Face {die.die.face + 1} up";
+            dieFaceText.text = die.die.face >= 0 ? $"Face {die.die.face + 1} up" : "";
             switch (die.die.lastError)
             {
                 case PixelError.None:

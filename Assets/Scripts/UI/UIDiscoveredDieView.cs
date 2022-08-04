@@ -59,7 +59,7 @@ public class UIDiscoveredDieView : MonoBehaviour
 
     void SetFace(int face)
     {
-        dieFaceText.text = $"Face {face + 1} up";
+        dieFaceText.text = face >= 0 ? $"Face {face + 1} up" : "";
     }
 
     void Awake()
