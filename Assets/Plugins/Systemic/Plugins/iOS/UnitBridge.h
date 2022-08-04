@@ -213,7 +213,7 @@ inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionar
     {
         [jsonStr appendString:@"\"manufacturerData\":["];
         std::uint8_t *bytes = (std::uint8_t *)manufacturerData.bytes;
-        uint16_t companyId = bytes[0] | ((uint16_t)bytes[1] << 8);
+        uint16_t companyId = bytes[1] | ((uint16_t)bytes[0] << 8);
         [jsonStr appendFormat:@"{\"companyId\":%d,", companyId];
         [jsonStr appendString:@"\"data\":"];
         appendToJsonStr(jsonStr, bytes, 2, manufacturerData.length - 2);

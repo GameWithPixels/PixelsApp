@@ -56,11 +56,11 @@ namespace Systemic.Unity.Pixels
             /// Older version of the CustomManufacturerData (was named CustomAdvertisingData in firmware code)
             /// </summary>
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
-            struct CustomAdvertisingData
+            struct OlderCustomAdvertisingData
             {
                 // Pixel type identification
-                public byte ledCount; // Number of LEDs
                 public PixelDesignAndColor designAndColor; // Physical look, also only 8 bits
+                public byte ledCount; // Number of LEDs
 
                 // Device ID
                 public uint pixelId;
@@ -137,7 +137,7 @@ namespace Systemic.Unity.Pixels
                 {
                     var manufDataSrc = _peripheral.ManufacturersData[0]; // Assume we want to use the first one
                     bool isManufData = manufDataSrc.Data.Count == Marshal.SizeOf(typeof(CustomManufacturerData));
-                    bool isOldAdvData = manufDataSrc.Data.Count == (Marshal.SizeOf(typeof(CustomAdvertisingData)) - 2);
+                    bool isOldAdvData = manufDataSrc.Data.Count == (Marshal.SizeOf(typeof(OlderCustomAdvertisingData)) - 2);
 
                     // Marshall the data into the struct we expect
                     if (isManufData || isOldAdvData)
@@ -178,12 +178,12 @@ namespace Systemic.Unity.Pixels
                         }
                         else
                         {
-                            int size = Marshal.SizeOf(typeof(CustomAdvertisingData));
+                            int size = Marshal.SizeOf(typeof(OlderCustomAdvertisingData));
 
                             // Copy data in a byte array for marshaling
                             var arr = new byte[size];
-                            arr[0] = (byte)(manufDataSrc.CompanyId & 0xFF);
-                            arr[1] = (byte)(manufDataSrc.CompanyId >> 8);
+                            arr[0] = (byte)(manufDataSrc.CompanyId & 0xFF); // designAndColor
+                            arr[1] = (byte)(manufDataSrc.CompanyId >> 8); // ledCount
                             for (int i = 2; i < size; ++i)
                             {
                                 arr[i] = manufDataSrc.Data[i - 2];
@@ -192,7 +192,7 @@ namespace Systemic.Unity.Pixels
                             // Marshal data to an object
                             var ptr = Marshal.AllocHGlobal(size);
                             Marshal.Copy(arr, 0, ptr, size);
-                            var advData = Marshal.PtrToStructure<CustomAdvertisingData>(ptr);
+                            var advData = Marshal.PtrToStructure<OlderCustomAdvertisingData>(ptr);
                             Marshal.FreeHGlobal(ptr);
 
                             manufData.ledCount = advData.ledCount;
