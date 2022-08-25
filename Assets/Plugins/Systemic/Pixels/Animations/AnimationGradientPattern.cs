@@ -134,7 +134,6 @@ namespace Systemic.Unity.Pixels.Animations
         public byte padding_type { get; set; } // to keep duration 16-bit aligned
         public ushort duration { get; set; } // in ms
 
-        public ushort speedMultiplier256; // A multiplier to the duration, scaled to 256
         public ushort tracksOffset; // offset into a global buffer of tracks
         public ushort trackCount;
         public ushort gradientTrackOffset;
@@ -179,6 +178,8 @@ namespace Systemic.Unity.Pixels.Animations
             int time = ms - startTime;
             var preset = getPreset();
 
+            int trackTime = time * 1000 / preset.duration;
+
             // Figure out the color from the gradient
             var gradient = animationBits.getRGBTrack(preset.gradientTrackOffset);
 
@@ -189,11 +190,8 @@ namespace Systemic.Unity.Pixels.Animations
             }
             else
             {
-                int gradientTime = time * 1000 / preset.duration;
-                gradientColor = gradient.evaluateColor(animationBits, gradientTime);
+                gradientColor = gradient.evaluateColor(animationBits, trackTime);
             }
-
-            int trackTime = time * 256 / preset.speedMultiplier256;
 
             // Each track will append its led indices and colors into the return array
             // The assumption is that led indices don't overlap between tracks of a single animation,

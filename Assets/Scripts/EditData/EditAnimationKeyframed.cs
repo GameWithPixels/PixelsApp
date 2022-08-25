@@ -54,22 +54,9 @@ public class EditRGBTrack
 public class EditAnimationKeyframed
     : EditAnimation
 {
-    public float speedMultiplier = 1.0f;
     [Slider, FloatRange(0.1f, 30.0f, 0.1f), Units("sec")]
-    public override float duration
-    {
-        get
-        {
-            return (pattern?.duration ?? 0) * speedMultiplier;
-        }
-        set
-        {
-            if (pattern != null)
-            {
-                speedMultiplier = value / pattern.duration;
-            }
-        }
-    }
+    public override float duration { get; set; }
+
     [RGBPattern, Name("LED Pattern")]
     public EditPattern pattern = new EditPattern();
     [Name("Traveling Order")]
@@ -98,7 +85,6 @@ public class EditAnimationKeyframed
         return new AnimationKeyframed
         {
             duration = (ushort)(duration * 1000), // stored in milliseconds
-            speedMultiplier256 = (ushort)(speedMultiplier * 256.0f),
             tracksOffset = (ushort)editSet.getPatternRGBTrackOffset(pattern),
             trackCount = (ushort)pattern.gradients.Count,
             flowOrder = flowOrder ? (byte)1 : (byte)0,
@@ -112,7 +98,6 @@ public class EditAnimationKeyframed
             name = name,
             pattern = pattern,
             flowOrder = flowOrder,
-            speedMultiplier = speedMultiplier,
             //hueAdjust = hueAdjust;
         };
     }
@@ -151,10 +136,8 @@ public class EditAnimationKeyframed
                 var patternIndex = dataSet.patterns.IndexOf(value.pattern);
                 writer.WritePropertyName("patternIndex");
                 serializer.Serialize(writer, patternIndex);
-                writer.WritePropertyName("speedMultiplier");
-                serializer.Serialize(writer, value.speedMultiplier);
-                //writer.WritePropertyName("duration");
-                //serializer.Serialize(writer, value.duration);
+                writer.WritePropertyName("duration");
+                serializer.Serialize(writer, value.duration);
                 //writer.WritePropertyName("hueAdjust");
                 //serializer.Serialize(writer, value.hueAdjust);
                 writer.WriteEndObject();
@@ -176,8 +159,9 @@ public class EditAnimationKeyframed
                     ret.pattern = dataSet.patterns[patternIndex];
                 else
                     ret.pattern = AppDataSet.Instance.AddNewDefaultPattern();
-                ret.speedMultiplier = jsonObject["speedMultiplier"].Value<float>();
-                //ret.duration = jsonObject["duration"].Value<float>();
+                //float speedMultiplier = jsonObject["speedMultiplier"].Value<float>();
+                //ret.duration = (ret.pattern?.duration ?? 0) * speedMultiplier;
+                ret.duration = jsonObject["duration"].Value<float>();
                 //ret.hueAdjust = jsonObject["hueAdjust"].Value<float>();
                 return ret;
             }

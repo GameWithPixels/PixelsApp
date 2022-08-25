@@ -167,7 +167,8 @@ public class EditPattern
     public Texture2D ToTexture()
     {
         Texture2D ret = null;
-        int width = Mathf.RoundToInt(duration / 0.02f);
+        float timeScale = 1000f / Constants.KeyframeTimeResolutionMs;
+        int width = Mathf.RoundToInt(duration * timeScale);
         int height = gradients.Count;
         if (width > 0 && height > 0)
         {
@@ -186,7 +187,7 @@ public class EditPattern
                 int x = 0, lastMax = 0;
                 for (int i = 1; i < currentGradient.keyframes.Count; ++i)
                 {
-                    int max = Mathf.RoundToInt(currentGradient.keyframes[i].time / 0.02f);
+                    int max = Mathf.RoundToInt(currentGradient.keyframes[i].time * timeScale);
                     for (; x < max; ++x)
                     {
                         Color prevColor = currentGradient.keyframes[i - 1].color;
@@ -205,7 +206,8 @@ public class EditPattern
     public Texture2D ToGreyscaleTexture()
     {
         Texture2D ret = null;
-        int width = Mathf.RoundToInt(duration / 0.02f);
+        float timeScale = 1000f / Constants.KeyframeTimeResolutionMs;
+        int width = Mathf.RoundToInt(duration * timeScale);
         int height = gradients.Count;
         if (width > 0 && height > 0)
         {
@@ -224,7 +226,7 @@ public class EditPattern
                 int x = 0, lastMax = 0;
                 for (int i = 1; i < currentGradient.keyframes.Count; ++i)
                 {
-                    int max = Mathf.RoundToInt(currentGradient.keyframes[i].time / 0.02f);
+                    int max = Mathf.RoundToInt(currentGradient.keyframes[i].time * timeScale);
                     for (; x < max; ++x)
                     {
                         float prevIntensity = ColorUtils.desaturate(currentGradient.keyframes[i - 1].color);

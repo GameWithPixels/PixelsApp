@@ -10,22 +10,9 @@ using Systemic.Unity.Pixels.Animations;
 public class EditAnimationGradientPattern
     : EditAnimation
 {
-    public float speedMultiplier = 1.0f;
     [Slider, FloatRange(0.1f, 30.0f, 0.1f), Units("sec")]
-    public override float duration
-    {
-        get
-        {
-            return (pattern?.duration ?? 0) * speedMultiplier;
-        }
-        set
-        {
-            if (pattern != null)
-            {
-                speedMultiplier = value / pattern.duration;
-            }
-        }
-    }
+    public override float duration { get; set; }
+
     [GreyscalePattern, Name("LED Pattern")]
     public EditPattern pattern = new EditPattern();
     [Gradient]
@@ -45,7 +32,6 @@ public class EditAnimationGradientPattern
         return new AnimationGradientPattern
         {
             duration = (ushort)(duration * 1000), // stored in milliseconds
-            speedMultiplier256 = (ushort)(speedMultiplier * 256.0f),
             tracksOffset = (ushort)editSet.getPatternTrackOffset(pattern),
             trackCount = (ushort)pattern?.gradients.Count,
             gradientTrackOffset = (ushort)gradientTrackOffset,
@@ -59,7 +45,6 @@ public class EditAnimationGradientPattern
         {
             name = name,
             pattern = pattern,
-            speedMultiplier = speedMultiplier,
             gradient = gradient?.Duplicate(),
             overrideWithFace = overrideWithFace,
         };
@@ -99,10 +84,8 @@ public class EditAnimationGradientPattern
                 var patternIndex = dataSet.patterns.IndexOf(value.pattern);
                 writer.WritePropertyName("patternIndex");
                 serializer.Serialize(writer, patternIndex);
-                writer.WritePropertyName("speedMultiplier");
-                serializer.Serialize(writer, value.speedMultiplier);
-                //writer.WritePropertyName("duration");
-                //serializer.Serialize(writer, value.duration);
+                writer.WritePropertyName("duration");
+                serializer.Serialize(writer, value.duration);
                 writer.WritePropertyName("gradient");
                 serializer.Serialize(writer, value.gradient);
                 writer.WritePropertyName("overrideWithFace");
@@ -126,8 +109,9 @@ public class EditAnimationGradientPattern
                     ret.pattern = dataSet.patterns[patternIndex];
                 else
                     ret.pattern = AppDataSet.Instance.AddNewDefaultPattern();
-                ret.speedMultiplier = jsonObject["speedMultiplier"].Value<float>();
-                //ret.duration = jsonObject["duration"].Value<float>();
+                //float speedMultiplier = jsonObject["speedMultiplier"].Value<float>();
+                //ret.duration = (ret.pattern?.duration ?? 0) * speedMultiplier;
+                ret.duration = jsonObject["duration"].Value<float>();
                 ret.gradient = jsonObject["gradient"].ToObject<EditRGBGradient>();
                 if (jsonObject["overrideWithFace"] != null)
                 {

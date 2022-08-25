@@ -1,7 +1,6 @@
 {
   "jsonVersion": 1,
-  "dice": [
-  ],
+  "dice": [],
   "audioClips": [
     {
       "name": "01",
@@ -75854,7 +75853,6 @@
       "data": {
         "name": "Rainbow Falls",
         "patternIndex": 4,
-        "speedMultiplier": 0.6827284,
         "duration": 2.03453064,
         "hueAdjust": 0.02202946
       }
@@ -76040,7 +76038,6 @@
       "data": {
         "name": "Waterfall",
         "patternIndex": 1,
-        "speedMultiplier": 0.474377543,
         "duration": 0.967730165,
         "gradient": {
           "keyframes": [
@@ -76108,7 +76105,6 @@
       "data": {
         "name": "Rolling Anim",
         "patternIndex": 18,
-        "speedMultiplier": 0.3265726,
         "duration": 0.6466137,
         "gradient": {
           "keyframes": [
@@ -76153,7 +76149,6 @@
       "data": {
         "name": "Flicker On",
         "patternIndex": 8,
-        "speedMultiplier": 1.93050194,
         "duration": 10.0,
         "gradient": {
           "keyframes": [
@@ -76261,7 +76256,6 @@
       "data": {
         "name": "Rotating Rings",
         "patternIndex": 6,
-        "speedMultiplier": 1.35816538,
         "duration": 6.763664,
         "hueAdjust": 0.0
       }
@@ -76271,7 +76265,6 @@
       "data": {
         "name": "Noise",
         "patternIndex": 9,
-        "speedMultiplier": 1.01833224,
         "duration": 2.01629782,
         "gradient": {
           "keyframes": [
@@ -76325,7 +76318,6 @@
       "data": {
         "name": "Rotating Ring",
         "patternIndex": 10,
-        "speedMultiplier": 0.764505863,
         "duration": 3.04273343,
         "gradient": {
           "keyframes": [
@@ -76406,7 +76398,6 @@
       "data": {
         "name": "Red to Green Rotation",
         "patternIndex": 11,
-        "speedMultiplier": 0.8658561,
         "duration": 3.44610739,
         "hueAdjust": -0.04506141
       }
@@ -76416,7 +76407,6 @@
       "data": {
         "name": "Trifold",
         "patternIndex": 12,
-        "speedMultiplier": 1.53111625,
         "duration": 3.03161,
         "hueAdjust": 0.0
       }
@@ -76426,7 +76416,6 @@
       "data": {
         "name": "Accelerating",
         "patternIndex": 13,
-        "speedMultiplier": 1.33666,
         "duration": 5.31990671,
         "gradient": {
           "keyframes": [
@@ -76507,7 +76496,6 @@
       "data": {
         "name": "Vertical Rotating Ring",
         "patternIndex": 14,
-        "speedMultiplier": 4.05520058,
         "duration": 3.9740963,
         "gradient": {
           "keyframes": [
@@ -76605,7 +76593,6 @@
       "data": {
         "name": "More Noise",
         "patternIndex": 15,
-        "speedMultiplier": 1.25923622,
         "duration": 5.01176,
         "gradient": {
           "keyframes": [
@@ -76659,7 +76646,6 @@
       "data": {
         "name": "Short Noise",
         "patternIndex": 16,
-        "speedMultiplier": 1.02600741,
         "duration": 1.0054872,
         "gradient": {
           "keyframes": [
@@ -76713,7 +76699,6 @@
       "data": {
         "name": "Very Short Noise",
         "patternIndex": 19,
-        "speedMultiplier": 3.63533068,
         "duration": 0.43623966,
         "gradient": {
           "keyframes": [
@@ -76758,7 +76743,6 @@
       "data": {
         "name": "Rainbow Noise",
         "patternIndex": 15,
-        "speedMultiplier": 0.873058,
         "duration": 3.474771,
         "gradient": {
           "keyframes": [
@@ -76875,7 +76859,6 @@
       "data": {
         "name": "Pastel Rainbow",
         "patternIndex": 17,
-        "speedMultiplier": 3.0,
         "duration": 3.0,
         "gradient": {
           "keyframes": [
@@ -77543,8 +77526,7 @@
       }
     }
   ],
-  "presets": [
-  ],
+  "presets": [],
   "defaultBehavior": {
     "name": null,
     "description": null,

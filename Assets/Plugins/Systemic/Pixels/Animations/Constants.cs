@@ -15,5 +15,7 @@ namespace Systemic.Unity.Pixels.Animations
 
         public const ushort PaletteColorFromFace = 127;
         public const ushort PaletteColorFromRandom = 126;
+
+        public const int KeyframeTimeResolutionMs = 2;
     }
 }

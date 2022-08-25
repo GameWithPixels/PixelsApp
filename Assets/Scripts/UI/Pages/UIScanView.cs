@@ -125,7 +125,7 @@ public class UIScanView
     {
         pairSelectedDice.onClick.RemoveListener(PairSelectedDice);
         pairSelectedDice.SetActive(false);
-        PixelsApp.Instance.AddDiscoveredDice(selectedDice.Select(d => d.die));
+        PixelsApp.Instance.AddDiscoveredDice(selectedDice.Select(d => d.die)); //TODO d.die might be null
         // Tell the navigation to go back to the pool, and then start connecting to the selected dice
         NavigationManager.Instance.GoBack();
     }

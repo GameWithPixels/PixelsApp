@@ -34,7 +34,8 @@ class ColorUtils
         }
 
         float computePixelTime(int pixelIndex) {
-            return (float)pixelIndex * 0.02f; // 0.02 is the smallest time increment in the keyframe data
+            // KeyframeTimeResolutionMs is the smallest time increment in the keyframe data
+            return (float)pixelIndex * Systemic.Unity.Pixels.Animations.Constants.KeyframeTimeResolutionMs * 0.001f;
         }
 
         // Always add the first color

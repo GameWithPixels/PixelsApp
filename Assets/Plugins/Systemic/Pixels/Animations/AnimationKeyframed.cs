@@ -139,7 +139,6 @@ namespace Systemic.Unity.Pixels.Animations
         public byte padding_type { get; set; } // to keep duration 16-bit aligned
         public ushort duration { get; set; } // in ms
 
-        public ushort speedMultiplier256;
         public ushort tracksOffset; // offset into a global buffer of tracks
         public ushort trackCount;
         public byte flowOrder; // boolean, if true the indices are led indices, not face indices
@@ -178,7 +177,7 @@ namespace Systemic.Unity.Pixels.Animations
             int time = ms - startTime;
             var preset = getPreset();
 
-            int trackTime = time * 256 / preset.speedMultiplier256;
+            int trackTime = time * 1000 / preset.duration;
 
             // Each track will append its led indices and colors into the return array
             // The assumption is that led indices don't overlap between tracks of a single animation,
