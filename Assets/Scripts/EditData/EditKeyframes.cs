@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using Systemic.Unity.Pixels.Animations;
 using Systemic.Unity.Pixels;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Simple animation keyframe, time in seconds and color!
@@ -61,9 +62,16 @@ public class EditRGBGradient
 {
     public List<EditRGBKeyframe> keyframes = new List<EditRGBKeyframe>();
 
+    [JsonIgnore]
     public bool empty => keyframes?.Count == 0;
+
+    [JsonIgnore]
     public float duration => keyframes.Count == 0 ? 0 : keyframes.Max(k => k.time);
+
+    [JsonIgnore]
     public float firstTime => keyframes.Count == 0 ? 0 : keyframes.First().time;
+
+    [JsonIgnore]
     public float lastTime => keyframes.Count == 0 ? 0 : keyframes.Last().time;
 
     public EditRGBGradient Duplicate()
@@ -90,6 +98,8 @@ public class EditPattern
 {
     public string name = "LED Pattern";
     public readonly List<EditRGBGradient> gradients = new List<EditRGBGradient>();
+
+    [JsonIgnore]
     public float duration => gradients.Count > 0 ? gradients.Max(g => g.duration) : 1.0f;
 
     public EditPattern Duplicate()
