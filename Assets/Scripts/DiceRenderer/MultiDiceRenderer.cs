@@ -40,7 +40,7 @@ public class MultiDiceRenderer : DiceRenderer
             {
                 var variant = variants[dieIndex];
                 var root = dieRoots[dieIndex];
-                var die = GameObject.Instantiate<DiceRendererDice>(diceVariantPrefabs[(int)variant], root.transform);
+                var die = GameObject.Instantiate<DiceRendererDice>(GetDieRenderer(variant), root.transform);
                 dice.Add(die);
             }
         }
