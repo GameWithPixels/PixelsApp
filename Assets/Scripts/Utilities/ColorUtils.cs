@@ -4,12 +4,12 @@ using UnityEngine;
 
 class ColorUtils
 {
-    public static float desaturate(Color color)
+    public static float Desaturate(Color color)
     {
         return  (Mathf.Min(color.r, Mathf.Min(color.g, color.b)) + Mathf.Max(color.r, Mathf.Max(color.g, color.b))) * 0.5f;
     }
 
-    public static float computeSqrColorDistance(Color color1, Color color2)
+    public static float ComputeSqrColorDistance(Color color1, Color color2)
     {
         return
             (color1.r - color2.r) * (color1.r - color2.r) +
@@ -18,7 +18,7 @@ class ColorUtils
     }
 
 
-    public static List<EditRGBKeyframe> extractKeyframes(Color[] pixels)
+    public static List<EditRGBKeyframe> ExtractKeyframes(Color[] pixels)
     {
         var ret = new List<EditRGBKeyframe>();
         
@@ -28,7 +28,7 @@ class ColorUtils
             float sumError = 0.0f;
             for (int i = firstIndex; i <= lastIndex; ++i) {
                 float pct = (float)(i - firstIndex) / (lastIndex - firstIndex);
-                sumError += computeSqrColorDistance(pixels[i], Color.Lerp(startColor, endColor, pct));
+                sumError += ComputeSqrColorDistance(pixels[i], Color.Lerp(startColor, endColor, pct));
             }
             return sumError;
         }

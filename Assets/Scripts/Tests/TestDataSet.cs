@@ -28,7 +28,7 @@ public class TestDataSet : MonoBehaviour
         byte[] fileData = File.ReadAllBytes(filePath);
         var tex = new Texture2D(2, 2);
         tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
-        var keyframes = ColorUtils.extractKeyframes(tex.GetPixels());
+        var keyframes = ColorUtils.ExtractKeyframes(tex.GetPixels());
         var gradient = new EditRGBGradient() { keyframes = keyframes };
         PixelsApp.Instance.ShowGradientEditor("test", gradient, null);
     }

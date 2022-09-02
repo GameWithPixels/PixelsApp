@@ -37,7 +37,7 @@ public class EditRGBKeyframe
     {
         SimpleKeyframe ret = new SimpleKeyframe();
         // Get the intensity from the color and scale
-        ret.setTimeAndIntensity(time, (byte)(ColorUtils.desaturate(color) * 255.0f));
+        ret.setTimeAndIntensity(time, (byte)(ColorUtils.Desaturate(color) * 255.0f));
         return ret;
     }
 
@@ -167,8 +167,7 @@ public class EditPattern
         for (int i = 0; i < texture.height; ++i)
         {
             var gradientPixels = texture.GetPixels(0, i, texture.width, 1, 0);
-            var keyframes = ColorUtils.extractKeyframes(gradientPixels);
-            // Convert to greyscale (right now us the red channel only)
+            var keyframes = ColorUtils.ExtractKeyframes(gradientPixels);
             var gradient = new EditRGBGradient() { keyframes = keyframes };
             gradients.Add(gradient);
         }
@@ -239,8 +238,8 @@ public class EditPattern
                     int max = Mathf.RoundToInt(currentGradient.keyframes[i].time * timeScale);
                     for (; x < max; ++x)
                     {
-                        float prevIntensity = ColorUtils.desaturate(currentGradient.keyframes[i - 1].color);
-                        float nextIntensity = ColorUtils.desaturate(currentGradient.keyframes[i].color);
+                        float prevIntensity = ColorUtils.Desaturate(currentGradient.keyframes[i - 1].color);
+                        float nextIntensity = ColorUtils.Desaturate(currentGradient.keyframes[i].color);
                         Color prevColor = new Color(prevIntensity, prevIntensity, prevIntensity);
                         Color nextColor = new Color(nextIntensity, nextIntensity, nextIntensity);
                         pixels[j * ret.width + x] = Color.Lerp(prevColor, nextColor, ((float)x - lastMax) / (max - lastMax));
