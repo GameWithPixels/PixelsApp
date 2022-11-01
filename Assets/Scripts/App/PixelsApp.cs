@@ -263,7 +263,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                 }
                 finally
                 {
-                    DiceBag.CancelScanning();
+                    DiceBag.StopScanning();
                 }
             }
 

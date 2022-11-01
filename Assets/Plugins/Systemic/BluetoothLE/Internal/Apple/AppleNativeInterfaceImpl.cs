@@ -123,19 +123,19 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
         private static extern void sgBleReadPeripheralRssi(string peripheralId, RssiReadEventCallback onRssiRead, RequestIndex requestIndex);
 
         [DllImport(_libName)]
-        private static extern string sgBleGetPeripheralDiscoveredServices(string peripheralId);
+        private static extern string sgBleGetDiscoveredServices(string peripheralId);
 
         [DllImport(_libName)]
-        private static extern string sgBleGetPeripheralServiceCharacteristics(string peripheralId, string serviceUuid);
+        private static extern string sgBleGetServiceCharacteristics(string peripheralId, string serviceUuid);
 
         [DllImport(_libName)]
         private static extern ulong sgBleGetCharacteristicProperties(string peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex);
 
         [DllImport(_libName)]
-        private static extern void sgBleReadCharacteristicValue(string peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, ValueReadCallback onReadChanged, RequestIndex requestIndex);
+        private static extern void sgBleReadCharacteristic(string peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, ValueReadCallback onReadChanged, RequestIndex requestIndex);
 
         [DllImport(_libName)]
-        private static extern void sgBleWriteCharacteristicValue(string peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, IntPtr data, UIntPtr length, bool withoutResponse, RequestStatusCallback onRequestStatus, RequestIndex requestIndex);
+        private static extern void sgBleWriteCharacteristic(string peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, IntPtr data, UIntPtr length, bool withoutResponse, RequestStatusCallback onRequestStatus, RequestIndex requestIndex);
 
         [DllImport(_libName)]
         private static extern void sgBleSetNotifyCharacteristic(string peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, ValueReadCallback onValueChanged, RequestStatusCallback onRequestStatus, RequestIndex requestIndex);
@@ -433,14 +433,14 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
             sgBleReadPeripheralRssi(GetPeripheralId(peripheralHandle), OnRssiReadHandler, requestIndex);
         }
 
-        public string GetPeripheralDiscoveredServices(INativePeripheralHandleImpl peripheralHandle)
+        public string GetDiscoveredServices(INativePeripheralHandleImpl peripheralHandle)
         {
-            return sgBleGetPeripheralDiscoveredServices(GetPeripheralId(peripheralHandle));
+            return sgBleGetDiscoveredServices(GetPeripheralId(peripheralHandle));
         }
 
-        public string GetPeripheralServiceCharacteristics(INativePeripheralHandleImpl peripheralHandle, string serviceUuid)
+        public string GetServiceCharacteristics(INativePeripheralHandleImpl peripheralHandle, string serviceUuid)
         {
-            return sgBleGetPeripheralServiceCharacteristics(GetPeripheralId(peripheralHandle), serviceUuid);
+            return sgBleGetServiceCharacteristics(GetPeripheralId(peripheralHandle), serviceUuid);
         }
 
         public CharacteristicProperties GetCharacteristicProperties(INativePeripheralHandleImpl peripheralHandle, string serviceUuid, string characteristicUuid, uint instanceIndex)
@@ -456,7 +456,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
                 _onValueReadHandlers.Add(requestIndex, onValueRead);
             }
 
-            sgBleReadCharacteristicValue(GetPeripheralId(peripheralHandle), serviceUuid, characteristicUuid, instanceIndex, OnValueReadHandler, requestIndex);
+            sgBleReadCharacteristic(GetPeripheralId(peripheralHandle), serviceUuid, characteristicUuid, instanceIndex, OnValueReadHandler, requestIndex);
             //TODO remove handler once value is read
         }
 
@@ -467,7 +467,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
             var (ptr, length) = UnmanagedBuffer.AllocUnmanagedBuffer(data);
             try
             {
-                sgBleWriteCharacteristicValue(GetPeripheralId(peripheralHandle), serviceUuid, characteristicUuid, instanceIndex, ptr, (UIntPtr)length, withoutResponse, OnRequestStatus, requestIndex);
+                sgBleWriteCharacteristic(GetPeripheralId(peripheralHandle), serviceUuid, characteristicUuid, instanceIndex, ptr, (UIntPtr)length, withoutResponse, OnRequestStatus, requestIndex);
             }
             finally
             {

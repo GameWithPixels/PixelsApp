@@ -300,7 +300,7 @@ void sgBleReadPeripheralRssi(peripheral_id_t peripheralId,
  * @remark The caller should free the returned string with a call to free(). <br>
  *         Unity marshaling takes care of it.
  */
-const char *sgBleGetPeripheralDiscoveredServices(peripheral_id_t peripheralId)
+const char *sgBleGetDiscoveredServices(peripheral_id_t peripheralId)
 {
     CBPeripheral *peripheral = getCBPeripheral(peripheralId);
     return allocateCStr(toUuidsString(peripheral.services));
@@ -318,8 +318,8 @@ const char *sgBleGetPeripheralDiscoveredServices(peripheral_id_t peripheralId)
  * @remark The caller should free the returned string with a call to free(). <br>
  *         Unity marshaling takes care of it.
  */
-const char *sgBleGetPeripheralServiceCharacteristics(peripheral_id_t peripheralId,
-                                                     const char* serviceUuid)
+const char *sgBleGetServiceCharacteristics(peripheral_id_t peripheralId,
+                                           const char* serviceUuid)
 {
     CBService *service = getService(peripheralId, serviceUuid);
     return allocateCStr(toUuidsString(service.characteristics));
@@ -367,12 +367,12 @@ characteristic_property_t sgBleGetCharacteristicProperties(peripheral_id_t perip
  *                    and with the data read from the characteristic.
  * @param requestIndex The index of this request, passed back when calling @p onRequestStatus.
  */
-void sgBleReadCharacteristicValue(peripheral_id_t peripheralId,
-                                  const char *serviceUuid,
-                                  const char *characteristicUuid,
-                                  characteristic_index_t instanceIndex,
-                                  ValueReadCallback onValueRead,
-                                  request_index_t requestIndex)
+void sgBleReadCharacteristic(peripheral_id_t peripheralId,
+                             const char *serviceUuid,
+                             const char *characteristicUuid,
+                             characteristic_index_t instanceIndex,
+                             ValueReadCallback onValueRead,
+                             request_index_t requestIndex)
 {
     SGBlePeripheralQueue *peripheral = getSGBlePeripheralQueue(peripheralId, onValueRead, requestIndex);
     [peripheral queueReadValueForCharacteristic:getCharacteristic(peripheralId, serviceUuid, characteristicUuid, instanceIndex)
@@ -396,15 +396,15 @@ void sgBleReadCharacteristicValue(peripheral_id_t peripheralId,
  * @param onRequestStatus Called when the request has completed (successfully or not).
  * @param requestIndex The index of this request, passed back when calling @p onRequestStatus.
  */
-void sgBleWriteCharacteristicValue(peripheral_id_t peripheralId,
-                                   const char *serviceUuid,
-                                   const char *characteristicUuid,
-                                   characteristic_index_t instanceIndex,
-                                   const void *data,
-                                   const size_t length,
-                                   bool withoutResponse,
-                                   RequestStatusCallback onRequestStatus,
-                                   request_index_t requestIndex)
+void sgBleWriteCharacteristic(peripheral_id_t peripheralId,
+                              const char *serviceUuid,
+                              const char *characteristicUuid,
+                              characteristic_index_t instanceIndex,
+                              const void *data,
+                              const size_t length,
+                              bool withoutResponse,
+                              RequestStatusCallback onRequestStatus,
+                              request_index_t requestIndex)
 {
     if (data)
     {

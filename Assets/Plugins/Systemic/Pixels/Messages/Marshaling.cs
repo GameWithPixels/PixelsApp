@@ -90,7 +90,7 @@ namespace Systemic.Unity.Pixels.Messages
                         }
                         break;
                     case MessageType.Telemetry:
-                        ret = FromByteArray<AccelerationState>(data);
+                        ret = FromByteArray<Telemetry>(data);
                         break;
                     case MessageType.BulkSetup:
                         ret = FromByteArray<BulkSetup>(data);
@@ -201,14 +201,14 @@ namespace Systemic.Unity.Pixels.Messages
                     case MessageType.TestHardware:
                         ret = FromByteArray<TestHardware>(data);
                         break;
-                    case MessageType.SetStandardState:
-                        ret = FromByteArray<SetStandardState>(data);
+                    case MessageType.TestLedLoopback:
+                        ret = FromByteArray<TestLedLoopback>(data);
                         break;
-                    case MessageType.SetLEDAnimationState:
-                        ret = FromByteArray<SetLEDAnimState>(data);
+                    case MessageType.LedLoopback:
+                        ret = FromByteArray<LedLoopback>(data);
                         break;
-                    case MessageType.SetBattleState:
-                        ret = FromByteArray<SetBattleState>(data);
+                    case MessageType.SetTopLevelState:
+                        ret = FromByteArray<SetTopLevelState>(data);
                         break;
                     case MessageType.ProgramDefaultParameters:
                         ret = FromByteArray<ProgramDefaultParameters>(data);

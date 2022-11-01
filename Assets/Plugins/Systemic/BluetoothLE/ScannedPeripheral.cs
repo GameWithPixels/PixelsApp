@@ -111,7 +111,7 @@ namespace Systemic.Unity.BluetoothLE
         public string SystemId { get; }
 
         /// <summary>
-        /// Gets the bluetooth address of the peripheral (not available on iOS).
+        /// Gets the Bluetooth address of the peripheral (not available on iOS).
         /// </summary>
         public ulong BluetoothAddress { get; }
 

@@ -49,11 +49,11 @@ namespace Systemic.Unity.Pixels.Messages
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class AccelerationState : IPixelMessage
+    public class Telemetry : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.Telemetry;
 
-        public AccelFrame data;
+        public AccelerationFrame accelFrame;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -187,7 +187,7 @@ namespace Systemic.Unity.Pixels.Messages
     public class RequestTelemetry : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.RequestTelemetry;
-        public byte telemetry;
+        public byte activate; // Boolean
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -328,7 +328,8 @@ namespace Systemic.Unity.Pixels.Messages
     public class Rssi : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.Rssi;
-        public short value;
+        public sbyte value;
+        public byte channelIndex;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -369,21 +370,23 @@ namespace Systemic.Unity.Pixels.Messages
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class SetStandardState : IPixelMessage
+    public class TestLedLoopback : IPixelMessage
     {
-        public MessageType type { get; set; } = MessageType.SetStandardState;
+        public MessageType type { get; set; } = MessageType.TestLedLoopback;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class SetLEDAnimState : IPixelMessage
+    public class LedLoopback : IPixelMessage
     {
-        public MessageType type { get; set; } = MessageType.SetLEDAnimationState;
+        public MessageType type { get; set; } = MessageType.LedLoopback;
+        public byte value;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class SetBattleState : IPixelMessage
+    public class SetTopLevelState : IPixelMessage
     {
-        public MessageType type { get; set; } = MessageType.SetBattleState;
+        public MessageType type { get; set; } = MessageType.SetTopLevelState;
+        public byte state; // See TopLevelState enumeration
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

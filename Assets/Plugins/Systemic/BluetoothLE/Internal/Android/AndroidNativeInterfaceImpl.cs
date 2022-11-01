@@ -203,12 +203,12 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
                 new ReadRssiRequestCallback(onRssiRead));
         }
 
-        public string GetPeripheralDiscoveredServices(INativePeripheralHandleImpl peripheralHandle)
+        public string GetDiscoveredServices(INativePeripheralHandleImpl peripheralHandle)
         {
             return GetJavaPeripheral(peripheralHandle)?.Call<string>("getDiscoveredServices");
         }
 
-        public string GetPeripheralServiceCharacteristics(INativePeripheralHandleImpl peripheralHandle, string serviceUuid)
+        public string GetServiceCharacteristics(INativePeripheralHandleImpl peripheralHandle, string serviceUuid)
         {
             return GetJavaPeripheral(peripheralHandle)?.Call<string>(
                 "getServiceCharacteristics",

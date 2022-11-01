@@ -56,9 +56,9 @@ namespace Systemic.Unity.BluetoothLE.Internal
 
         void ReadPeripheralRssi(INativePeripheralHandleImpl peripheralHandle, NativeValueRequestResultCallback<int> onRssiRead);
 
-        string GetPeripheralDiscoveredServices(INativePeripheralHandleImpl peripheralHandle);
+        string GetDiscoveredServices(INativePeripheralHandleImpl peripheralHandle);
 
-        string GetPeripheralServiceCharacteristics(INativePeripheralHandleImpl peripheralHandle, string serviceUuid);
+        string GetServiceCharacteristics(INativePeripheralHandleImpl peripheralHandle, string serviceUuid);
 
         CharacteristicProperties GetCharacteristicProperties(INativePeripheralHandleImpl peripheralHandle, string serviceUuid, string characteristicUuid, uint instanceIndex);
 

@@ -45,7 +45,7 @@ public class UIDiscoveredDieView : MonoBehaviour
         die.BatteryLevelChanged += OnBatteryLevelChanged;
         die.RssiChanged += OnRssiChanged;
         die.RollStateChanged += OnRollStateChanged;
-        SetFace(die.face);
+        SetFace(die.currentFace);
         SetSelected(false);
     }
 

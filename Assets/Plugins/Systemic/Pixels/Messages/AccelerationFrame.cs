@@ -2,7 +2,7 @@
 
 namespace Systemic.Unity.Pixels.Messages
 {
-    public struct AccelFrame
+    public struct AccelerationFrame
     {
         public float accX;
         public float accY;

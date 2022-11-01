@@ -327,12 +327,12 @@ namespace Systemic.Unity.BluetoothLE
         /// <param name="nativePeripheralHandle">Handle to the native object for the BLE peripheral.</param>
         /// <returns>The list of discovered services.</returns>
         /// <remarks>The peripheral must be connected.</remarks>
-        public static Guid[] GetPeripheralDiscoveredServices(NativePeripheralHandle nativePeripheralHandle)
+        public static Guid[] GetDiscoveredServices(NativePeripheralHandle nativePeripheralHandle)
         {
             if (!nativePeripheralHandle.IsValid) throw new ArgumentException("Invalid NativePeripheralHandle", nameof(nativePeripheralHandle));
 
             return StringToUuids(
-                _impl.GetPeripheralDiscoveredServices(nativePeripheralHandle.NativePeripheral));
+                _impl.GetDiscoveredServices(nativePeripheralHandle.NativePeripheral));
         }
 
         /// <summary>
@@ -344,13 +344,13 @@ namespace Systemic.Unity.BluetoothLE
         /// <param name="serviceUuid">The service UUID for which to retrieve the characteristics.</param>
         /// <returns>The list of discovered characteristics of a service.</returns>
         /// <remarks>The peripheral must be connected.</remarks>
-        public static Guid[] GetPeripheralServiceCharacteristics(NativePeripheralHandle nativePeripheralHandle, Guid serviceUuid)
+        public static Guid[] GetServiceCharacteristics(NativePeripheralHandle nativePeripheralHandle, Guid serviceUuid)
         {
             if (!nativePeripheralHandle.IsValid) throw new ArgumentException("Invalid NativePeripheralHandle", nameof(nativePeripheralHandle));
             if (serviceUuid == Guid.Empty) throw new ArgumentException("Empty service UUID", nameof(serviceUuid));
 
             return StringToUuids(
-                _impl.GetPeripheralServiceCharacteristics(nativePeripheralHandle.NativePeripheral, serviceUuid.ToString()));
+                _impl.GetServiceCharacteristics(nativePeripheralHandle.NativePeripheral, serviceUuid.ToString()));
         }
 
         //! @}

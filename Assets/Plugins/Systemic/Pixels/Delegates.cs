@@ -83,7 +83,7 @@ namespace Systemic.Unity.Pixels
     /// </summary>
     /// <param name="pixel">The source of the event.</param>
     /// <param name="frame">The latest acceleration data reported by the die.</param>
-    public delegate void TelemetryEventHandler(Pixel pixel, AccelFrame frame);
+    public delegate void TelemetryEventHandler(Pixel pixel, AccelerationFrame frame);
 
     /// <summary>
     /// Delegate for Pixel requests to notify user of some message, with the option to cancel the operation.

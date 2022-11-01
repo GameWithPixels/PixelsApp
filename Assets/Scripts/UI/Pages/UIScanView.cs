@@ -47,7 +47,7 @@ public class UIScanView
     void OnDisable()
     {
         DiceBag.PixelDiscovered -= OnDieDiscovered;
-        DiceBag.CancelScanning();
+        DiceBag.StopScanning();
         foreach (var die in discoveredDice)
         {
             DestroyDiscoveredDie(die);

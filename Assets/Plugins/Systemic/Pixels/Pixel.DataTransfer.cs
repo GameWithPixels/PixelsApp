@@ -36,7 +36,7 @@ namespace Systemic.Unity.Pixels
 
             if (sendMsg.IsSuccess)
             {
-                Debug.Log($"Pixel {name}: ready for receiving data");
+                Debug.Log($"Pixel {name}: Ready for receiving data");
 
                 // Then transfer data
                 ushort offset = 0;
@@ -51,7 +51,7 @@ namespace Systemic.Unity.Pixels
 
                     System.Array.Copy(bytes, offset, data.data, 0, data.size);
 
-                    //Debug.Log($"Pixel {name}: sending Bulk Data (offset: 0x" + data.offset.ToString("X") + ", length: " + data.size + ")");
+                    //Debug.Log($"Pixel {name}: Sending Bulk Data (offset: 0x" + data.offset.ToString("X") + ", length: " + data.size + ")");
                     //StringBuilder hexdumpBuilder = new StringBuilder();
                     //for (int i = 0; i < data.data.Length; ++i)
                     //{
@@ -256,7 +256,7 @@ namespace Systemic.Unity.Pixels
 
                     // Upload data
                     var hash = DataSet.ComputeHash(data);
-                    Debug.Log($"Pixel {name}: ready to receive dataset, byte array should be:"
+                    Debug.Log($"Pixel {name}: Ready to receive dataset, byte array should be:"
                         + $" {data.Length} bytes and hash 0x{hash:X8}");
                     yield return InternalUploadDataSetAsync(
                         MessageType.TransferAnimationSetFinished, data, err => error = err, onProgress);
@@ -283,7 +283,7 @@ namespace Systemic.Unity.Pixels
         }
 
         /// <summary>
-        /// Asynchronously plays the (only) LEDs animation included in the given data set.
+        /// Asynchronously plays the (single) LEDs animation included in the given data set.
         /// </summary>
         /// <param name="testAnimSet">The data set containing just one animation to play.</param>
         /// <param name="onResult">An optional callback that is called when the operation completes
@@ -311,7 +311,7 @@ namespace Systemic.Unity.Pixels
                 trackCount = testAnimSet.animationBits.getTrackCount(),
                 animationSize = (ushort)Marshal.SizeOf(testAnimSet.animations[0].GetType()),
                 hash = hash,
-        };
+            };
 
             // Debug.Log($"Pixel {name}: Animation Data to be sent:");
             // Debug.Log("palette: " + prepareDie.paletteSize * Marshal.SizeOf<byte>());
@@ -329,7 +329,7 @@ namespace Systemic.Unity.Pixels
                 {
                     case TransferTestAnimationSetAckType.Download:
                         // Upload data
-                        Debug.Log($"Pixel {name}: ready to receive test dataset, byte array should be:"
+                        Debug.Log($"Pixel {name}: Ready to receive test dataset, byte array should be:"
                             + $" {data.Length} bytes and hash 0x{hash:X8}");
                         yield return InternalUploadDataSetAsync(
                             MessageType.TransferTestAnimationSetFinished, data, err => error = err, onProgress);
@@ -391,14 +391,14 @@ namespace Systemic.Unity.Pixels
                 if (success)
                 {
                     // We're done sending data, wait for the Pixel to say its finished programming it!
-                    Debug.Log($"Pixel {name}: done sending dataset, waiting for Pixel to finish programming");
+                    Debug.Log($"Pixel {name}: Done sending dataset, waiting for Pixel to finish programming");
                     float timeout = Time.realtimeSinceStartup + AckMessageTimeout;
                     yield return new WaitUntil(() => programmingFinished || (Time.realtimeSinceStartup > timeout));
 
                     if (programmingFinished)
                     {
                         Debug.Assert(error == null);
-                        Debug.Log($"Pixel {name}: programming done");
+                        Debug.Log($"Pixel {name}: Programming done");
                     }
                     else
                     {

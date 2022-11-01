@@ -24,14 +24,14 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
         sealed class NativePeripheral : INativePeripheralHandleImpl
         {
             // Keep references to all callbacks so they are not reclaimed by the GC
-            PeripheralConnectionEventCallback _peripheralConnectionStatusChanged;
-            HashSet<RequestStatusCallback> _requestStatusHandlers = new HashSet<RequestStatusCallback>();
-            Dictionary<string, ValueChangedCallback> _valueChangedHandlers = new Dictionary<string, ValueChangedCallback>();
+            readonly PeripheralConnectionEventCallback _onPeripheralConnectionEvent;
+            readonly HashSet<RequestStatusCallback> _requestStatusHandlers = new HashSet<RequestStatusCallback>();
+            readonly Dictionary<string, ValueChangedCallback> _valueChangedHandlers = new Dictionary<string, ValueChangedCallback>();
 
-            static HashSet<NativePeripheral> _releasedPeripherals = new HashSet<NativePeripheral>();
+            static readonly HashSet<NativePeripheral> _releasedPeripherals = new HashSet<NativePeripheral>();
 
-            public NativePeripheral(ulong bluetoothAddress, string name, PeripheralConnectionEventCallback onPeripheralConnectionStatusChanged)
-                => (BluetoothAddress, Name, _peripheralConnectionStatusChanged) = (bluetoothAddress, name, onPeripheralConnectionStatusChanged);
+            public NativePeripheral(ulong bluetoothAddress, string name, PeripheralConnectionEventCallback onPeripheralConnectionEvent)
+                => (BluetoothAddress, Name, _onPeripheralConnectionEvent) = (bluetoothAddress, name, onPeripheralConnectionEvent);
 
             public ulong BluetoothAddress { get; }
 
@@ -163,19 +163,19 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
         private static extern int sgBleGetPeripheralMtu(ulong peripheralId);
 
         [DllImport(_libName)]
-        private static extern string sgBleGetPeripheralDiscoveredServices(ulong peripheralId);
+        private static extern string sgBleGetDiscoveredServices(ulong peripheralId);
 
         [DllImport(_libName)]
-        private static extern string sgBleGetPeripheralServiceCharacteristics(ulong peripheralId, string serviceUuid);
+        private static extern string sgBleGetServiceCharacteristics(ulong peripheralId, string serviceUuid);
 
         [DllImport(_libName)]
         private static extern ulong sgBleGetCharacteristicProperties(ulong peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex);
 
         [DllImport(_libName)]
-        private static extern void sgBleReadCharacteristicValue(ulong peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, ValueReadCallback onValueRead);
+        private static extern void sgBleReadCharacteristic(ulong peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, ValueReadCallback onValueRead);
 
         [DllImport(_libName)]
-        private static extern void sgBleWriteCharacteristicValue(ulong peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, IntPtr data, UIntPtr length, bool withoutResponse, RequestStatusCallback onRequestStatus);
+        private static extern void sgBleWriteCharacteristic(ulong peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, IntPtr data, UIntPtr length, bool withoutResponse, RequestStatusCallback onRequestStatus);
 
         [DllImport(_libName)]
         private static extern void sgBleSetNotifyCharacteristic(ulong peripheralId, string serviceUuid, string characteristicUuid, uint instanceIndex, ValueChangedCallback onValueChanged, RequestStatusCallback onRequestStatus);
@@ -307,14 +307,14 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
             onRssiRead(int.MinValue, RequestStatus.NotSupported);
         }
 
-        public string GetPeripheralDiscoveredServices(INativePeripheralHandleImpl peripheralHandle)
+        public string GetDiscoveredServices(INativePeripheralHandleImpl peripheralHandle)
         {
-            return sgBleGetPeripheralDiscoveredServices(GetPeripheralAddress(peripheralHandle));
+            return sgBleGetDiscoveredServices(GetPeripheralAddress(peripheralHandle));
         }
 
-        public string GetPeripheralServiceCharacteristics(INativePeripheralHandleImpl peripheralHandle, string serviceUuid)
+        public string GetServiceCharacteristics(INativePeripheralHandleImpl peripheralHandle, string serviceUuid)
         {
-            return sgBleGetPeripheralServiceCharacteristics(GetPeripheralAddress(peripheralHandle), serviceUuid);
+            return sgBleGetServiceCharacteristics(GetPeripheralAddress(peripheralHandle), serviceUuid);
         }
 
         public CharacteristicProperties GetCharacteristicProperties(INativePeripheralHandleImpl peripheralHandle, string serviceUuid, string characteristicUuid, uint instanceIndex)
@@ -327,7 +327,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
             var valueReadHandler = GetValueReadHandler(peripheralHandle, onValueRead);
             var periph = (NativePeripheral)peripheralHandle;
             //TODO store handler periph.KeepValueChangedHandler(serviceUuid, characteristicUuid, instanceIndex, valueReadHandler);
-            sgBleReadCharacteristicValue(GetPeripheralAddress(peripheralHandle), serviceUuid, characteristicUuid, instanceIndex, valueReadHandler);
+            sgBleReadCharacteristic(GetPeripheralAddress(peripheralHandle), serviceUuid, characteristicUuid, instanceIndex, valueReadHandler);
         }
 
         public void WriteCharacteristic(INativePeripheralHandleImpl peripheralHandle, string serviceUuid, string characteristicUuid, uint instanceIndex, byte[] data, bool withoutResponse, NativeRequestResultCallback onResult)
@@ -335,7 +335,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
             var (ptr, length) = UnmanagedBuffer.AllocUnmanagedBuffer(data);
             try
             {
-                sgBleWriteCharacteristicValue(GetPeripheralAddress(peripheralHandle), serviceUuid, characteristicUuid, instanceIndex, ptr, (UIntPtr)length, withoutResponse,
+                sgBleWriteCharacteristic(GetPeripheralAddress(peripheralHandle), serviceUuid, characteristicUuid, instanceIndex, ptr, (UIntPtr)length, withoutResponse,
                     GetRequestStatusHandler(RequestOperation.WriteCharacteristic, peripheralHandle, onResult));
             }
             finally
@@ -348,6 +348,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
         {
             var valueChangedHandler = GetValueChangedHandler(peripheralHandle, onValueChanged);
             var periph = (NativePeripheral)peripheralHandle;
+            //TODO the call below will replace an previous handler => keep it until sgBleSetNotifyCharacteristic() has returned
             periph.KeepValueChangedHandler(serviceUuid, characteristicUuid, instanceIndex, valueChangedHandler);
             sgBleSetNotifyCharacteristic(GetPeripheralAddress(peripheralHandle), serviceUuid, characteristicUuid, instanceIndex, valueChangedHandler,
                 GetRequestStatusHandler(RequestOperation.SubscribeCharacteristic, peripheralHandle, onResult));
