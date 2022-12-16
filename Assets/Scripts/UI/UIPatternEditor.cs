@@ -41,7 +41,7 @@ public class UIPatternEditor : MonoBehaviour
             ForceHide();
         }
 
-        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(PixelDesignAndColor.V5_Black);
+        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(PixelDesignAndColor.V5Black);
         if (dieRenderer != null)
         {
             diePreviewImage.texture = dieRenderer.renderTexture;

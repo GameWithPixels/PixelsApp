@@ -17,7 +17,7 @@ public abstract class EditAnimation
 {
     public string name;
 	public abstract float duration { get; set; }
-    public PreviewSettings defaultPreviewSettings = new PreviewSettings() { design = PixelDesignAndColor.V5_Grey };
+    public PreviewSettings defaultPreviewSettings = new PreviewSettings() { design = PixelDesignAndColor.V5Grey };
 
     [JsonIgnore]
     public abstract AnimationType type { get; }

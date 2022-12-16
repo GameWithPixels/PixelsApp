@@ -13,7 +13,7 @@ public class EditProfile
     public string description;
     public readonly List<EditRule> rules;
 
-    public readonly PreviewSettings defaultPreviewSettings = new PreviewSettings() { design = PixelDesignAndColor.V5_Grey };
+    public readonly PreviewSettings defaultPreviewSettings = new PreviewSettings() { design = PixelDesignAndColor.V5Grey };
 
     public EditProfile(List<EditRule> rules = null)
     {

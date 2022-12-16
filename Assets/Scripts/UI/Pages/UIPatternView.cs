@@ -53,9 +53,9 @@ public class UIPatternView
         }
         parameters = null;
 
-        if (previewDie != null)
+        if (previewDie?.die != null)
         {
-            previewDie.die.SetStandardMode();
+            // Note: the die will revert to standard mode on disconnection
             DiceBag.DisconnectPixel(previewDie.die);
             previewDie = null;
             previewDieConnected = false;
@@ -64,9 +64,9 @@ public class UIPatternView
 
     void Setup(EditAnimation anim)
     {
-        base.SetupHeader(false, false, anim.name, SetName);
+        SetupHeader(false, false, anim.name, SetName);
         editAnimation = anim;
-        this.dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(anim.defaultPreviewSettings.design, 600);
+        dieRenderer = DiceRendererManager.Instance.CreateDiceRenderer(anim.defaultPreviewSettings.design, 600);
         if (dieRenderer != null)
         {
             previewImage.texture = dieRenderer.renderTexture;
@@ -100,7 +100,7 @@ public class UIPatternView
         var theEditAnim = (EditAnimation)animObject;
         Debug.Assert(theEditAnim == editAnimation);
         dieRenderer.SetAnimation(theEditAnim);
-        base.pageDirty = true;
+        pageDirty = true;
     }
 
     void SetAnimationType(AnimationType newType)
@@ -131,7 +131,7 @@ public class UIPatternView
             dieRenderer.SetAnimation(newEditAnimation);
 
             editAnimation = newEditAnimation;
-            base.pageDirty = true;
+            pageDirty = true;
         }
     }
 
@@ -159,6 +159,11 @@ public class UIPatternView
 
         if (previewDie != null)
         {
+            if (previewDie.die == null)
+            {
+                previewDieConnected = false;
+            }
+
             if (!previewDieConnected)
             {
                 string error = null;

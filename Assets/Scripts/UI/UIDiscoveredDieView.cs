@@ -59,7 +59,7 @@ public class UIDiscoveredDieView : MonoBehaviour
 
     void SetFace(int face)
     {
-        dieFaceText.text = face >= 0 ? $"Face {face + 1} up" : "";
+        dieFaceText.text = face > 0 ? $"Face {face} up" : "";
     }
 
     void Awake()
@@ -85,7 +85,7 @@ public class UIDiscoveredDieView : MonoBehaviour
         }
     }
     
-    void OnBatteryLevelChanged(Pixel die, float level, bool? charging)
+    void OnBatteryLevelChanged(Pixel die, int level, bool charging)
     {
         batteryView.SetLevel(level, charging);
     }

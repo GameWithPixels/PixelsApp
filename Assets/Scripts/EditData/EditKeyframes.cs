@@ -26,7 +26,7 @@ public class EditRGBKeyframe
 
     public RGBKeyframe ToRGBKeyframe(EditDataSet editSet, DataSet.AnimationBits bits)
     {
-        RGBKeyframe ret = new RGBKeyframe();
+        var ret = new RGBKeyframe();
         // Add the color to the palette if not already there, otherwise grab the color index
         var colorIndex = EditColor.toColorIndex(ref bits.palette, color);
         ret.setTimeAndColorIndex(time, (ushort)colorIndex);
@@ -35,7 +35,7 @@ public class EditRGBKeyframe
 
     public SimpleKeyframe ToKeyframe(EditDataSet editSet, DataSet.AnimationBits bits)
     {
-        SimpleKeyframe ret = new SimpleKeyframe();
+        var ret = new SimpleKeyframe();
         // Get the intensity from the color and scale
         ret.setTimeAndIntensity(time, (byte)(ColorUtils.Desaturate(color) * 255.0f));
         return ret;

@@ -16,28 +16,31 @@ public class UIDieLargeBatteryView : MonoBehaviour
     public float[] batteryLevels;
     public Sprite notAvailableImage;
 
-    public void SetLevel(float? level, bool? charging)
+    public void SetLevel(int? levelPercent, bool? charging)
     {
-        if (level.HasValue)
+        batteryNiceText.text = "Battery";
+
+        if (levelPercent.HasValue)
         {
             // Find the first keyframe
             int index = 0;
-            while (index < batteryLevels.Length && batteryLevels[index] > level.Value) {
+            while (index < batteryLevels.Length && batteryLevels[index] > levelPercent.Value)
+            {
                 index++;
             }
 
             var sprite = batteryLevelImages[index];
             batteryImage.sprite = sprite;
-            batteryLevelText.text = level.Value.ToString("P0");
+            batteryLevelText.text = $"{levelPercent} %";
         }
         else
         {
-            int index = batteryLevels.Length-1;
+            int index = batteryLevels.Length - 1;
             var sprite = batteryLevelImages[index];
             batteryImage.sprite = sprite;
             batteryLevelText.text = "Unknown";
-            batteryNiceText.text = "Battery";
         }
+
         if (charging.HasValue && charging.Value)
         {
             chargingImage.gameObject.SetActive(true);
@@ -46,14 +49,6 @@ public class UIDieLargeBatteryView : MonoBehaviour
         else
         {
             chargingImage.gameObject.SetActive(false);
-            if (level.HasValue && Mathf.RoundToInt(level.Value * 100.0f) == 69)
-            {
-                batteryNiceText.text = "Nice.";
-            }
-            else
-            {
-                batteryNiceText.text = "Battery";
-            }
         }
     }
 }

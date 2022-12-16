@@ -38,7 +38,7 @@ public class UIParameterAnimation
         // Set name
         nameText.text = name;
 
-        var design = PixelDesignAndColor.V5_Grey;
+        var design = PixelDesignAndColor.V5Grey;
         if (initialAnim != null)
         {
             design = initialAnim.defaultPreviewSettings.design;

@@ -190,6 +190,8 @@ public class UIPairedDieToken : MonoBehaviour
 
     IEnumerator RefreshInfo()
     {
+        //TODO subscribe to die connection events instead of this coroutine
+
         var menuEntries = new[]
         {
             statsButton,
@@ -205,32 +207,25 @@ public class UIPairedDieToken : MonoBehaviour
         .Where(e => e != null)
         .ToArray();
 
-        bool IsReady() => die.die?.isReady ?? false;
-
+        bool wasReady = true; // Initially set to true to force an update
         while (true)
         {
-            bool ready = IsReady();
+            bool ready = die.die?.isReady ?? false;
+
+            // Update menu entries
             foreach (var e in menuEntries)
             {
                 e.EnableMenuEntry(ready);
             }
 
-            // Die might be destroyed (-> null) or change state at any time
-            while (ready)
+            // Start battery & RSSI automatic updates
+            if (ready && !wasReady)
             {
-                // Fetch battery level
-                yield return die.die.UpdateBatteryLevelAsync();
-
-                // Fetch RSSI
-                ready = IsReady();
-                if (ready)
-                {
-                    yield return die.die.UpdateRssiAsync();
-                    yield return new WaitForSeconds(3.0f);
-
-                    ready = IsReady();
-                }
+                die.die.ReportRssi(true);
             }
+
+            // Die might be destroyed (-> null) or change state at any time
+            wasReady = ready;
 
             yield return null;
         }

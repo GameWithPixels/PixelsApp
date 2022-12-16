@@ -89,7 +89,7 @@ public class UIPairedDieView : MonoBehaviour
             firmwareIDText.text = $"Firmware: {die.die.buildDateTime}";
             batteryView.SetLevel(die.die.batteryLevel, die.die.isCharging);
             signalView.SetRssi(die.die.rssi);
-            dieFaceText.text = die.die.currentFace >= 0 ? $"Face {die.die.currentFace + 1} up" : "";
+            dieFaceText.text = die.die.currentFace > 0 ? $"Face {die.die.currentFace} up" : "";
             switch (die.die.lastError)
             {
                 case PixelError.None:
@@ -194,7 +194,7 @@ public class UIPairedDieView : MonoBehaviour
         UpdateState();
     }
 
-    void OnBatteryLevelChanged(Pixel die, float level, bool? charging)
+    void OnBatteryLevelChanged(Pixel die, int level, bool charging)
     {
         UpdateState();
     }

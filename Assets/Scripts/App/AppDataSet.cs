@@ -561,7 +561,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             name = "Die 000",
             systemId = "test:123456789ABCDEF0",
             ledCount = 20,
-            designAndColor = PixelDesignAndColor.V3_Orange
+            designAndColor = PixelDesignAndColor.V3Orange
         };
         ret.dice.Add(die0);
         var die1 = new EditDie()
@@ -569,7 +569,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             name = "Die 001",
             systemId = "test:ABCDEF0123456789",
             ledCount = 20,
-            designAndColor = PixelDesignAndColor.V5_Black
+            designAndColor = PixelDesignAndColor.V5Black
         };
         ret.dice.Add(die1);
         var die2 = new EditDie()
@@ -577,7 +577,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             name = "Die 002",
             systemId = "test:CDEF0123456789AB",
             ledCount = 20,
-            designAndColor = PixelDesignAndColor.V5_Grey
+            designAndColor = PixelDesignAndColor.V5Grey
         };
         ret.dice.Add(die2);
         var die3 = new EditDie()
@@ -585,7 +585,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             name = "Die 003",
             systemId = "test:EF0123456789ABCD",
             ledCount = 20,
-            designAndColor = PixelDesignAndColor.V5_Gold
+            designAndColor = PixelDesignAndColor.V5Gold
         };
         ret.dice.Add(die3);
         
