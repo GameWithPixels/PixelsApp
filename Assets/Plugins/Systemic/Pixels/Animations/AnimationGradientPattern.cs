@@ -4,24 +4,36 @@ using UnityEngine;
 namespace Systemic.Unity.Pixels.Animations
 {
     /// <summary>
-    /// An animation track is essentially an animation curve for a specific LED.
+    /// Represents of a series of RGB keyframes which together make
+    /// an animation curve for a light intensity.
     /// size: 8 bytes (+ the actual keyframe data)
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     [System.Serializable]
     public struct Track
     {
-        public ushort keyframesOffset;  // offset into a global keyframe buffer
+        public ushort keyframesOffset;  // Offset into a global keyframe buffer
         public byte keyFrameCount;      // Keyframe count
         public byte padding;
         public uint ledMask;            // Each bit indicates whether the led is included in the animation track
 
+        /// <summary>
+        /// Gets the track duration.
+        /// </summary>
+        /// <param name="bits">The animation bits with the keyframes data.</param>
+        /// <returns>The track duration.</returns>
         public ushort getDuration(DataSet.AnimationBits bits)
         {
             var kf = bits.getRGBKeyframe((ushort)(keyframesOffset + keyFrameCount - 1));
-            return kf.time();
+            return kf.time;
         }
 
+        /// <summary>
+        /// Gets the data of the keyframe at the given index.
+        /// </summary>
+        /// <param name="bits">The animation bits with the keyframes data.</param>
+        /// <param name="keyframeIndex">The index of the keyframe.</param>
+        /// <returns>The keyframe data.</returns>
         public SimpleKeyframe getKeyframe(DataSet.AnimationBits bits, ushort keyframeIndex)
         {
             Debug.Assert(keyframeIndex < keyFrameCount);
@@ -29,19 +41,26 @@ namespace Systemic.Unity.Pixels.Animations
         }
 
         /// <summary>
-        /// Evaluate an animation track's for a given time, in milliseconds, and fills returns arrays of led indices and colors
+        /// Evaluate an animation track's for a given time, in milliseconds, and fills returns arrays of led indices and colors.
+        /// The returned colors are the given color modulated with the light intensity of the track for the given time.
         /// Values outside the track's range are clamped to first or last keyframe value.
         /// </summary>
+        /// <param name="bits">The animation bits with the keyframes data and color palette.</param>
+        /// <param name="color">The color for which to modulate the intensity.</param>
+        /// <param name="time">The time at which to evaluate the track.</param>
+        /// <param name="retIndices">Array of LED indices to be updated.</param>
+        /// <param name="retColors">Array of 32 bits colors to be updated.</param>
+        /// <returns>The number of LED indices that have been set in the returned arrays.</returns>
         public int evaluate(DataSet.AnimationBits bits, uint color, int time, int[] retIndices, uint[] retColors)
         {
             if (keyFrameCount == 0)
                 return 0;
 
-            uint mcolor = modulateColor(bits, color, time);
+            uint mcolor = ColorUIntUtils.ModulateColor(color, evaluateIntensity(bits, time));
 
             // Fill the return arrays
             int currentCount = 0;
-            for (int i = 0; i < Constants.MaxLedsCount; ++i)
+            for (int i = 0; i < Constants.MaxLEDsCount; ++i)
             {
                 if ((ledMask & (1 << i)) != 0)
                 {
@@ -54,55 +73,58 @@ namespace Systemic.Unity.Pixels.Animations
         }
 
         /// <summary>
-        /// Evaluate an animation track's for a given time, in milliseconds
+        /// Evaluate an animation track's light intensity for a given time, in milliseconds.
         /// Values outside the track's range are clamped to first or last keyframe value.
         /// </summary>
-        public uint modulateColor(DataSet.AnimationBits bits, uint color, int time)
+        /// <param name="bits">The animation bits with the keyframes data and color palette.</param>
+        /// <param name="color">The color to modulate.</param>
+        /// <param name="time">The time at which to evaluate the track.</param>
+        /// <returns>The modulated color.</returns>
+        public byte evaluateIntensity(DataSet.AnimationBits bits, int time)
         {
             // Find the first keyframe
             int nextIndex = 0;
-            while (nextIndex < keyFrameCount && getKeyframe(bits, (ushort)nextIndex).time() < time)
+            while (nextIndex < keyFrameCount && getKeyframe(bits, (ushort)nextIndex).time < time)
             {
                 nextIndex++;
             }
 
-            byte intensity = 0;
             if (nextIndex == 0)
             {
                 // The first keyframe is already after the requested time, clamp to first value
-                intensity = getKeyframe(bits, (ushort)nextIndex).intensity();
+                return getKeyframe(bits, (ushort)nextIndex).intensity;
             }
             else if (nextIndex == keyFrameCount)
             {
                 // The last keyframe is still before the requested time, clamp to the last value
-                intensity = getKeyframe(bits, (ushort)(nextIndex - 1)).intensity();
+                return getKeyframe(bits, (ushort)(nextIndex - 1)).intensity;
             }
             else
             {
                 // Grab the prev and next keyframes
                 var nextKeyframe = getKeyframe(bits, (ushort)nextIndex);
-                ushort nextKeyframeTime = nextKeyframe.time();
-                byte nextKeyframeIntensity = nextKeyframe.intensity();
+                ushort nextKeyframeTime = nextKeyframe.time;
+                byte nextKeyframeIntensity = nextKeyframe.intensity;
 
                 var prevKeyframe = getKeyframe(bits, (ushort)(nextIndex - 1));
-                ushort prevKeyframeTime = prevKeyframe.time();
-                byte prevKeyframeIntensity = prevKeyframe.intensity();
+                ushort prevKeyframeTime = prevKeyframe.time;
+                byte prevKeyframeIntensity = prevKeyframe.intensity;
 
                 // Compute the interpolation parameter
-                intensity = ColorUIntUtils.InterpolateIntensity(prevKeyframeIntensity, prevKeyframeTime, nextKeyframeIntensity, nextKeyframeTime, time);
+                return ColorUIntUtils.InterpolateIntensity(prevKeyframeIntensity, prevKeyframeTime, nextKeyframeIntensity, nextKeyframeTime, time);
             }
-
-            return ColorUIntUtils.ModulateColor(color, intensity);
         }
 
         /// <summary>
-        /// Extracts the LED indices from the led bit mask
+        /// Extracts the LED indices from the LED bit mask.
         /// </summary>
+        /// <param name="retIndices">Array of LED indices to be updated.</param>
+        /// <returns>The number of LED indices that have been set in the returned arrays.</returns>
         public int extractLEDIndices(int[] retIndices)
         {
             // Fill the return arrays
             int currentCount = 0;
-            for (int i = 0; i < Constants.MaxLedsCount; ++i)
+            for (int i = 0; i < Constants.MaxLEDsCount; ++i)
             {
                 if ((ledMask & (1 << i)) != 0)
                 {
@@ -113,12 +135,15 @@ namespace Systemic.Unity.Pixels.Animations
             return currentCount;
         }
 
-
+        /// <summary>
+        /// Compares two Track instances.
+        /// </summary>
+        /// <param name="other">The Track instance to compare with.</param>
+        /// <returns>Whether the two Track instances have the same data.</returns>
         public bool Equals(Track other)
         {
             return keyframesOffset == other.keyframesOffset && keyFrameCount == other.keyFrameCount && ledMask == other.ledMask;
         }
-
     }
 
     /// <summary>
@@ -197,8 +222,8 @@ namespace Systemic.Unity.Pixels.Animations
             // The assumption is that led indices don't overlap between tracks of a single animation,
             // so there will always be enough room in the return arrays.
             int totalCount = 0;
-            var indices = new int[Constants.MaxLedsCount];
-            var colors = new uint[Constants.MaxLedsCount];
+            var indices = new int[Constants.MaxLEDsCount];
+            var colors = new uint[Constants.MaxLEDsCount];
             for (int i = 0; i < preset.trackCount; ++i)
             {
                 var track = animationBits.getTrack((ushort)(preset.tracksOffset + i));
@@ -220,7 +245,7 @@ namespace Systemic.Unity.Pixels.Animations
             // The assumption is that led indices don't overlap between tracks of a single animation,
             // so there will always be enough room in the return arrays.
             int totalCount = 0;
-            var indices = new int[Constants.MaxLedsCount];
+            var indices = new int[Constants.MaxLEDsCount];
             for (int i = 0; i < preset.trackCount; ++i)
             {
                 var track = animationBits.getRGBTrack((ushort)(preset.tracksOffset + i));

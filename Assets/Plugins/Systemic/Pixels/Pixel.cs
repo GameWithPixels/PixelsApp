@@ -30,6 +30,7 @@ namespace Systemic.Unity.Pixels
         PixelConnectionState _connectionState = PixelConnectionState.Invalid;
 
         // Events and callbacks
+        RssiChangedEventHandler _notifyRssi;
         TelemetryEventHandler _notifyTelemetry;
         NotifyUserCallback _notifyUser;
         PlayAudioClipCallback _playAudioClip;
@@ -56,6 +57,18 @@ namespace Systemic.Unity.Pixels
                     _connectionState = value;
                     ConnectionStateChanged?.Invoke(this, oldState, value);
                 }
+
+                if (connectionState == PixelConnectionState.Ready)
+                {
+                    if (_notifyRssi?.GetInvocationList().Length > 0)
+                    {
+                        ReportRssi(true);
+                    }
+                    if (_notifyTelemetry?.GetInvocationList().Length > 0)
+                    {
+                        ReportTelemetry(true);
+                    }
+                }
             }
         }
 
@@ -78,6 +91,13 @@ namespace Systemic.Unity.Pixels
         /// Gets the unique system id assigned to the Pixel. This value is platform specific and may change over long periods of time.
         /// </summary>
         public string systemId { get; protected set; }
+
+        /// <summary>
+        /// Gets the Pixel unique device id.
+        ///
+        /// This value is set when the Pixel is being scanned or when connected.
+        /// </summary>
+        public uint pixelId { get; protected set; }
 
         /// <summary>
         /// Gets the number of LEDs for the Pixel.
@@ -126,23 +146,22 @@ namespace Systemic.Unity.Pixels
         ///
         /// This value is set when the Pixel is being scanned or when connected.
         /// </summary>
-        public PixelRollState rollState { get; protected set; } = PixelRollState.Unknown;
+        public PixelRollState rollState { get; private set; } = PixelRollState.Unknown;
 
         /// <summary>
         /// Gets Pixel the current face that is up.
         /// 
         /// This value is set when the Pixel is being scanned or when connected.
         /// </summary>
-        public int currentFace { get; protected set; } = -1; //TODO change to face number rather than index
+        public int currentFace { get; private set; }
 
         /// <summary>
-        /// Gets the Pixel last read battery level.
+        /// Gets the Pixel last read battery level in percent.
         /// 
-        /// The value is normalized between 0 and 1 included.
         /// This value is set when the Pixel is being scanned and
         /// <see cref="UpdateBatteryLevelAsync(OperationResultCallback)"/> is called while connected.
         /// </summary>
-        public float batteryLevel { get; protected set; }
+        public int batteryLevel { get; private set; }
 
         /// <summary>
         /// Indicates whether or not the Pixel was last reported as charging.
@@ -150,7 +169,7 @@ namespace Systemic.Unity.Pixels
         /// This value is only set when
         /// <see cref="UpdateBatteryLevelAsync(OperationResultCallback)"/> is called while connected.
         /// </summary>
-        public bool? isCharging { get; protected set; }
+        public bool isCharging { get; private set; }
 
         /// <summary>
         /// Gets the Pixel last read Received Signal Strength Indicator (RSSI) value.
@@ -158,14 +177,12 @@ namespace Systemic.Unity.Pixels
         /// This value is set when the Pixel is being scanned or when
         /// <see cref="UpdateRssiAsync(OperationResultCallback)"/> is called while connected.
         /// </summary>
-        public int rssi { get; protected set; }
+        public int rssi { get; private set; }
 
         /// <summary>
-        /// Gets the Pixel unique device id.
-        ///
-        /// This value is set when the Pixel is being scanned or when connected.
+        /// 
         /// </summary>
-        public uint pixelId { get; protected set; }
+        public float temperature { get; private set; }
 
         #endregion
 
@@ -189,7 +206,7 @@ namespace Systemic.Unity.Pixels
         /// <summary>
         /// Event raised when the Pixel roll state changes.
         /// </summary>
-        public RollStateChangedEventHandler RollStateChanged; //TODO change to face number rather than index
+        public RollStateChangedEventHandler RollStateChanged;
 
         /// <summary>
         /// Event raised when the battery level reported by the Pixel changes.
@@ -199,7 +216,33 @@ namespace Systemic.Unity.Pixels
         /// <summary>
         /// Event raised when the RSSI value reported by the Pixel changes.
         /// </summary>
-        public RssiChangedEventHandler RssiChanged;
+        public event RssiChangedEventHandler RssiChanged
+        {
+            add
+            {
+                if (_notifyRssi == null && connectionState == PixelConnectionState.Ready)
+                {
+                    // The first time around, we make sure to request RSSI from the Pixel
+                        ReportRssi(true);
+                }
+                _notifyRssi += value;
+            }
+            remove
+            {
+                _notifyRssi -= value;
+                if ((_notifyRssi == null || _notifyRssi.GetInvocationList().Length == 0)
+                     && connectionState == PixelConnectionState.Ready)
+                {
+                    // Unregister from the Pixel telemetry
+                    ReportRssi(false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Event raised when the temperature reported by the Pixel changes.
+        /// </summary>
+        public TemperatureChangedEventHandler TemperatureChanged;
 
         /// <summary>
         /// Event raised when telemetry data is received.
@@ -208,24 +251,21 @@ namespace Systemic.Unity.Pixels
         {
             add
             {
-                if (_notifyTelemetry == null)
+                if (_notifyTelemetry == null && connectionState == PixelConnectionState.Ready)
                 {
                     // The first time around, we make sure to request telemetry from the Pixel
-                    RequestTelemetry(true);
+                    ReportTelemetry(true);
                 }
                 _notifyTelemetry += value;
             }
             remove
             {
                 _notifyTelemetry -= value;
-                if (_notifyTelemetry == null || _notifyTelemetry.GetInvocationList().Length == 0)
+                if ((_notifyTelemetry == null || _notifyTelemetry.GetInvocationList().Length == 0)
+                     && connectionState == PixelConnectionState.Ready)
                 {
-                    if (connectionState == PixelConnectionState.Ready)
-                    {
-                        // Unregister from the Pixel telemetry
-                        RequestTelemetry(false);
-                    }
-                    // Otherwise we can't send bluetooth packets to the Pixel, can we?
+                    // Unregister from the Pixel telemetry
+                    ReportTelemetry(false);
                 }
             }
         }
@@ -367,6 +407,9 @@ namespace Systemic.Unity.Pixels
             // Setup delegates for face and telemetry
             _messageHandlers.Add(MessageType.IAmADie, msg => ProcessIAmADieMessage((IAmADie)msg));
             _messageHandlers.Add(MessageType.RollState, msg => ProcessRollStateMessage((RollState)msg));
+            _messageHandlers.Add(MessageType.BatteryLevel, msg => ProcessBatteryLevelMessage((BatteryLevel)msg));
+            _messageHandlers.Add(MessageType.Rssi, msg => ProcessRssiMessage((Rssi)msg));
+            _messageHandlers.Add(MessageType.Temperature, msg => ProcessTemperatureMessage((Temperature)msg));
             _messageHandlers.Add(MessageType.Telemetry, msg => ProcessTelemetryMessage((Telemetry)msg));
             _messageHandlers.Add(MessageType.DebugLog, msg => ProcessDebugLogMessage((DebugLog)msg));
             _messageHandlers.Add(MessageType.NotifyUser, msg => ProcessNotifyUserMessage((NotifyUser)msg));
@@ -386,6 +429,12 @@ namespace Systemic.Unity.Pixels
                 pixelId = message.pixelId;
                 buildTimestamp = message.buildTimestamp;
 
+                // Roll state
+                NotifyRollState(message.rollState, message.rollFaceIndex);
+
+                // Battery level
+                NotifyBatteryLevel(message.batteryLevelPercent, message.batteryChargeState >= PixelBatteryState.Charging);
+
                 if (appearanceChanged)
                 {
                     // Notify
@@ -395,21 +444,31 @@ namespace Systemic.Unity.Pixels
 
             void ProcessRollStateMessage(RollState message)
             {
-                Debug.Log($"Pixel {SafeName}: State is {message.state}, {message.faceIndex}");
+                NotifyRollState(message.state, message.faceIndex);
+            }
 
-                if ((message.state != rollState) || (message.faceIndex != currentFace))
-                {
-                    // Update instance
-                    rollState = message.state;
-                    currentFace = message.faceIndex;
+            void ProcessBatteryLevelMessage(BatteryLevel message)
+            {
+                NotifyBatteryLevel(message.levelPercent, message.batteryState >= PixelBatteryState.Charging);
+            }
 
-                    // Notify
-                    RollStateChanged?.Invoke(this, rollState, currentFace);
-                }
+            void ProcessRssiMessage(Rssi message)
+            {
+                NotifyRssi(message.value);
+            }
+
+            void ProcessTemperatureMessage(Temperature message)
+            {
+                NotifyTemperature(message.tempTimes100);
             }
 
             void ProcessTelemetryMessage(Telemetry message)
             {
+                NotifyRollState(message.accelFrame.rollState, message.accelFrame.faceIndex);
+                NotifyBatteryLevel(message.batteryLevelPercent, message.batteryChargeState >= PixelBatteryState.Charging);
+                NotifyRssi(message.rssi);
+                NotifyTemperature(message.tempTimes100);
+
                 // Notify
                 _notifyTelemetry?.Invoke(this, message.accelFrame);
             }
@@ -433,6 +492,58 @@ namespace Systemic.Unity.Pixels
             void ProcessPlayAudioClip(PlaySound message)
             {
                 _playAudioClip?.Invoke(this, message.clipId);
+            }
+        }
+
+        protected void NotifyRollState(PixelRollState state, byte faceIndex)
+        {
+            int face = faceIndex + 1;
+            if ((state != rollState) || (face != this.currentFace))
+            {
+                // Update instance
+                rollState = state;
+                currentFace = face;
+
+                // Notify
+                Debug.Log($"Pixel {SafeName}: Notifying roll state: {rollState}, face: {currentFace}");
+                RollStateChanged?.Invoke(this, rollState, this.currentFace);
+            }
+        }
+
+        protected void NotifyBatteryLevel(int level, bool charging)
+        {
+            if ((batteryLevel != level) || (isCharging != charging))
+            {
+                batteryLevel = level;
+                isCharging = charging;
+
+                Debug.Log($"Pixel {SafeName}: Notifying battery level: {batteryLevel}, isCharging: {isCharging}");
+                BatteryLevelChanged?.Invoke(this, batteryLevel, isCharging);
+            }
+        }
+
+        protected void NotifyRssi(int newRssi)
+        {
+            if (newRssi == 0) Debug.LogError("ZERO RSSSSI!!!");
+
+            if (rssi != newRssi)
+            {
+                rssi = newRssi;
+
+                Debug.Log($"Pixel {SafeName}: Notifying RSSI: {rssi}");
+                _notifyRssi?.Invoke(this, rssi);
+            }
+        }
+
+        protected void NotifyTemperature(int newTempTimes100)
+        {
+            float newTemp = newTempTimes100 / 100f;
+            if (temperature != newTemp)
+            {
+                temperature = newTemp;
+
+                Debug.Log($"Pixel {SafeName}: Notifying temperature: {temperature}");
+                TemperatureChanged?.Invoke(this, temperature);
             }
         }
 

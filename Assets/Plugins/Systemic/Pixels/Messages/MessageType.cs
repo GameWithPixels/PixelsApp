@@ -67,6 +67,15 @@ namespace Systemic.Unity.Pixels.Messages
         SetCurrentBehaviorAck,
         SetName,
         SetNameAck,
+        Sleep,
+        ExitValidation,
+        TransferInstantAnimSet,
+        TransferInstantAnimSetAck,
+        TransferInstantAnimSetFinished,
+        PlayInstantAnim,
+        StopAllAnims,
+        RequestTemperature,
+        Temperature,
 
         // Testing
         TestBulkSend,
@@ -77,6 +86,6 @@ namespace Systemic.Unity.Pixels.Messages
         PrintA2DReadings,
         LightUpFace,
         SetLEDToColor,
-        DebugAnimationController,
+        PrintAnimControllerState,
     }
 }

@@ -8,17 +8,17 @@ namespace Systemic.Unity.BluetoothLE
     public static class BleUuid
     {
         /// <summary>
-        /// Convert a 16 bits Bluetooth LE UUID to a full 128 bit UUID
+        /// Converts a 16 bits Bluetooth LE UUID to a full 128 bit UUID.
         /// </summary>
-        /// <param name="shortUuid">A short BLE UUID (16 bits)</param>
-        /// <returns>128 bit UUID as a <see cref="Guid"/></returns>
+        /// <param name="shortUuid">Short BLE UUID (16 bits).</param>
+        /// <returns>A 128 bits UUID as a <see cref="Guid"/>.</returns>
         public static Guid ToFullUuid(short shortUuid) => new Guid($"0000{shortUuid:x4}-0000-1000-8000-00805f9b34fb");
 
         /// <summary>
-        /// Convert a string representing a Bluetooth LE UUID (16 or 128 bits) to a <see cref="Guid"/>.
+        /// Converts a string representing a Bluetooth LE UUID (16 or 128 bits) to a <see cref="Guid"/>.
         /// </summary>
-        /// <param name="bleUuid">String representing BLE UUID (16 or 128 bits)</param>
-        /// <returns>128 bit UUID as a <see cref="Guid"/></returns>
+        /// <param name="bleUuid">String representing a BLE UUID (16 or 128 bits).</param>
+        /// <returns>A 128 bit UUID as a <see cref="Guid"/>.</returns>
         public static Guid StringToGuid(string bleUuid)
         {
             if (bleUuid == null)

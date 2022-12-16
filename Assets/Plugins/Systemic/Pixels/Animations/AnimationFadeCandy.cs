@@ -109,9 +109,9 @@ namespace Systemic.Unity.Pixels.Animations
             //int gradientTime = time * 1000 / preset.duration;
             //uint color = gradient.evaluateColor(animationBits, gradientTime);
 
-            // Fill the indices and colors for the anim controller to know how to update leds
-            int retCount = Constants.MaxLedsCount;
-            for (int i = 0; i < Constants.MaxLedsCount; ++i)
+            // Fill the indices and colors for the anim controller to know how to update LEDs
+            int retCount = Constants.MaxLEDsCount;
+            for (int i = 0; i < Constants.MaxLEDsCount; ++i)
             {
                 retIndices[i] = i;
                 retColors[i] = 0;
@@ -143,7 +143,7 @@ namespace Systemic.Unity.Pixels.Animations
         public override int stop(int[] retIndices)
         {
             int retCount = 0;
-            for (int i = 0; i < Constants.MaxLedsCount; ++i)
+            for (int i = 0; i < Constants.MaxLEDsCount; ++i)
             {
                 retIndices[retCount] = i;
                 retCount++;

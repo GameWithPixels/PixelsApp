@@ -78,60 +78,36 @@ namespace Systemic.Unity.Pixels
         /// <summary>
         /// Sends a message to the Pixel to turn telemetry on or off.
         /// </summary>
-        /// <param name="turnOn"></param>
-        public void RequestTelemetry(bool turnOn)
+        /// <param name="activate">Whether to turn telemetry reporting on or off.</param>
+        public void ReportTelemetry(bool activate)
         {
-            PostMessage(new RequestTelemetry() { activate = turnOn ? (byte)1 : (byte)0 });
+            PostMessage(new RequestTelemetry()
+            {
+                requestMode = activate ? TelemetryRequestMode.Repeat : TelemetryRequestMode.Off,
+                minInterval = 100,
+            });
         }
 
         /// <summary>
-        /// Sends a message to the Pixel to update the <see cref="batteryLevel"/> and
-        /// <see cref="isCharging"/> properties.
+        /// Sends a message to the Pixel to make it report the <see cref="rssi"/> value.
         /// </summary>
-        /// <param name="onResult">An optional callback that is called when the operation completes
-        ///                        successfully (true) or not (false) with an error message.</param>
-        /// <returns>An enumerator meant to be run as a coroutine.</returns>
-        public IEnumerator UpdateBatteryLevelAsync(OperationResultCallback onResult = null)
+        /// <param name="activate">Whether to turn RSSI reporting on or off.</param>
+        public void ReportRssi(bool activate)
         {
-            //TODO stay registered?
-            var op = new SendMessageAndProcessResponseWithValueEnumerator<RequestBatteryLevel, BatteryLevel, float>(this,
-                lvlMsg =>
-                {
-                    bool charging = lvlMsg.charging != 0;
-                    bool changed = (batteryLevel != lvlMsg.level) || (isCharging != charging);
-                    batteryLevel = lvlMsg.level;
-                    isCharging = charging;
-                    if (changed)
-                    {
-                        BatteryLevelChanged?.Invoke(this, batteryLevel, isCharging);
-                    }
-                    return lvlMsg.level;
-                });
-            yield return op;
-            onResult?.Invoke(op.IsSuccess, op.Error);
+            PostMessage(new RequestRssi()
+            {
+                requestMode = activate ? TelemetryRequestMode.Repeat : TelemetryRequestMode.Off,
+                minInterval = 5000, // 5 sec
+            });
         }
 
         /// <summary>
-        /// Sends a message to the Pixel to update the <see cref="rssi"/> property.
+        /// Sends a message to the Pixel to update the <see cref="temperature"/> property.
         /// </summary>
-        /// <param name="onResult">An optional callback that is called when the operation completes
-        ///                        successfully (true) or not (false) with an error message.</param>
-        /// <returns>An enumerator meant to be run as a coroutine.</returns>
-        public IEnumerator UpdateRssiAsync(OperationResultCallback onResult = null)
+        /// <param name="onResult"></param>
+        public void UpdateTemperature(OperationResultCallback onResult = null)
         {
-            //TODO stay registered?
-            var op = new SendMessageAndProcessResponseWithValueEnumerator<RequestRssi, Rssi, int>(this,
-                rssiMsg =>
-                {
-                    if (rssi != rssiMsg.value)
-                    {
-                        rssi = rssiMsg.value;
-                        RssiChanged?.Invoke(this, rssi);
-                    }
-                    return rssiMsg.value;
-                });
-            yield return op;
-            onResult?.Invoke(op.IsSuccess, op.Error);
+            PostMessage(new RequestTemperature());
         }
 
         /// <summary>

@@ -67,16 +67,23 @@ namespace Systemic.Unity.Pixels
     /// Delegate for Pixel battery level changes.
     /// </summary>
     /// <param name="pixel">The source of the event.</param>
-    /// <param name="batteryLevel">The latest battery level reported by the die, normalized between 0 and 1 included.</param>
+    /// <param name="batteryLevel">The latest battery level reported by the die, in percent.</param>
     /// <param name="isCharging">Whether or not the battery is reported as charging.</param>
-    public delegate void BatteryLevelChangedEventHandler(Pixel pixel, float batteryLevel, bool? isCharging);
+    public delegate void BatteryLevelChangedEventHandler(Pixel pixel, int batteryLevel, bool isCharging);
 
     /// <summary>
     /// Delegate for Pixel RSSI changes.
     /// </summary>
     /// <param name="pixel">The source of the event.</param>
-    /// <param name="rssi">The latest RSSI reported by the die.</param>
+    /// <param name="rssi">The latest RSSI in dBm reported by the die.</param>
     public delegate void RssiChangedEventHandler(Pixel pixel, int rssi);
+
+    /// <summary>
+    /// Delegate for Pixel temperature changes.
+    /// </summary>
+    /// <param name="pixel">The source of the event.</param>
+    /// <param name="temperature">The latest temperature in Celsius degrees reported by the die.</param>
+    public delegate void TemperatureChangedEventHandler(Pixel pixel, float temperature);
 
     /// <summary>
     /// Delegate for Pixel telemetry events.

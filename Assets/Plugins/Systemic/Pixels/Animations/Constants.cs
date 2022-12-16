@@ -8,7 +8,7 @@ namespace Systemic.Unity.Pixels.Animations
 {
     public static class Constants
     {
-        public const int MaxLedsCount = 20;
+        public const int MaxLEDsCount = 20;
 
         static int[] faceIndices = new int[] { 17, 1, 19, 13, 3, 10, 8, 5, 15, 7, 9, 11, 14, 4, 12, 0, 18, 2, 16, 6 };
         public static int getFaceIndex(int i) => faceIndices[i];

@@ -168,14 +168,7 @@ namespace Systemic.Unity.Pixels.Messages
                         ret = FromByteArray<DefaultAnimationSetColor>(data);
                         break;
                     case MessageType.BatteryLevel:
-#if PLATFORM_ANDROID
-                        var modifiedData = new byte[13];
-                        modifiedData[0] = data[0];
-                        System.Array.Copy(data, 1, modifiedData, 4, 9);
-                        ret = FromByteArray<BatteryLevel>(modifiedData);
-#else
                         ret = FromByteArray<BatteryLevel>(data);
-#endif
                         break;
                     case MessageType.RequestBatteryLevel:
                         ret = FromByteArray<RequestBatteryLevel>(data);
@@ -240,8 +233,14 @@ namespace Systemic.Unity.Pixels.Messages
                     case MessageType.SetNameAck:
                         ret = FromByteArray<SetNameAck>(data);
                         break;
-                    case MessageType.DebugAnimationController:
-                        ret = FromByteArray<DebugAnimationController>(data);
+                    case MessageType.RequestTemperature:
+                        ret = FromByteArray<RequestTemperature>(data);
+                        break;
+                    case MessageType.Temperature:
+                        ret = FromByteArray<Temperature>(data);
+                        break;
+                    case MessageType.PrintAnimControllerState:
+                        ret = FromByteArray<PrintAnimControllerState>(data);
                         break;
                     default:
                         throw new System.Exception($"Unhandled DieMessage type {type} for marshaling");
@@ -254,7 +253,7 @@ namespace Systemic.Unity.Pixels.Messages
             where T : class
         {
             int size = Marshal.SizeOf<T>();
-            if (data?.Length == size)
+            if (data?.Length >= size)
             {
                 var ptr = Marshal.AllocHGlobal(size);
                 try
@@ -269,7 +268,7 @@ namespace Systemic.Unity.Pixels.Messages
             }
             else
             {
-                Debug.LogError($"Incorrect data size ${data?.Length ?? -1} != ${size} for marshaling to message of type {typeof(T).Name}");
+                Debug.LogError($"Incorrect data size {data?.Length ?? -1} != {size} for marshaling to message of type {typeof(T).Name}");
                 return null;
             }
         }

@@ -38,8 +38,8 @@ namespace Systemic.Unity.Pixels
 
                 // Current state
                 public PixelRollState rollState; // Indicates whether the dice is being shaken
-                public byte currentFace; // Which face is currently up
-                public byte batteryLevel; // 0 -> 255
+                public byte faceIndex; // Which face is currently up
+                public byte batteryLevel; // Charge level in percent, MSB is charging
             };
 
             /// <summary>
@@ -126,26 +126,21 @@ namespace Systemic.Unity.Pixels
                 systemId = _peripheral.SystemId;
                 name = _peripheral.Name;
 
-                bool rssiChanged = rssi != _peripheral.Rssi;
-                rssi = _peripheral.Rssi;
-                if (rssiChanged)
-                {
-                    RssiChanged?.Invoke(this, rssi);
-                }
+                NotifyRssi(_peripheral.Rssi);
 
                 if (_peripheral.ManufacturersData?.Count > 0)
                 {
                     var manufDataSrc = _peripheral.ManufacturersData[0]; // Assume we want to use the first one
-                    bool isManufData = manufDataSrc.Data.Count == Marshal.SizeOf(typeof(CustomManufacturerData));
+                    bool isNewAdvData = manufDataSrc.Data.Count == Marshal.SizeOf(typeof(CustomManufacturerData));
                     bool isOldAdvData = manufDataSrc.Data.Count == (Marshal.SizeOf(typeof(OlderCustomAdvertisingData)) - 2);
 
                     // Marshall the data into the struct we expect
-                    if (isManufData || isOldAdvData)
+                    if (isNewAdvData || isOldAdvData)
                     {
                         var manufData = new CustomManufacturerData();
                         var servData = new CustomServiceData();
 
-                        if (isManufData)
+                        if (isNewAdvData)
                         {
                             int size = Marshal.SizeOf(typeof(CustomManufacturerData));
 
@@ -198,41 +193,31 @@ namespace Systemic.Unity.Pixels
                             manufData.ledCount = advData.ledCount;
                             manufData.designAndColor = advData.designAndColor;
                             manufData.rollState = advData.rollState;
-                            manufData.currentFace = advData.currentFace;
-                            manufData.batteryLevel = advData.batteryLevel;
+                            manufData.faceIndex = advData.currentFace;
+                            manufData.batteryLevel = (byte)(Mathf.RoundToInt(100f * advData.batteryLevel / 255) & 0x7F);
 
                             servData.pixelId = advData.pixelId;
                         }
 
                         // Update Pixel data
                         bool appearanceChanged = ledCount != manufData.ledCount || designAndColor != manufData.designAndColor;
-                        bool rollStateChanged = rollState != manufData.rollState || currentFace != manufData.currentFace;
                         ledCount = manufData.ledCount;
                         designAndColor = manufData.designAndColor;
-                        rollState = manufData.rollState;
-                        currentFace = manufData.currentFace;
-
-                        float newBatteryLevel = manufData.batteryLevel / 255f;
-                        bool batteryLevelChanged = batteryLevel != newBatteryLevel;
-                        batteryLevel = newBatteryLevel;
-                        isCharging = null;
 
                         pixelId = servData.pixelId;
                         buildTimestamp = servData.buildTimestamp;
+
+                        // MSB is battery charging
+                        int newBatteryLevel = manufData.batteryLevel & 0x7F;
+                        bool newIsCharging = (manufData.batteryLevel & 0x80) != 0;
 
                         // Run callbacks
                         if (appearanceChanged)
                         {
                             AppearanceChanged?.Invoke(this, ledCount, designAndColor);
                         }
-                        if (rollStateChanged)
-                        {
-                            RollStateChanged?.Invoke(this, rollState, currentFace);
-                        }
-                        if (batteryLevelChanged)
-                        {
-                            BatteryLevelChanged?.Invoke(this, batteryLevel, isCharging);
-                        }
+                        NotifyRollState(manufData.rollState, manufData.faceIndex);
+                        NotifyBatteryLevel(newBatteryLevel, newIsCharging);
                     }
                     else
                     {
@@ -470,14 +455,6 @@ namespace Systemic.Unity.Pixels
                     // Ask the Pixel who it is!
                     var request = new SendMessageAndWaitForResponseEnumerator<WhoAreYou, IAmADie>(this) as IOperationEnumerator;
                     yield return request;
-
-                    // Continue identification if we are still in the identify state
-                    if (request.IsSuccess && (connectionState == PixelConnectionState.Identifying))
-                    {
-                        // Get the Pixel initial state
-                        request = new SendMessageAndWaitForResponseEnumerator<RequestRollState, RollState>(this);
-                        yield return request;
-                    }
 
                     // Report result
                     onResult(request);

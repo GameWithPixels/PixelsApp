@@ -68,12 +68,12 @@ namespace Systemic.Unity.Pixels.Animations
             if (preset.traveling != 0)
             {
                 // Fill the indices and colors for the anim controller to know how to update LEDs
-                for (int i = 0; i < Constants.MaxLedsCount; ++i)
+                for (int i = 0; i < Constants.MaxLEDsCount; ++i)
                 {
                     if ((preset.faceMask & (1 << i)) != 0)
                     {
                         retIndices[retCount] = Constants.getFaceIndex(i);
-                        retColors[retCount] = GammaUtils.Gamma(ColorUIntUtils.RainbowWheel((byte)((wheelPos + i * 256 / Constants.MaxLedsCount) % 256), intensity));
+                        retColors[retCount] = GammaUtils.Gamma(ColorUIntUtils.RainbowWheel((byte)((wheelPos + i * 256 / Constants.MaxLEDsCount) % 256), intensity));
                         retCount++;
                     }
                 }
@@ -84,7 +84,7 @@ namespace Systemic.Unity.Pixels.Animations
                 uint color = GammaUtils.Gamma(ColorUIntUtils.RainbowWheel((byte)wheelPos, intensity));
 
                 // Fill the indices and colors for the anim controller to know how to update LEDs
-                for (int i = 0; i < Constants.MaxLedsCount; ++i)
+                for (int i = 0; i < Constants.MaxLEDsCount; ++i)
                 {
                     if ((preset.faceMask & (1 << i)) != 0)
                     {
@@ -102,7 +102,7 @@ namespace Systemic.Unity.Pixels.Animations
         {
             var preset = getPreset();
             int retCount = 0;
-            for (int i = 0; i < Constants.MaxLedsCount; ++i)
+            for (int i = 0; i < Constants.MaxLEDsCount; ++i)
             {
                 if ((preset.faceMask & (1 << i)) != 0)
                 {

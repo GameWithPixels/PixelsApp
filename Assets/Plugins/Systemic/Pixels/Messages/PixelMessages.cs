@@ -38,6 +38,14 @@ namespace Systemic.Unity.Pixels.Messages
         public uint pixelId; // A unique identifier
         public ushort availableFlashSize; // Available flash memory size for storing settings
         public uint buildTimestamp; // Firmware build timestamp
+
+        // Roll state
+        public PixelRollState rollState;
+        public byte rollFaceIndex;
+
+        // Battery level
+        public byte batteryLevelPercent;
+        public PixelBatteryState batteryChargeState;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -54,6 +62,20 @@ namespace Systemic.Unity.Pixels.Messages
         public MessageType type { get; set; } = MessageType.Telemetry;
 
         public AccelerationFrame accelFrame;
+
+        // Battery and power
+        public byte batteryLevelPercent;
+        public PixelBatteryState batteryChargeState;
+        public byte voltageTimes50;
+        public byte vCoilTimes50;
+
+        // RSSI
+        public sbyte rssi;
+        public byte channelIndex;
+
+        // Temperature
+        public short tempTimes100;
+        public short temp2Times100;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -183,11 +205,19 @@ namespace Systemic.Unity.Pixels.Messages
         public MessageType type { get; set; } = MessageType.RequestSettings;
     }
 
+    public enum TelemetryRequestMode : byte
+    {
+        Off = 0,
+        Once = 1,
+        Repeat = 2,
+    };
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class RequestTelemetry : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.RequestTelemetry;
-        public byte activate; // Boolean
+        public TelemetryRequestMode requestMode;
+        public ushort minInterval; // Milliseconds, 0 for no cap on rate
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -309,19 +339,16 @@ namespace Systemic.Unity.Pixels.Messages
     public class BatteryLevel : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.BatteryLevel;
-#if PLATFORM_ANDROID
-        // We need padding on ARMv7 to have 4 bytes alignment for float types
-        private byte _padding1, _padding2, _padding3;
-#endif
-        public float level;
-        public float voltage;
-        public byte charging;
+        public byte levelPercent;
+        public PixelBatteryState batteryState;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class RequestRssi : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.RequestRssi;
+        public TelemetryRequestMode requestMode;
+        public ushort minInterval; // Milliseconds, 0 for no cap on rate
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -329,7 +356,6 @@ namespace Systemic.Unity.Pixels.Messages
     {
         public MessageType type { get; set; } = MessageType.Rssi;
         public sbyte value;
-        public byte channelIndex;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -457,9 +483,23 @@ namespace Systemic.Unity.Pixels.Messages
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class DebugAnimationController : IPixelMessage
+    public class RequestTemperature : IPixelMessage
     {
-        public MessageType type { get; set; } = MessageType.DebugAnimationController;
+        public MessageType type { get; set; } = MessageType.RequestTemperature;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class Temperature : IPixelMessage
+    {
+        public MessageType type { get; set; } = MessageType.Temperature;
+
+        public ushort tempTimes100;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class PrintAnimControllerState : IPixelMessage
+    {
+        public MessageType type { get; set; } = MessageType.PrintAnimControllerState;
     }
 }
 

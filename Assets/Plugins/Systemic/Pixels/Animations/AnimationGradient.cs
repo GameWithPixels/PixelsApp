@@ -44,9 +44,9 @@ namespace Systemic.Unity.Pixels.Animations
             int gradientTime = time * 1000 / preset.duration;
             uint color = gradient.evaluateColor(animationBits, gradientTime);
 
-            // Fill the indices and colors for the anim controller to know how to update leds
+            // Fill the indices and colors for the anim controller to know how to update LEDs
             int retCount = 0;
-            for (int i = 0; i < Constants.MaxLedsCount; ++i)
+            for (int i = 0; i < Constants.MaxLEDsCount; ++i)
             {
                 if ((preset.faceMask & (1 << i)) != 0)
                 {
@@ -62,7 +62,7 @@ namespace Systemic.Unity.Pixels.Animations
         {
             var preset = getPreset();
             int retCount = 0;
-            for (int i = 0; i < Constants.MaxLedsCount; ++i)
+            for (int i = 0; i < Constants.MaxLEDsCount; ++i)
             {
                 if ((preset.faceMask & (1 << i)) != 0)
                 {
