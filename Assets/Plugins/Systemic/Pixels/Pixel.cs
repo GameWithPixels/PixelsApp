@@ -180,9 +180,14 @@ namespace Systemic.Unity.Pixels
         public int rssi { get; private set; }
 
         /// <summary>
-        /// 
+        /// Pixel microcontroller temperature in degree Celsius.
         /// </summary>
-        public float temperature { get; private set; }
+        public float mcuTemperature { get; private set; }
+
+        /// <summary>
+        /// Pixel battery temperature in degree Celsius.
+        /// </summary>
+        public float batteryTemperature { get; private set; }
 
         #endregion
 
@@ -433,7 +438,7 @@ namespace Systemic.Unity.Pixels
                 NotifyRollState(message.rollState, message.rollFaceIndex);
 
                 // Battery level
-                NotifyBatteryLevel(message.batteryLevelPercent, message.batteryChargeState >= PixelBatteryState.Charging);
+                NotifyBatteryLevel(message.batteryLevelPercent, message.batteryState >= PixelBatteryState.Charging);
 
                 if (appearanceChanged)
                 {
@@ -459,15 +464,15 @@ namespace Systemic.Unity.Pixels
 
             void ProcessTemperatureMessage(Temperature message)
             {
-                NotifyTemperature(message.tempTimes100);
+                NotifyTemperature(message.mcuTemperatureTimes100, message.batteryTemperatureTimes100);
             }
 
             void ProcessTelemetryMessage(Telemetry message)
             {
                 NotifyRollState(message.accelFrame.rollState, message.accelFrame.faceIndex);
-                NotifyBatteryLevel(message.batteryLevelPercent, message.batteryChargeState >= PixelBatteryState.Charging);
+                NotifyBatteryLevel(message.batteryLevelPercent, message.batteryState >= PixelBatteryState.Charging);
                 NotifyRssi(message.rssi);
-                NotifyTemperature(message.tempTimes100);
+                NotifyTemperature(message.mcuTemperatureTimes100, message.batteryTemperatureTimes100);
 
                 // Notify
                 _notifyTelemetry?.Invoke(this, message.accelFrame);
@@ -535,15 +540,17 @@ namespace Systemic.Unity.Pixels
             }
         }
 
-        protected void NotifyTemperature(int newTempTimes100)
+        protected void NotifyTemperature(int newMcuTempTimes100, int newBatteryTempTimes100)
         {
-            float newTemp = newTempTimes100 / 100f;
-            if (temperature != newTemp)
+            float newMcuTemp = newMcuTempTimes100 / 100f;
+            float newBatteryTemp = newBatteryTempTimes100 / 100f;
+            if (mcuTemperature != newMcuTemp || batteryTemperature != newBatteryTemp)
             {
-                temperature = newTemp;
+                mcuTemperature = newMcuTemp;
+                batteryTemperature = newBatteryTemp;
 
-                Debug.Log($"Pixel {SafeName}: Notifying temperature: {temperature}");
-                TemperatureChanged?.Invoke(this, temperature);
+                Debug.Log($"Pixel {SafeName}: Notifying MCU temperature = {mcuTemperature} and battery temperature = {batteryTemperature}");
+                TemperatureChanged?.Invoke(this, mcuTemperature, batteryTemperature);
             }
         }
 

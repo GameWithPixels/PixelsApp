@@ -82,8 +82,9 @@ namespace Systemic.Unity.Pixels
     /// Delegate for Pixel temperature changes.
     /// </summary>
     /// <param name="pixel">The source of the event.</param>
-    /// <param name="temperature">The latest temperature in Celsius degrees reported by the die.</param>
-    public delegate void TemperatureChangedEventHandler(Pixel pixel, float temperature);
+    /// <param name="temperature">The latest temperature for the microcontroller and the battery
+    ///                           in Celsius degrees reported by the die.</param>
+    public delegate void TemperatureChangedEventHandler(Pixel pixel, float mcuTemperature, float batteryTemperature);
 
     /// <summary>
     /// Delegate for Pixel telemetry events.

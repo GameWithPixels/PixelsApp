@@ -45,7 +45,7 @@ namespace Systemic.Unity.Pixels.Messages
 
         // Battery level
         public byte batteryLevelPercent;
-        public PixelBatteryState batteryChargeState;
+        public PixelBatteryState batteryState;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -65,7 +65,7 @@ namespace Systemic.Unity.Pixels.Messages
 
         // Battery and power
         public byte batteryLevelPercent;
-        public PixelBatteryState batteryChargeState;
+        public PixelBatteryState batteryState;
         public byte voltageTimes50;
         public byte vCoilTimes50;
 
@@ -74,8 +74,8 @@ namespace Systemic.Unity.Pixels.Messages
         public byte channelIndex;
 
         // Temperature
-        public short tempTimes100;
-        public short temp2Times100;
+        public short mcuTemperatureTimes100;
+        public short batteryTemperatureTimes100;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -493,7 +493,8 @@ namespace Systemic.Unity.Pixels.Messages
     {
         public MessageType type { get; set; } = MessageType.Temperature;
 
-        public ushort tempTimes100;
+        public short mcuTemperatureTimes100;
+        public short batteryTemperatureTimes100;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

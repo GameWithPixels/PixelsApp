@@ -102,7 +102,8 @@ namespace Systemic.Unity.Pixels
         }
 
         /// <summary>
-        /// Sends a message to the Pixel to update the <see cref="temperature"/> property.
+        /// Sends a message to the Pixel to update the <see cref="mcuTemperature"/> and
+        /// <see cref="batteryTemperature"/> properties.
         /// </summary>
         /// <param name="onResult"></param>
         public void UpdateTemperature(OperationResultCallback onResult = null)

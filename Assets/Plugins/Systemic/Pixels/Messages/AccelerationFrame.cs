@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Systemic.Unity.Pixels.Messages
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct AccelerationFrame
     {
         public float accX;
