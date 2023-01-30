@@ -5,19 +5,19 @@ Shader "Standard Triplanar"
 {
     Properties
     {
-        _Color("", Color) = (1, 1, 1, 1)
-        _MainTex("", 2D) = "white" {}
+        _Color("Color", Color) = (1, 1, 1, 1)
+        _MainTex("Albedo", 2D) = "white" {}
 
-        _Glossiness("", Range(0, 1)) = 0.5
-        [Gamma] _Metallic("", Range(0, 1)) = 0
+        _Glossiness("Glossiness", Range(0, 1)) = 0.5
+        [Gamma] _Metallic("Metallic", Range(0, 1)) = 0
 
-        _BumpScale("", Float) = 1
-        _BumpMap("", 2D) = "bump" {}
+        _BumpScale("Bump Scale", Float) = 1
+        _BumpMap("Bump Map", 2D) = "bump" {}
 
-        _OcclusionStrength("", Range(0, 1)) = 1
-        _OcclusionMap("", 2D) = "white" {}
+        _OcclusionStrength("Occlusion Strength", Range(0, 1)) = 1
+        _OcclusionMap("Occlusion Map", 2D) = "white" {}
 
-        _MapScale("", Float) = 1
+        _MapScale("Map Scale", Float) = 1
     }
     SubShader
     {

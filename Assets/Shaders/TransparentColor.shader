@@ -2,10 +2,10 @@
 {
 	Properties
 	{
-		_MainTex("Texture", 2D) = "white" {}
-	_Color("Color", Color) = (1.0, 1.0, 1.0, 1.0)
+		_MainTex("Albedo", 2D) = "white" {}
+		_Color("Color", Color) = (1.0, 1.0, 1.0, 1.0)
 	}
-		SubShader
+	SubShader
 	{
 		Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" }
 		LOD 100
