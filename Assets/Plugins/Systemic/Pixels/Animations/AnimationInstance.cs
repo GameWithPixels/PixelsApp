@@ -7,25 +7,30 @@ namespace Systemic.Unity.Pixels.Animations
     /// </summary>
     public abstract class AnimationInstance
     {
-        public IAnimationPreset animationPreset;
-        public DataSet.AnimationBits animationBits;
-        public int startTime; //ms
-        public byte remapFace;
-        public bool loop;
+        public IAnimationPreset animationPreset
+        {
+            get; private set;
+        }
+        public DataSet.AnimationBits animationBits
+        {
+            get; private set;
+        }
+        public int startTime
+        {
+            get; private set;
+        }
 
         protected DataSet set;
 
-        public AnimationInstance(IAnimationPreset animation, DataSet.AnimationBits bits)
+        public AnimationInstance(IAnimationPreset preset, DataSet.AnimationBits bits)
         {
-            animationPreset = animation;
+            animationPreset = preset;
             animationBits = bits;
         }
 
-        public virtual void start(int _startTime, byte _remapFace, bool _loop)
+        public virtual void start(int _startTime)
         {
             startTime = _startTime;
-            remapFace = _remapFace;
-            loop = _loop;
         }
 
         public abstract int updateLEDs(int ms, int[] retIndices, uint[] retColors);

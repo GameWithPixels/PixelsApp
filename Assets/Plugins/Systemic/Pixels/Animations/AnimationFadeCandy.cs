@@ -93,10 +93,10 @@ namespace Systemic.Unity.Pixels.Animations
             }
         }
 
-        public override void start(int _startTime, byte _remapFace, bool _loop)
+        public override void start(int startTime)
         {
-            base.start(_startTime, _remapFace, _loop);
-            AddSphere(_startTime);
+            base.start(startTime);
+            AddSphere(startTime);
         }
 
         public override int updateLEDs(int ms, int[] retIndices, uint[] retColors)

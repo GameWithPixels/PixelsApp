@@ -37,9 +37,9 @@ namespace Systemic.Unity.Pixels.Animations
         {
         }
 
-        public override void start(int _startTime, byte _remapFace, bool _loop)
+        public override void start(int startTime)
         {
-            base.start(_startTime, _remapFace, _loop);
+            base.start(startTime);
             var preset = getPreset();
             rgb = animationBits.getColor32(preset.colorIndex);
         }

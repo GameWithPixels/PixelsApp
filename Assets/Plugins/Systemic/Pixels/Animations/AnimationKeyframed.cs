@@ -184,11 +184,6 @@ namespace Systemic.Unity.Pixels.Animations
         {
         }
 
-        public override void start(int _startTime, byte _remapFace, bool _loop)
-        {
-            base.start(_startTime, _remapFace, _loop);
-        }
-
         /// <summary>
         /// Computes the list of LEDs that need to be on, and what their intensities should be
         /// based on the different tracks of this animation.

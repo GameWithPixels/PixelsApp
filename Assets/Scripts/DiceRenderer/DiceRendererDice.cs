@@ -62,7 +62,7 @@ public class DiceRendererDice : MonoBehaviour
             if (currentInstance != null)
             {
                 // We're switching the animation from underneath the playback
-                SetupInstance(currentAnimationIndex, currentInstance.startTime, currentInstance.remapFace);
+                SetupInstance(currentAnimationIndex, currentInstance.startTime);
             }
         }
         else
@@ -81,7 +81,7 @@ public class DiceRendererDice : MonoBehaviour
             if (currentInstance != null)
             {
                 // We're switching the animation from underneath the playback
-                SetupInstance(currentAnimationIndex, currentInstance.startTime, currentInstance.remapFace);
+                SetupInstance(currentAnimationIndex, currentInstance.startTime);
             }
         }
         else
@@ -187,7 +187,7 @@ public class DiceRendererDice : MonoBehaviour
                                 }
                                 if (animations[currentAnimationIndex] != null)
                                 {
-                                    SetupInstance(currentAnimationIndex, (int)(Time.time * 1000), 0xFF);
+                                    SetupInstance(currentAnimationIndex, (int)(Time.time * 1000));
                                 }
                                 else
                                 {
@@ -295,12 +295,12 @@ public class DiceRendererDice : MonoBehaviour
         }
     }
 
-    void SetupInstance(int animationIndex, int startTime, byte remapFace)
+    void SetupInstance(int animationIndex, int startTime)
     {
         currentAnimationIndex = animationIndex;
         EditDataSet tempEditSet = AppDataSet.Instance.ExtractEditSetForAnimation(animations[animationIndex]);
         dataSet = tempEditSet.ToDataSet();
         currentInstance = dataSet.animations[0].CreateInstance(dataSet.animationBits);
-        currentInstance.start(startTime, remapFace, false);
+        currentInstance.start(startTime);
     }
 }
