@@ -423,7 +423,7 @@ namespace Systemic.Unity.Pixels
             void ProcessIAmADieMessage(IAmADie message)
             {
                 Debug.Log($"Pixel {SafeName}: {message.availableFlashSize} bytes available for data,"
-                    + $" current dataset hash {message.dataSetHash:X08}, firmware build is {System.DateTime.FromFileTimeUtc(message.buildTimestamp)}");
+                    + $" current dataset hash {message.dataSetHash:X08}, firmware build is {UnixTimestampToDateTime(message.buildTimestamp)}");
 
                 // Update instance
                 bool appearanceChanged = ledCount != message.ledCount || designAndColor != message.designAndColor;
