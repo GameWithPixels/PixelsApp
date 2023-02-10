@@ -60,7 +60,7 @@ public class EditAnimationKeyframed
     [RGBPattern, Name("LED Pattern")]
     public EditPattern pattern = new EditPattern();
     [Name("Traveling Order")]
-    public bool flowOrder = false;
+    public bool traveling = false;
 
     //[Slider, FloatRange(-0.5f, 0.5f), Name("Hue Adjustment")]
     //public float hueAdjust = 0.0f;
@@ -87,7 +87,7 @@ public class EditAnimationKeyframed
             duration = (ushort)(duration * 1000), // stored in milliseconds
             tracksOffset = (ushort)editSet.getPatternRGBTrackOffset(pattern),
             trackCount = (ushort)pattern.gradients.Count,
-            flowOrder = flowOrder ? (byte)1 : (byte)0,
+            flowOrder = traveling ? (byte)1 : (byte)0,
         };
     }
 
@@ -97,7 +97,7 @@ public class EditAnimationKeyframed
         {
             name = name,
             pattern = pattern,
-            flowOrder = flowOrder,
+            traveling = traveling,
             //hueAdjust = hueAdjust;
         };
     }

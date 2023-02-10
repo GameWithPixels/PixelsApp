@@ -7,7 +7,7 @@ namespace Systemic.Unity.Pixels.Profiles
     /// </summary>
     public enum ActionType : byte
     {
-        Unknown = 0,
+        None = 0,
         PlayAnimation,
         PlayAudioClip,
     };

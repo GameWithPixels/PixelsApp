@@ -7,7 +7,7 @@ namespace Systemic.Unity.Pixels.Profiles
     /// </summary>
     public enum ConditionType : byte
     {
-        Unknown = 0,
+        None = 0,
         HelloGoodbye,
         Handling,
         Rolling,

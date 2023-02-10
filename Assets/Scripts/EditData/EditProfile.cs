@@ -9,8 +9,8 @@ using Systemic.Unity.Pixels.Profiles;
 public class EditProfile
     : EditObject
 {
-    public string name;
-    public string description;
+    public string name = string.Empty;
+    public string description = string.Empty;
     public readonly List<EditRule> rules;
 
     public readonly PreviewSettings defaultPreviewSettings = new PreviewSettings() { design = PixelDesignAndColor.V5Grey };

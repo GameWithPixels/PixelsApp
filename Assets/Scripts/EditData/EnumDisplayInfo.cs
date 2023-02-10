@@ -40,7 +40,7 @@ public static class EnumDisplayInfo
     {
         switch (animType)
         {
-            case AnimationType.Unknown:
+            case AnimationType.None:
                 return new NameAndOrder();
             case AnimationType.Simple:
                 return new NameAndOrder { Name = "Simple Flashes", Order = 0 };
@@ -62,7 +62,7 @@ public static class EnumDisplayInfo
     {
         switch (actionType)
         {
-            case ActionType.Unknown:
+            case ActionType.None:
                 return new NameAndOrder();
             case ActionType.PlayAnimation:
                 return new NameAndOrder { Name = "Trigger Pattern", Order = 0 };
@@ -78,7 +78,7 @@ public static class EnumDisplayInfo
     {
         switch (conditionType)
         {
-            case ConditionType.Unknown:
+            case ConditionType.None:
                 return new NameAndOrder();
             case ConditionType.HelloGoodbye:
                 return new NameAndOrder { Name = "Pixel wakes up / sleeps", Order = 0 };

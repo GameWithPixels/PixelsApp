@@ -9,7 +9,7 @@ namespace Systemic.Unity.Pixels.Animations
     /// </summary>
     public enum AnimationType : byte
     {
-        Unknown = 0,
+        None = 0,
         Simple,
         Rainbow,
         Keyframed,
