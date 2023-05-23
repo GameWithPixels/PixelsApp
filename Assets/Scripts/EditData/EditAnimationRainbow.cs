@@ -18,6 +18,9 @@ public class EditAnimationRainbow
     public float fade = 0.1f;
     [Name("Traveling Order")]
     public bool traveling = true;
+    [Slider]
+    [FloatRange(0.1f, 1.0f), Name("Intensity")]
+    public float intensity = 0.5f;
 
     public override AnimationType type { get { return AnimationType.Rainbow; } }
     public override IAnimationPreset ToAnimation(EditDataSet editSet, DataSet.AnimationBits bits)
@@ -29,6 +32,7 @@ public class EditAnimationRainbow
             fade = (byte)(255.0f * fade),
             count = (byte)count,
             traveling = traveling ? (byte)1 : (byte)0,
+            intensity = (byte)(intensity * 255.0f),
         };
     }
 
@@ -42,6 +46,7 @@ public class EditAnimationRainbow
             fade = fade,
             count = count,
             traveling = traveling,
+            intensity = intensity,
         };
     }
 }

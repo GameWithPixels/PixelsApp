@@ -161,7 +161,7 @@ public class EditConditionRolling
     : EditCondition
 {
     public override ConditionType type { get { return ConditionType.Rolling; } }
-    [Slider, FloatRange(0.5f, 5.0f, 0.1f), Units("sec")]
+    [Slider, FloatRange(0.0f, 5.0f, 0.1f), Units("sec")]
     public float recheckAfter = 1.0f;
     public override ICondition ToCondition(EditDataSet editSet, DataSet set)
     {
@@ -412,7 +412,7 @@ public class EditConditionBatteryState
 {
     [Bitfield, Name("Battery State")]
     public BatteryStateFlags flags;
-    [Slider, FloatRange(5.0f, 60.0f, 1.0f), Units("sec")]
+    [Slider, FloatRange(0.0f, 60.0f, 1.0f), Units("sec")]
     public float recheckAfter = 1.0f;
 
     public override ConditionType type { get { return ConditionType.BatteryState; } }

@@ -23,7 +23,7 @@ namespace Systemic.Unity.Pixels.Animations
         public byte count;
         public byte fade;
         public byte traveling;
-        public byte paddingTraveling;
+        public byte intensity;
 
         public AnimationInstance CreateInstance(DataSet.AnimationBits bits)
         {
@@ -52,16 +52,16 @@ namespace Systemic.Unity.Pixels.Animations
 
             int wheelPos = (time * preset.count * 255 / preset.duration) % 256;
 
-            byte intensity = 255;
+            byte intensity = preset.intensity;
             if (time <= fadeTime)
             {
                 // Ramp up
-                intensity = (byte)(time * 255 / fadeTime);
+                intensity = (byte)(time * preset.intensity / fadeTime);
             }
             else if (time >= (preset.duration - fadeTime))
             {
                 // Ramp down
-                intensity = (byte)((preset.duration - time) * 255 / fadeTime);
+                intensity = (byte)((preset.duration - time) * preset.intensity / fadeTime);
             }
 
             int retCount = 0;

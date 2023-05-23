@@ -161,10 +161,12 @@ namespace Systemic.Unity.Pixels.Profiles
     [System.Flags]
     public enum BatteryStateFlags : byte
     {
-        Ok        = 1 << 0,
-        Low       = 1 << 1,
-		Charging  = 1 << 2,
-		Done      = 1 << 3
+        Ok            = 1 << 0,
+        Low           = 1 << 1,
+		Charging      = 1 << 2,
+		Done          = 1 << 3,
+        BadCharging   = 1 << 4,
+        Error         = 1 << 5,
     };
 
     /// <summary>
