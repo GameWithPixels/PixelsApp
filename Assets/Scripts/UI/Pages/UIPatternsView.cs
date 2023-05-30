@@ -122,7 +122,7 @@ public class UIPatternsView
         {
             if (res)
             {
-                var dependentPresets = AppDataSet.Instance.CollectPresetsForAnimation(anim);
+                var dependentPresets = AppDataSet.Instance.CollectProfilesForAnimation(anim);
                 if (dependentPresets.Any())
                 {
                     StringBuilder builder = new StringBuilder();
