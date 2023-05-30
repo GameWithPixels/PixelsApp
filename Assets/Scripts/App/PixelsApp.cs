@@ -530,7 +530,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         }
 
 #if UNITY_EDITOR
-        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select JSON Pattern", "", "json"));
+        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select JSON Animation File", "", "json"));
 #elif UNITY_STANDALONE_WIN
         // Set filters (optional)
 		// It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
@@ -561,7 +561,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         }
 
 #if UNITY_EDITOR
-        FileSelected(UnityEditor.EditorUtility.SaveFilePanel("Export Pattern", "", animation.name, "json"));
+        FileSelected(UnityEditor.EditorUtility.SaveFilePanel("Export Animation", "", animation.name, "json"));
 #elif UNITY_STANDALONE_WIN
         // Set filters (optional)
         // It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
@@ -580,7 +580,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
             {
                 if (!res)
                 {
-                    Debug.LogError("Error exporting animation to JSON");
+                    Debug.LogError("Error exporting Animation to JSON");
                 }
                 File.Delete(jsonPathname);
             }));
@@ -593,7 +593,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         {
             if (!string.IsNullOrEmpty(filePathname))
             {
-                ShowDialogBox("Replace Settings?", "Presets, Lighting Patterns, LED Patterns and Profiles will be replaced. Imported Audio Clips will be kept.", "Yes", "No", res =>
+                ShowDialogBox("Replace Settings?", "All Profiles, Animations and Designs will be replaced. Imported Audio Clips will be kept.", "Yes", "No", res =>
                 {
                     if (res)
                     {
@@ -617,7 +617,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         }
 
 #if UNITY_EDITOR
-        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select JSON settings", "", "json"));
+        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select JSON Settings File", "", "json"));
 #elif UNITY_STANDALONE_WIN
         // Set filters (optional)
 		// It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
@@ -651,7 +651,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         }
 
 #if UNITY_EDITOR
-        FileSelected(UnityEditor.EditorUtility.SaveFilePanel("Export settings", "", "PixelsSettingsBackup", "json"));
+        FileSelected(UnityEditor.EditorUtility.SaveFilePanel("Export Settings", "", "PixelsSettingsBackup", "json"));
 #elif UNITY_STANDALONE_WIN
         // Set filters (optional)
         // It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
@@ -679,7 +679,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 
     public void RestoreDefaultSettings()
     {
-        ShowDialogBox("Restore Default Settings?", "All imported Audio Clips and LED Patterns will be lost. Presets, Lighting Patterns and Profiles will be restored to the app defaults. All Dice pairing information will be removed.", "Yes", "No", res =>
+        ShowDialogBox("Restore Default Settings?", "All imported Audio Clips and Designs will be lost. Profiles and Animations will be restored to the app defaults. All Dice pairing information will be removed.", "Yes", "No", res =>
         {
             if (res)
             {

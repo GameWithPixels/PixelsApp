@@ -96,7 +96,7 @@ public class EditRGBGradient
 [System.Serializable]
 public class EditPattern
 {
-    public string name = "LED Pattern";
+    public string name = "Design";
     public readonly List<EditRGBGradient> gradients = new List<EditRGBGradient>();
 
     [JsonIgnore]

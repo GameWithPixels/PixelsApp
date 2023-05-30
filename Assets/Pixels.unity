@@ -16123,7 +16123,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Pattern
+  m_Text: New Animation
 --- !u!222 &849861233
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -18407,7 +18407,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Manage Lighting Patterns...
+  m_Text: Manage Designs...
 --- !u!222 &990752755
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -27478,7 +27478,7 @@ PrefabInstance:
     - target: {fileID: 8686402109847964462, guid: cd0d12a5bb7cab2459059c0a5067b0a8,
         type: 3}
       propertyPath: m_Text
-      value: Patterns
+      value: Animations
       objectReference: {fileID: 0}
     - target: {fileID: 8686402109847964462, guid: cd0d12a5bb7cab2459059c0a5067b0a8,
         type: 3}
@@ -34091,7 +34091,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: LED Patterns
+  m_Text: Designs
 --- !u!222 &1897401509
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -37159,7 +37159,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Lighting Patterns
+  m_Text: Designs
 --- !u!222 &2082642034
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -37891,7 +37891,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Import JSON Pattern
+  m_Text: Import JSON Animation
 --- !u!222 &2115099821
 CanvasRenderer:
   m_ObjectHideFlags: 0

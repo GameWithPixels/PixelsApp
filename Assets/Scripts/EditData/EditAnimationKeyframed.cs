@@ -57,7 +57,7 @@ public class EditAnimationKeyframed
     [Slider, FloatRange(0.1f, 30.0f, 0.1f), Units("sec")]
     public override float duration { get; set; }
 
-    [RGBPattern, Name("LED Pattern")]
+    [RGBPattern, Name("Color Design")]
     public EditPattern pattern = new EditPattern();
     [Name("Traveling Order")]
     public bool traveling = false;

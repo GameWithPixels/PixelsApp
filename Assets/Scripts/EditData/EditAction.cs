@@ -115,7 +115,7 @@ public class EditActionConverter
 public class EditActionPlayAnimation
     : EditAction
 {
-    [Name("Lighting Pattern")]
+    [Name("Animation")]
     public EditAnimation animation;
     [PlaybackFace, Name("Play on Face")]
     public int faceIndex = -1;
@@ -247,7 +247,7 @@ public class EditActionPlayAnimation
         }
         else
         {
-            builder.Append("- Please select a Pattern -");
+            builder.Append("- Please select an Animation -");
         }
         return builder.ToString();
     }

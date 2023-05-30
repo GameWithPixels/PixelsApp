@@ -43,15 +43,15 @@ public static class EnumDisplayInfo
             case AnimationType.None:
                 return new NameAndOrder();
             case AnimationType.Simple:
-                return new NameAndOrder { Name = "Simple Flashes", Order = 0 };
+                return new NameAndOrder { Name = "Flashes", Order = 0 };
             case AnimationType.Rainbow:
                 return new NameAndOrder { Name = "Colorful Rainbow", Order = 1 };
             case AnimationType.Keyframed:
-                return new NameAndOrder { Name = "Color LED Pattern", Order = 3 };
+                return new NameAndOrder { Name = "Color Design", Order = 3 };
             case AnimationType.GradientPattern:
-                return new NameAndOrder { Name = "Gradient LED Pattern", Order = 4 };
+                return new NameAndOrder { Name = "Gradient With Greyscale Design ", Order = 4 };
             case AnimationType.Gradient:
-                return new NameAndOrder { Name = "Simple Gradient", Order = 2 };
+                return new NameAndOrder { Name = "Gradient", Order = 2 };
             default:
                 Debug.LogError($"Unknown value for enum {nameof(AnimationType)}: {animType}");
                 return new NameAndOrder();
@@ -65,7 +65,7 @@ public static class EnumDisplayInfo
             case ActionType.None:
                 return new NameAndOrder();
             case ActionType.PlayAnimation:
-                return new NameAndOrder { Name = "Trigger Pattern", Order = 0 };
+                return new NameAndOrder { Name = "Trigger Animation", Order = 0 };
             case ActionType.PlayAudioClip:
                 return new NameAndOrder { Name = "Play Audio Clip", Order = 1 };
             default:

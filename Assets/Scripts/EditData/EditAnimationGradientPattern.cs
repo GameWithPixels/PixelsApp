@@ -13,11 +13,11 @@ public class EditAnimationGradientPattern
     [Slider, FloatRange(0.1f, 30.0f, 0.1f), Units("sec")]
     public override float duration { get; set; }
 
-    [GreyscalePattern, Name("LED Pattern")]
+    [GreyscalePattern, Name("Greyscale Design")]
     public EditPattern pattern = new EditPattern();
     [Gradient]
     public EditRGBGradient gradient = new EditRGBGradient();
-    [Name("Override color based on face")]
+    [Name("Override Color Based On Face Up")]
     public bool overrideWithFace = false;
 
     public override AnimationType type => AnimationType.GradientPattern;

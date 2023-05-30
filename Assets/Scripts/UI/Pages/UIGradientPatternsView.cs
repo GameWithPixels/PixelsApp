@@ -21,7 +21,7 @@ public class UIGradientPatternsView
 
     void OnEnable()
     {
-        base.SetupHeader(true, false, "LED Patterns", null);
+        base.SetupHeader(true, false, "Designs", null);
         RefreshView();
     }
 
@@ -123,11 +123,11 @@ public class UIGradientPatternsView
             }
             builder.Append($"First remove or modify the animation{pluralStr}.");
 
-            PixelsApp.Instance.ShowDialogBox("LED Pattern In Use!", builder.ToString());
+            PixelsApp.Instance.ShowDialogBox("Design In Use!", builder.ToString());
         }
         else
         {
-            PixelsApp.Instance.ShowDialogBox("Delete LED Pattern?", "Are you sure you want to delete " + pattern.name + "?", "Ok", "Cancel", res =>
+            PixelsApp.Instance.ShowDialogBox("Delete Design?", "Are you sure you want to delete " + pattern.name + "?", "Ok", "Cancel", res =>
             {
                 if (res)
                 {

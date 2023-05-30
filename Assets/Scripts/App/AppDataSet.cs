@@ -235,7 +235,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
             duration = 3.0f,
             color = EditColor.FromColor(new Color32(0xFF, 0x30, 0x00, 0xFF)),
             faces = 0b11111111111111111111,
-            name = "New Lighting Pattern"
+            name = "New Animation"
         };
         animations.Add(newAnim);
         return newAnim;
@@ -270,7 +270,7 @@ public class AppDataSet : SingletonMonoBehaviour<AppDataSet>
     public EditPattern AddNewDefaultPattern()
     {
         var newPattern = new EditPattern();
-        newPattern.name = "New Pattern";
+        newPattern.name = "New Design";
         for (int i = 0; i < 20; ++i)
         {
             var grad = new EditRGBGradient();

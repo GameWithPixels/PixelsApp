@@ -170,7 +170,7 @@ public class UIPatternEditor : MonoBehaviour
     void LoadFromFile()
     {
 #if UNITY_EDITOR
-        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select Pattern Image", "", "png"));
+        FileSelected(UnityEditor.EditorUtility.OpenFilePanel("Select Image For Design", "", "png"));
 #elif UNITY_STANDALONE_WIN
         // Set filters (optional)
 		// It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
@@ -183,7 +183,7 @@ public class UIPatternEditor : MonoBehaviour
 		FileBrowser.SetDefaultFilter( ".png" );
         FileBrowser.ShowLoadDialog((paths) => FileSelected(paths[0]), null, FileBrowser.PickMode.Files, false, null, null, "Select png", "Select");
 #else
-        NativeGallery.GetImageFromGallery(FileSelected, "Select Pattern Image");
+        NativeGallery.GetImageFromGallery(FileSelected, "Select Image For Design");
         // NativeFilePicker.PickFile( FileSelected, new string[] { NativeFilePicker.ConvertExtensionToFileType( "png" ) });
 #endif
     }

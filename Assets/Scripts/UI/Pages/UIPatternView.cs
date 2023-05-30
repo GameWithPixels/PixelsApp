@@ -76,7 +76,7 @@ public class UIPatternView
         rotationControl.Setup(this.dieRenderer);
 
         animationSelector.Setup(
-            "Lighting Pattern Type",
+            "Animation Type",
             () => editAnimation.type,
             (t) => SetAnimationType((AnimationType)t),
             null);

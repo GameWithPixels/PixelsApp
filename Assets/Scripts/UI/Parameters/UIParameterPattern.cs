@@ -46,7 +46,7 @@ public class UIParameterPattern : UIParameter
         valueButton.onClick.AddListener(
         () =>
         {
-            PixelsApp.Instance.ShowPatternPicker("Select Pattern", (EditPattern)getterFunc(),
+            PixelsApp.Instance.ShowPatternPicker("Select A Design", (EditPattern)getterFunc(),
             (res, pattern) =>
             {
                 if (res)

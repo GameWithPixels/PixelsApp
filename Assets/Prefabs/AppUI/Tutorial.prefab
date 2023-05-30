@@ -1712,7 +1712,7 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Rules are IF / THEN blocks. You specify a condition (like what face the
-    die landed on) and an action (for instance trigger a lighting pattern).
+    die landed on) and an action (for instance trigger an animation).
 --- !u!1 &5855313478669882439
 GameObject:
   m_ObjectHideFlags: 0
@@ -2592,8 +2592,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: This is the list of lighting patterns that you can assign to your profiles.
-    Tap a lighting pattern to edit it!
+  m_Text: This is the list of animations that you can assign to your profiles.
+    Tap an animation to edit it!
 --- !u!1 &5855313478785314426
 GameObject:
   m_ObjectHideFlags: 0
@@ -3403,7 +3403,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Lighting Pattern Editor
+  m_Text: Animation Editor
 --- !u!1 &5855313478850573189
 GameObject:
   m_ObjectHideFlags: 0
@@ -4729,7 +4729,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Lighting Patterns
+  m_Text: Animations
 --- !u!1 &5855313478932689280
 GameObject:
   m_ObjectHideFlags: 0
@@ -15788,7 +15788,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: You can also see a preview of the pattern on a real die by tapping the
+  m_Text: You can also see a preview of the animation on a real die by tapping the
     preview button.
 --- !u!114 &5855313479859687364
 MonoBehaviour:
@@ -16579,8 +16579,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: This screen lets you configure a lighting pattern. Patterns can be one
-    many 'types', and each pattern type exposes a different set of parameters.
+  m_Text: This screen lets you configure an animation. Animations can be one
+    many 'types', and each animation type exposes a different set of parameters.
 --- !u!1 &5855313479969665778
 GameObject:
   m_ObjectHideFlags: 0

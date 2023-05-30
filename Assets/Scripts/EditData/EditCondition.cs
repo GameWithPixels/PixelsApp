@@ -455,7 +455,7 @@ public class EditConditionBatteryState
             }
             if ((flags & BatteryStateFlags.Charging) != 0)
             {
-                builder.Append(or + "charing");
+                builder.Append(or + "charging");
                 or = " or ";
             }
             if ((flags & BatteryStateFlags.Done) != 0)

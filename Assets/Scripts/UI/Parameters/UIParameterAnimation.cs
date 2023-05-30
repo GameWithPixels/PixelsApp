@@ -49,7 +49,7 @@ public class UIParameterAnimation
             animationRender.texture = dieRenderer.renderTexture;
         }
 
-        selectAnimationButton.onClick.AddListener(() => PixelsApp.Instance.ShowAnimationPicker("Select Lighting Pattern", (EditAnimation)getterFunc.Invoke(), (res, newAnim) => 
+        selectAnimationButton.onClick.AddListener(() => PixelsApp.Instance.ShowAnimationPicker("Select An Animation", (EditAnimation)getterFunc.Invoke(), (res, newAnim) => 
         {
             if (res)
             {
@@ -84,7 +84,7 @@ public class UIParameterAnimation
         {
             dieRenderer.ClearAnimations();
             dieRenderer.SetAuto(false);
-            animationNameText.text = "- Please select a Pattern -";
+            animationNameText.text = "- Please select an Animation -";
         }
     }
 }

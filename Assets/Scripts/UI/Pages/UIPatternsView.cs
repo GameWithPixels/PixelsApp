@@ -29,7 +29,7 @@ public class UIPatternsView
 
     void OnEnable()
     {
-        base.SetupHeader(true, false, "Lighting Patterns", null);
+        base.SetupHeader(true, false, "Animations", null);
         RefreshView();
     }
 
@@ -118,7 +118,7 @@ public class UIPatternsView
 
     void DeleteAnimation(EditAnimation anim)
     {
-        PixelsApp.Instance.ShowDialogBox("Delete Lighting Pattern?", "Are you sure you want to delete " + anim.name + "?", "Ok", "Cancel", res =>
+        PixelsApp.Instance.ShowDialogBox("Delete Animation?", "Are you sure you want to delete " + anim.name + "?", "Ok", "Cancel", res =>
         {
             if (res)
             {
@@ -136,7 +136,7 @@ public class UIPatternsView
                     }
                     builder.Append("Are you sure you want to delete it?");
 
-                    PixelsApp.Instance.ShowDialogBox("Pattern In Use!", builder.ToString(), "Ok", "Cancel", res2 =>
+                    PixelsApp.Instance.ShowDialogBox("Animation In Use!", builder.ToString(), "Ok", "Cancel", res2 =>
                     {
                         if (res2)
                         {
