@@ -3,9 +3,14 @@
  * @brief Definition of the SGBleCentralManagerDelegate class.
  */
 
+#ifndef SGBleCentralManagerDelegate_h
+#define SGBleCentralManagerDelegate_h
+
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "SGBleTypes.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @brief Implementation of
@@ -66,7 +71,7 @@
  * @param stateUpdateHandler The handler for notifying of the host device Bluetooth state changes.
  * @return The initialized SGBleCentralManagerDelegate instance.
  */
-- (instancetype)initWithStateUpdateHandler:(void (^)(CBManagerState state))stateUpdateHandler;
+- (instancetype)initWithStateUpdateHandler:(nullable void (^)(CBManagerState state))stateUpdateHandler;
 
 /**
  * @brief Clear the list of discovered peripherals.
@@ -79,7 +84,7 @@
  * @param identifier The UUID assigned by the system to a BLE peripheral.
  * @return The CBPeripheral for the given UUID.
  */
-- (CBPeripheral *)peripheralForIdentifier:(NSUUID *)identifier;
+- (nullable CBPeripheral *)peripheralForIdentifier:(NSUUID *)identifier;
 
 /**
  * @brief Sets the handler for notifying of the given peripheral's connection events.
@@ -89,7 +94,11 @@
  * @param peripheralConnectionEventHandler The handler for notifying connection events.
  * @param peripheral The peripheral to watch for connection events.
  */
-- (void)setConnectionEventHandler:(SGBleConnectionEventHandler)peripheralConnectionEventHandler
+- (void)setConnectionEventHandler:(nullable SGBleConnectionEventHandler)peripheralConnectionEventHandler
                     forPeripheral:(CBPeripheral *)peripheral;
 
 @end
+
+NS_ASSUME_NONNULL_END
+
+#endif /* SGBleCentralManagerDelegate_h */

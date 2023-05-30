@@ -3,7 +3,12 @@
  * @brief Internal types for representing a BLE request.
  */
 
+#ifndef SGBleRequest_h
+#define SGBleRequest_h
+
 #import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @brief Internal type, list the Bluetooth operations supported by SGBleRequest.
@@ -24,13 +29,13 @@ typedef NS_ENUM(NSInteger, SGBleRequestType)
  * @brief Internal type, runs the Bluetooth operation associated with a SGBleRequest object.
  * @ingroup Apple_Objective-C
  */
-typedef NSError * (^SGBleRequestExecuteHandler)();
+typedef NSError * _Nullable (^SGBleRequestExecuteHandler)();
 
 /**
  * @brief Internal type, completion handler for operations associated with a SGBleRequest object.
  * @ingroup Apple_Objective-C
  */
-typedef void (^SGBleRequestCompletionHandler)(NSError *error);
+typedef void (^SGBleRequestCompletionHandler)(NSError * _Nullable error);
 
 /**
  * @brief Internal type, represents a Bluetooth operation to be performed on a
@@ -62,17 +67,17 @@ typedef void (^SGBleRequestCompletionHandler)(NSError *error);
  * @param executeHandler The operation to run, returns an error if it has failed to be run.
  * @param completionHandler Called when the operation has completed (successfully or not), may be nil.
  */
-- (instancetype)initWithRequestType:(SGBleRequestType)requestType executeHandler:(SGBleRequestExecuteHandler)executeHandler completionHandler:(SGBleRequestCompletionHandler)completionHandler;
+- (instancetype)initWithRequestType:(SGBleRequestType)requestType executeHandler:(SGBleRequestExecuteHandler)executeHandler  completionHandler: (nullable SGBleRequestCompletionHandler)completionHandler;
 
 /**
  * @brief Execute the associated request.
  */
-- (NSError *)execute;
+- (nullable NSError *)execute;
 
 /**
  * @brief Called by the execution block to notify this instance of the request outcome.
  */
-- (void)notifyResult:(NSError *)error;
+- (void)notifyResult:(nullable NSError *)error;
 
 /**
  * @brief Gets the string version of a SGBleRequestType value.
@@ -80,3 +85,7 @@ typedef void (^SGBleRequestCompletionHandler)(NSError *error);
 + (NSString *)requestTypeToString:(SGBleRequestType)typeSGBleRequest;
 
 @end
+
+NS_ASSUME_NONNULL_END
+
+#endif /* SGBleRequest_h */

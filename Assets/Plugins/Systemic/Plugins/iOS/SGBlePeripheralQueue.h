@@ -3,11 +3,16 @@
  * @brief Definition of the SGBlePeripheralQueue class.
  */
 
+#ifndef SGBlePeripheralQueue_h
+#define SGBlePeripheralQueue_h
+
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "SGBleCentralManagerDelegate.h"
 #import "SGBleTypes.h"
 #import "SGBleRequest.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @brief Implementation of the
@@ -44,7 +49,6 @@
     CBPeripheral *_peripheral;
     
     // Connection
-    void (^_connectionEventHandler)(SGBleConnectionEvent connectionEvent, SGBleConnectionEventReason reason);
     NSArray<CBUUID *> *_requiredServices;
     NSUInteger _discoveringServicesCounter;
     SGBleConnectionEventReason _disconnectReason;
@@ -57,8 +61,8 @@
     NSMutableArray<SGBleRequest *> *_pendingRequests; // Always synchronize access to this list
 
     // Read notifications
-    void (^_valueReadHandler)(CBCharacteristic *characteristic, NSError *error);
-    NSMapTable<CBCharacteristic *, void (^)(CBCharacteristic *characteristic, NSError *error)> *_valueChangedHandlers;
+    SGBleCharacteristicValueEventHandler _valueReadHandler;
+    NSMapTable<CBCharacteristic *, SGBleCharacteristicValueEventHandler> *_valueChangedHandlers;
 }
 
 // Property getters
@@ -73,14 +77,19 @@
 @property(readonly, getter=peripheral) CBPeripheral *peripheral;
 
 /**
- * @brief Indicates whether the peripheral is connected.
+ * @brief Indicates whether the peripheral is connected and has discovered its services.
  */
-@property(readonly, getter=isConnected) bool isConnected;
+@property(assign) bool isReady;
 
 /**
  * @brief Gets the last read value of the Received Signal Strength Indicator (RSSI).
  */
 @property(readonly, getter=rssi) int rssi;
+
+/**
+ * @brief Callback for notifying connection status changes of the peripheral.
+ */
+@property(strong) void (^ _Nullable connectionEventHandler)(SGBlePeripheralQueue *peripheralQueue, SGBleConnectionEvent connectionEvent, SGBleConnectionEventReason reason);
 
 //! \name Initialization
 //! @{
@@ -91,12 +100,10 @@
  *
  * @param peripheral The CBPeripheral object for the BLE peripheral.
  * @param centralManagerDelegate The instance of SGBleCentralManagerDelegate that discovered the peripheral.
- * @param connectionEventHandler The handler for notifying of changes of the connection status of the peripheral.
  * @return The initialized SGBlePeripheral instance.
  */
 - (instancetype)initWithPeripheral:(CBPeripheral *)peripheral
-            centralManagerDelegate:(SGBleCentralManagerDelegate *)centralManagerDelegate
-            connectionEventHandler:(void (^)(SGBleConnectionEvent connectionEvent, SGBleConnectionEventReason reason))connectionEventHandler;
+            centralManagerDelegate:(SGBleCentralManagerDelegate *)centralManagerDelegate;
 
 //! @}
 //! \name Connection and disconnection
@@ -112,7 +119,7 @@
  * @param completionHandler The handler for notifying of the request result.
  */
 - (void)queueConnectWithServices:(NSArray<CBUUID *> *)services
-               completionHandler:(void (^)(NSError *error))completionHandler;
+               completionHandler:(void (^)(NSError * _Nullable error))completionHandler;
 
 /**
  * @brief Queues a request to disconnect the peripheral.
@@ -122,7 +129,7 @@
  *
  * @param completionHandler The handler for notifying of the request result.
  */
-- (void)queueDisconnect:(void (^)(NSError *error))completionHandler;
+- (void)queueDisconnect:(void (^)(NSError * _Nullable error))completionHandler;
 
 //! @}
 //! \name Peripheral operations
@@ -134,7 +141,7 @@
  *
  * @param completionHandler The handler for notifying of the read RSSI and the request status..
  */
-- (void)queueReadRssi:(void (^)(NSError *error))completionHandler;
+- (void)queueReadRssi:(void (^)(NSError * _Nullable error))completionHandler;
 
 //! @}
 //! \name Characteristic operations
@@ -150,7 +157,7 @@
  * @param valueReadHandler The handler for notifying of the read value and the request status.
  */
 - (void)queueReadValueForCharacteristic:(CBCharacteristic *)characteristic
-                       valueReadHandler:(void (^)(CBCharacteristic *characteristic, NSError *error))valueReadHandler;
+                       valueReadHandler:(void (^)(SGBlePeripheralQueue *peripheralQueue, CBCharacteristic *characteristic, NSError *_Nullable error))valueReadHandler;
 
 /**
  * @brief Queues a request to write the value of specified service's characteristic.
@@ -165,7 +172,7 @@
 - (void)queueWriteValue:(NSData *)data
       forCharacteristic:(CBCharacteristic *)characteristic
                    type:(CBCharacteristicWriteType)type
-      completionHandler:(void (^)(NSError *error))completionHandler;
+      completionHandler:(void (^)(NSError * _Nullable error))completionHandler;
 
 /**
  * @brief Queues a request to enable or disable notifications for the specified service's characteristic.
@@ -178,18 +185,22 @@
  * @param completionHandler The handler for notifying of the request result.
  */
 - (void)queueSetNotifyValueForCharacteristic:(CBCharacteristic *)characteristic
-                         valueChangedHandler:(void (^)(CBCharacteristic *characteristic, NSError *error))valueChangedHandler
-                           completionHandler:(void (^)(NSError *error))completionHandler;
+                         valueChangedHandler:(void (^ _Nullable)(SGBlePeripheralQueue *peripheralQueue, CBCharacteristic *characteristic, NSError * _Nullable error))valueChangedHandler
+                           completionHandler:(void (^)(NSError * _Nullable error))completionHandler;
 
 //! @}
 //! \name Queue management.
 //! @{
 
 /**
- * @brief Clear the queue of pending request and cancel the running request.
+ * @brief Cancel any pending or running request.
  */
-- (void)cancelQueue;
+- (void)cancelAll;
 
 //! @}
 
 @end
+
+NS_ASSUME_NONNULL_END
+
+#endif /* SGBlePeripheralQueue_h */

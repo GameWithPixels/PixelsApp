@@ -3,6 +3,12 @@
  * @brief Definition of SGBleConnectionEvent and SGBleConnectionEventReason enumerations.
  */
 
+#ifndef SGBleTypes_h
+#define SGBleTypes_h
+
+// Forward declaration
+@class SGBlePeripheralQueue;
+
 /**
  * @defgroup Apple_Objective-C
  * @brief A collection of Objective-C classes that provides a simplified access to
@@ -93,13 +99,46 @@ typedef NS_ENUM(NSInteger, SGBleConnectionEventReason)
 };
 
 /**
+ * @brief Error codes.
+ * @ingroup Apple_Objective-C
+ */
+typedef NS_ENUM(NSInteger, SGBleError)
+{
+    /// Application out of memory.
+    SGBleErrorOutOfMemory,
+    
+    /// Call not implemented.
+    SGBleErrorNotImplemented,
+    
+    /// Peripheral request has one or more invalid parameters.
+    SGBleErrorInvalidParameter,
+    
+    /// Bluetooth or peripheral not in proper state to execute request.
+    SGBleErrorInvalidState,
+    
+    /// Peripheral request got canceled.
+    SGBleErrorRequestCanceled,
+    
+    /// Peripheral got disconnected while executing request.
+    SGBleErrorPeripheralDisconnected,
+};
+
+/**
  * @brief Peripheral discovery handler.
  * @ingroup Apple_Objective-C
  */
-typedef void (^SGBlePeripheralDiscoveryHandler)(CBPeripheral *peripheral, NSDictionary<NSString *,id> *advertisementData, NSNumber *RSSI);
+typedef void (^SGBlePeripheralDiscoveryHandler)(CBPeripheral * _Nonnull peripheral, NSDictionary<NSString *, id> * _Nonnull advertisementData, NSNumber * _Nonnull rssi);
 
 /**
  * @brief Peripheral connection event handler.
  * @ingroup Apple_Objective-C
  */
-typedef void (^SGBleConnectionEventHandler)(CBPeripheral *peripheral, SGBleConnectionEvent connectionEvent, NSError *error);
+typedef void (^SGBleConnectionEventHandler)(CBPeripheral * _Nonnull peripheral, SGBleConnectionEvent connectionEvent, NSError * _Nullable error);
+
+/**
+ * @brief Peripheral connection event handler.
+ * @ingroup Apple_Objective-C
+ */
+typedef void (^SGBleCharacteristicValueEventHandler)(SGBlePeripheralQueue * _Nonnull peripheralQueue, CBCharacteristic * _Nonnull characteristic, NSError * _Nullable error);
+
+#endif /* SGBleTypes_h */

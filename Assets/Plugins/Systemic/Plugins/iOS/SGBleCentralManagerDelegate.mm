@@ -68,9 +68,12 @@
 - (void)setConnectionEventHandler:(SGBleConnectionEventHandler)peripheralConnectionEventHandler
                     forPeripheral:(CBPeripheral *)peripheral
 {
-    @synchronized (_peripheralsConnectionEventHandlers)
+    if (peripheral)
     {
-        _peripheralsConnectionEventHandlers[peripheral] = peripheralConnectionEventHandler;
+        @synchronized (_peripheralsConnectionEventHandlers)
+        {
+            _peripheralsConnectionEventHandlers[peripheral] = peripheralConnectionEventHandler;
+        }
     }
 }
 

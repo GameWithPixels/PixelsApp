@@ -47,7 +47,7 @@ namespace internal
 {
 
 typedef void (^CompletionHandler)(NSError *error);
-typedef void (^ValueReadHandler)(CBCharacteristic *characteristic, NSError *error);
+typedef void (^ValueReadHandler)(SGBlePeripheralQueue *peripheral, CBCharacteristic *characteristic, NSError *error);
 
 static const int otherErrorsMask = 0x80000000;
 static const int unexpectedError = otherErrorsMask;
@@ -91,10 +91,10 @@ inline CompletionHandler toCompletionHandler(RequestStatusCallback onRequestStat
 
 inline ValueReadHandler toValueReadHandler(ValueReadCallback onValueRead, request_index_t requestIndex)
 {
-    void (^handler)(CBCharacteristic *, NSError *error) = nil;
+    ValueReadHandler handler = nil;
     if (onValueRead)
     {
-        handler = ^(CBCharacteristic *characteristic, NSError *error) {
+        handler = ^(SGBlePeripheralQueue *peripheral, CBCharacteristic *characteristic, NSError *error) {
           NSData *data = characteristic.value;
           onValueRead(requestIndex, data.bytes, data.length, toErrorCode(error));
         };
@@ -174,13 +174,13 @@ inline void appendToJsonStr(NSMutableString *jsonStr, NSArray<CBUUID *> *uuids)
 
 inline void appendToJsonStr(NSMutableString *jsonStr,
                             std::uint8_t *bytes,
-                            NSUInteger offset,
-                            NSUInteger length)
+                            NSUInteger start,
+                            NSUInteger end)
 {
     [jsonStr appendString:@"["];
-    for (NSUInteger i = offset; i < length; i++)
+    for (NSUInteger i = start; i < end; i++)
     {
-        if (i > offset)
+        if (i > start)
         {
             [jsonStr appendString:@","];
         }
@@ -198,9 +198,10 @@ inline void appendToJsonStr(NSMutableString *jsonStr, NSData *data)
 
 inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionary<NSString *, id> *advertisementData, NSNumber *RSSI)
 {
+    // Get the different bits of advertising data
     NSData *manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey];
     NSString *localName = advertisementData[CBAdvertisementDataLocalNameKey];
-    NSDictionary<CBUUID *, NSData *> *serviceData = advertisementData[CBAdvertisementDataServiceDataKey];
+    NSDictionary<CBUUID *, NSData *> *servicesData = advertisementData[CBAdvertisementDataServiceDataKey];
     NSArray<CBUUID *> *serviceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey];
     NSArray<CBUUID *> *overflowServiceUUIDs = advertisementData[CBAdvertisementDataOverflowServiceUUIDsKey];
     NSNumber *txPowerLevel = advertisementData[CBAdvertisementDataTxPowerLevelKey];
@@ -211,12 +212,13 @@ inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionar
     [jsonStr appendFormat:@"{\"systemId\":\"%s\",", systemId];
     if (manufacturerData && manufacturerData.length >= 2)
     {
+        // Only one manufacturer
         [jsonStr appendString:@"\"manufacturerData\":["];
         std::uint8_t *bytes = (std::uint8_t *)manufacturerData.bytes;
         uint16_t companyId = bytes[1] | ((uint16_t)bytes[0] << 8);
         [jsonStr appendFormat:@"{\"companyId\":%d,", companyId];
         [jsonStr appendString:@"\"data\":"];
-        appendToJsonStr(jsonStr, bytes, 2, manufacturerData.length - 2);
+        appendToJsonStr(jsonStr, bytes, 2, manufacturerData.length);
         [jsonStr appendString:@"}],"];
     }
     if (localName)
@@ -227,20 +229,21 @@ inline NSString *advertisementDataToJsonString(const char *systemId, NSDictionar
     {
         [jsonStr appendString:@"\"isConnectable\":true,"];
     }
-    if (serviceData && serviceData.count)
+    if (servicesData && servicesData.count)
     {
-        [jsonStr appendString:@"\"serviceData\":["];
+        [jsonStr appendString:@"\"servicesData\":["];
         bool first = true;
-        for (CBUUID *uuid in serviceData)
+        // Iterate services
+        for (CBUUID *uuid in servicesData)
         {
             if (!first)
             {
                 [jsonStr appendString:@","];
             }
             first = false;
-            [jsonStr appendFormat:@"{\"uuid\":\"%@\",", uuid];
+            [jsonStr appendFormat:@"{\"uuid\":\"%@\",", toJsonStr(uuid)];
             [jsonStr appendString:@"\"data\":"];
-            appendToJsonStr(jsonStr, [serviceData objectForKey:uuid]);
+            appendToJsonStr(jsonStr, [servicesData objectForKey:uuid]);
             [jsonStr appendString:@"}"];
         }
         [jsonStr appendString:@"],"];
