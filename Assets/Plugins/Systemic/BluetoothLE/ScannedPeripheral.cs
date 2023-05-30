@@ -169,7 +169,7 @@ namespace Systemic.Unity.BluetoothLE
         // Converts an array of JSON service data to an array of service data
         private ServiceData[] ToServiceDataArray(NativeAdvertisementDataJson.ServiceData[] arr)
         {
-            return arr?.Select(d => new ServiceData(new Guid(d.uuid), d.data)).ToArray() ?? Array.Empty<ServiceData>();
+            return arr?.Select(d => new ServiceData(BleUuid.StringToGuid(d.uuid), d.data)).ToArray() ?? Array.Empty<ServiceData>();
         }
 
         // Converts a list of strings representing BLE UUIDS to an array of Guids
