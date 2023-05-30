@@ -12,17 +12,15 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
     public class Data
     {
         public bool displayWhatsNew = true;
-
-        // Tutorial is now disabled by default
-        public bool mainTutorialEnabled = false;
-        public bool homeTutorialEnabled = false;
+        public bool mainTutorialEnabled = true;
+        public bool homeTutorialEnabled = true;
         public bool presetsTutorialEnabled = false;
         public bool presetTutorialEnabled = false;
-        public bool behaviorsTutorialEnabled = false;
-        public bool behaviorTutorialEnabled = false;
-        public bool ruleTutorialEnabled = false;
-        public bool animationsTutorialEnabled = false;
-        public bool animationTutorialEnabled = false;
+        public bool behaviorsTutorialEnabled = true;
+        public bool behaviorTutorialEnabled = true;
+        public bool ruleTutorialEnabled = true;
+        public bool animationsTutorialEnabled = true;
+        public bool animationTutorialEnabled = true;
     }
     
     readonly Data data = new Data();
