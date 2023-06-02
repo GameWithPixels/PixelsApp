@@ -53,13 +53,10 @@ public class UIPatternView
         }
         parameters = null;
 
-        if (previewDie?.die != null)
-        {
-            // Note: the die will revert to standard mode on disconnection
-            DiceBag.DisconnectPixel(previewDie.die);
-            previewDie = null;
-            previewDieConnected = false;
-        }
+        // Note: the die will revert to standard mode on disconnection
+        DiceBag.DisconnectPixel(previewDie.die);
+        previewDie = null;
+        previewDieConnected = false;
     }
 
     void Setup(EditAnimation anim)

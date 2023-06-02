@@ -306,10 +306,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         {
             onWillRemoveDie?.Invoke(editDie);
 
-            if (editDie.die != null)
-            {
-                DiceBag.DisconnectPixel(editDie.die, forceDisconnect: true);
-            }
+            DiceBag.DisconnectPixel(editDie.die, forceDisconnect: true);
 
             AppDataSet.Instance.DeleteDie(editDie);
             AppDataSet.Instance.SaveData();

@@ -322,22 +322,24 @@ namespace Systemic.Unity.Pixels
         /// <returns>The coroutine running the request.</returns>
         public static Coroutine DisconnectPixel(Pixel pixel, bool forceDisconnect = false)
         {
-            if (pixel == null) throw new System.ArgumentNullException(nameof(pixel));
             var blePixel = (BlePixel)pixel;
             return StartCoroutine(DisconnectAsync());
 
             IEnumerator DisconnectAsync()
             {
-                if (!_pixels.Contains(blePixel))
+                if (blePixel != null)
                 {
-                    Debug.LogError("The Pixel requested to be disconnected is either null or not in the " + nameof(DiceBag));
-                }
-                else
-                {
-                    bool? res = null;
-                    blePixel.Disconnect((d, r, s) => res = r, forceDisconnect);
+                    if (!_pixels.Contains(blePixel))
+                    {
+                        Debug.LogError("The Pixel requested to be disconnected is either null or not in the " + nameof(DiceBag));
+                    }
+                    else
+                    {
+                        bool? res = null;
+                        blePixel.Disconnect((d, r, s) => res = r, forceDisconnect);
 
-                    yield return new WaitUntil(() => res.HasValue);
+                        yield return new WaitUntil(() => res.HasValue);
+                    }
                 }
             }
         }
