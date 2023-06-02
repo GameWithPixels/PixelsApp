@@ -47,17 +47,24 @@ namespace Systemic.Unity.Pixels
     /// </summary>
     public enum PixelBatteryState : byte
     {
-        Unknown = 0,
-        Ok,            // Battery looks fine, nothing is happening
-        Low,           // Battery level is low, notify user they should recharge
-        Transition,    // Coil voltage is bad, but we don't know yet if that's because we removed the die and
-                       // the coil cap is still discharging, or if indeed the die is incorrectly positioned
-        BadCharging,   // Coil voltage is bad, die is probably positioned incorrectly
-                       // Note that currently this state is triggered during transition between charging and not charging...
-        Error,         // Charge state doesn't make sense (charging but no coil voltage detected for instance)
-        Charging,      // Battery is currently recharging
-        TrickleCharge, // Battery is almost full
-        Done		   // Battery is full and finished charging
+        /// Battery looks fine, nothing is happening.
+        Ok = 0,
+
+        /// Battery level is low, notify user they should recharge.
+        Low,
+
+        /// Battery is currently recharging.
+        Charging,
+
+        /// Battery is full and finished charging.
+        Done,
+
+        /// Coil voltage is bad, die is probably positioned incorrectly.
+        /// Note that currently this state is triggered during transition between charging and not charging...
+        BadCharging,
+
+        /// Charge state doesn't make sense (charging but no coil voltage detected for instance).
+        Error,
     }
 
     /// <summary>

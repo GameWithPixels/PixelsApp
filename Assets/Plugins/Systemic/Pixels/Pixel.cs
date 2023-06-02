@@ -438,7 +438,7 @@ namespace Systemic.Unity.Pixels
                 NotifyRollState(message.rollState, message.rollFaceIndex);
 
                 // Battery level
-                NotifyBatteryLevel(message.batteryLevelPercent, message.batteryState >= PixelBatteryState.Charging);
+                NotifyBatteryLevel(message.batteryLevelPercent, message.batteryState);
 
                 if (appearanceChanged)
                 {
@@ -454,7 +454,7 @@ namespace Systemic.Unity.Pixels
 
             void ProcessBatteryLevelMessage(BatteryLevel message)
             {
-                NotifyBatteryLevel(message.levelPercent, message.batteryState >= PixelBatteryState.Charging);
+                NotifyBatteryLevel(message.levelPercent, message.batteryState);
             }
 
             void ProcessRssiMessage(Rssi message)
@@ -513,6 +513,12 @@ namespace Systemic.Unity.Pixels
                 Debug.Log($"Pixel {SafeName}: Notifying roll state: {rollState}, face: {currentFace}");
                 RollStateChanged?.Invoke(this, rollState, this.currentFace);
             }
+        }
+
+        protected void NotifyBatteryLevel(int level, PixelBatteryState state)
+        {
+            bool charging = state == PixelBatteryState.Charging || state == PixelBatteryState.Done;
+            NotifyBatteryLevel(level, charging);
         }
 
         protected void NotifyBatteryLevel(int level, bool charging)
