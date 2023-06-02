@@ -41,7 +41,8 @@ namespace Systemic.Unity.Pixels.Messages
                         }
                         else
                         {
-                            // This an older firwmare with the "versionInfo" string
+                            // This an older firmware with the "versionInfo" string
+                            Debug.Log("Got older version of IAmADie message");
 
                             // Get the message part before the versionInfo string
                             var baseData = new byte[Marshal.SizeOf<IAmADieMarshaledDataBeforeBuildTimestamp>()];

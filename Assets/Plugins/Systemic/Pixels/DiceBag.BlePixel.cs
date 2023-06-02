@@ -173,6 +173,7 @@ namespace Systemic.Unity.Pixels
                         }
                         else
                         {
+                            Debug.Log("Got older version of advertisement data");
                             int size = Marshal.SizeOf(typeof(OlderCustomAdvertisingData));
 
                             // Copy data in a byte array for marshaling
@@ -223,6 +224,10 @@ namespace Systemic.Unity.Pixels
                     {
                         Debug.LogError($"Pixel {name}: unexpected advertising manufacturer data length, got {_peripheral.ManufacturersData[0].Data.Count}");
                     }
+                }
+                else
+                {
+                    Debug.LogError($"Pixel {name}: empty manufacturer data");
                 }
             }
 
@@ -464,7 +469,7 @@ namespace Systemic.Unity.Pixels
                 {
                     Debug.Assert(_peripheral.SystemId == p.SystemId);
 
-                    Debug.Log($"Pixel {SafeName}: {(connected ? "Connected" : "Disconnected")}");
+                    Debug.Log($"Pixel {SafeName}: {(connected ? "Connected" : "Disconnected")} (state was {connectionState})");
 
                     if ((!connected) && (connectionState != PixelConnectionState.Disconnecting))
                     {
@@ -532,6 +537,7 @@ namespace Systemic.Unity.Pixels
 
                     yield return Central.DisconnectPeripheralAsync(_peripheral);
 
+                    Debug.Log($"Pixel {SafeName}: Disconnected (state was {connectionState}");
                     Debug.Assert(_connectionCount == 0);
                     connectionState = PixelConnectionState.Available;
 
