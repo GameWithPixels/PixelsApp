@@ -287,7 +287,9 @@ namespace Systemic.Unity.Pixels.Messages
         public byte flashCount;
         public ushort duration;
         public uint color;
+        public uint faceMask;
         public byte fade;
+        public byte loop;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

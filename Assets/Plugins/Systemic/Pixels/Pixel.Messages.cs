@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Systemic.Unity.Pixels.Animations;
 using Systemic.Unity.Pixels.Messages;
 using UnityEngine;
 
@@ -181,6 +182,7 @@ namespace Systemic.Unity.Pixels
                 flashCount = (byte)count,
                 duration = (ushort)(1000 * duration),
                 fade = (byte)(255 * fade),
+                faceMask = Constants.FaceMaskAll,
             };
             var op = new SendMessageAndWaitForResponseEnumerator<Blink, BlinkFinished>(this, msg);
             yield return op;
