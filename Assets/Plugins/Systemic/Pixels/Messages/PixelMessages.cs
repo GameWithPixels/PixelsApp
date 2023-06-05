@@ -293,9 +293,9 @@ namespace Systemic.Unity.Pixels.Messages
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class BlinkFinished : IPixelMessage
+    public class BlinkAck : IPixelMessage
     {
-        public MessageType type { get; set; } = MessageType.BlinkFinished;
+        public MessageType type { get; set; } = MessageType.BlinkAck;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

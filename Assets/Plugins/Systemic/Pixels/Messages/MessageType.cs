@@ -44,7 +44,7 @@ namespace Systemic.Unity.Pixels.Messages
         ProgramDefaultAnimationSet,
         ProgramDefaultAnimationSetFinished,
         Blink,
-        BlinkFinished,
+        BlinkAck,
         RequestDefaultAnimationSetColor,
         DefaultAnimationSetColor,
         RequestBatteryLevel,

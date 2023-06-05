@@ -79,7 +79,7 @@ namespace Systemic.Unity.Pixels
             ++_scanRequestCount;
             Central.PeripheralDiscovered -= OnPeripheralDiscovered; // Prevents from subscribing twice
             Central.PeripheralDiscovered += OnPeripheralDiscovered;
-            Central.ScanForPeripheralsWithServices(new[] { PixelUuids.ServiceUuid });
+            Central.ScanForPeripheralsWithServices(new[] { PixelBleUuids.Service });
         }
 
         /// <summary>

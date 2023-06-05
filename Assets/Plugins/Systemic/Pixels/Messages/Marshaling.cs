@@ -159,8 +159,8 @@ namespace Systemic.Unity.Pixels.Messages
                     case MessageType.RequestTelemetry:
                         ret = FromByteArray<RequestTelemetry>(data);
                         break;
-                    case MessageType.BlinkFinished:
-                        ret = FromByteArray<BlinkFinished>(data);
+                    case MessageType.BlinkAck:
+                        ret = FromByteArray<BlinkAck>(data);
                         break;
                     case MessageType.ProgramDefaultAnimationSetFinished:
                         ret = FromByteArray<ProgramDefaultAnimSetFinished>(data);

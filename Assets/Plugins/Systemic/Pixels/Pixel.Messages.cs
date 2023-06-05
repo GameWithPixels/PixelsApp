@@ -184,7 +184,7 @@ namespace Systemic.Unity.Pixels
                 fade = (byte)(255 * fade),
                 faceMask = Constants.FaceMaskAll,
             };
-            var op = new SendMessageAndWaitForResponseEnumerator<Blink, BlinkFinished>(this, msg);
+            var op = new SendMessageAndWaitForResponseEnumerator<Blink, BlinkAck>(this, msg);
             yield return op;
             onResult?.Invoke(op.IsSuccess, op.Error);
         }
