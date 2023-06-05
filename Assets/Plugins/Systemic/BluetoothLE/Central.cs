@@ -456,7 +456,7 @@ namespace Systemic.Unity.BluetoothLE
                 else if (pInf.State != PeripheralState.Disconnected)
                 {
                     // We got disconnected
-                    Debug.Log($"[BLE {pInf.Name}] Disconnected");
+                    Debug.Log($"[BLE {pInf.Name}] Peripheral is disconnected, notifying");
 
                     // Update state
                     pInf.State = PeripheralState.Disconnected;
@@ -471,7 +471,7 @@ namespace Systemic.Unity.BluetoothLE
                 if (pInf.NativeHandle.IsValid && (pInf.State == PeripheralState.Connecting))
                 {
                     // We're done and ready
-                    Debug.Log($"[BLE {pInf.Name}] Peripheral is ready");
+                    Debug.Log($"[BLE {pInf.Name}] Peripheral is ready, notifying");
 
                     // Update state
                     pInf.State = PeripheralState.Ready;

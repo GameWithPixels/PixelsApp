@@ -469,27 +469,28 @@ namespace Systemic.Unity.Pixels
                 {
                     Debug.Assert(_peripheral.SystemId == p.SystemId);
 
-                    Debug.Log($"Pixel {SafeName}: {(connected ? "Connected" : "Disconnected")} (state was {connectionState})");
+                    Debug.Log($"Pixel {SafeName}: Got {(connected ? "connected" : "disconnected")} event (state is {connectionState})");
 
-                    if ((!connected) && (connectionState != PixelConnectionState.Disconnecting))
+                    if (!connected)
                     {
-                        if ((connectionState == PixelConnectionState.Connecting) || (connectionState == PixelConnectionState.Identifying))
-                        {
-                            NotifyConnectionResult("Disconnected unexpectedly");
-                        }
-                        else
-                        {
-                            Debug.LogError($"Pixel {SafeName}: Got disconnected unexpectedly while in state {connectionState}");
-                        }
-
                         // Reset connection count
                         //TODO Central may try to reconnect automatically! (if disconnected on timeout or access denied)
                         _connectionCount = 0;
-
                         connectionState = PixelConnectionState.Available;
-                        SetLastError(PixelError.Disconnected);
 
-                        DisconnectedUnexpectedly?.Invoke();
+                        if (connectionState != PixelConnectionState.Disconnecting)
+                        {
+                            Debug.LogWarning($"Pixel {SafeName}: Got disconnected unexpectedly while in state {connectionState}");
+
+                            if ((connectionState == PixelConnectionState.Connecting) || (connectionState == PixelConnectionState.Identifying))
+                            {
+                                NotifyConnectionResult("Disconnected unexpectedly");
+                            }
+
+                            SetLastError(PixelError.Disconnected);
+
+                            DisconnectedUnexpectedly?.Invoke();
+                        }
                     }
                 }
 
@@ -537,9 +538,14 @@ namespace Systemic.Unity.Pixels
 
                     yield return Central.DisconnectPeripheralAsync(_peripheral);
 
-                    Debug.Log($"Pixel {SafeName}: Disconnected (state was {connectionState}");
-                    Debug.Assert(_connectionCount == 0);
-                    connectionState = PixelConnectionState.Available;
+                    // If there was a disconnection event (meaning we were properly connected), the state would have already been updated.
+                    // It may also have changed since then, or there might have been no disconnection event.
+                    Debug.Log($"Pixel {SafeName}: Disconnect completed (state is {connectionState})");
+                    if (connectionState == PixelConnectionState.Disconnecting)
+                    {
+                        _connectionCount = 0;
+                        connectionState = PixelConnectionState.Available;
+                    }
 
                     var callbackCopy = _onDisconnectionResult;
                     _onDisconnectionResult = null;

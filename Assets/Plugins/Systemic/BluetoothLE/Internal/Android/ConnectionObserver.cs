@@ -50,7 +50,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 		/// <param name="device">The device that is ready.</param>
 		void onDeviceReady(AndroidJavaObject device)
         {
-			Debug.Log($"[BLE]ConnectionObserver ==> onDeviceReady");
+			Debug.Log($"[BLE] ConnectionObserver ==> onDeviceReady");
 			_connectionEventHandler?.Invoke(ConnectionEvent.Ready, ConnectionEventReason.Success);
 		}
 
@@ -60,7 +60,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 		/// <param name="device">The device that gets disconnecting.</param>
 		void onDeviceDisconnecting(AndroidJavaObject device)
         {
-			Debug.Log($"[BLE]ConnectionObserver ==> onDeviceDisconnecting");
+			Debug.Log($"[BLE] ConnectionObserver ==> onDeviceDisconnecting");
 			_connectionEventHandler?.Invoke(ConnectionEvent.Disconnecting, ConnectionEventReason.Success);
 		}
 
@@ -71,7 +71,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 		/// <param name="reason">The reason of the disconnection.</param>
 		void onDeviceDisconnected(AndroidJavaObject device, int reason)
         {
-			Debug.Log($"[BLE]ConnectionObserver ==> onDeviceDisconnected: {(AndroidConnectionEventReason)reason}");
+			Debug.Log($"[BLE] ConnectionObserver ==> onDeviceDisconnected: {(AndroidConnectionEventReason)reason}");
 			_connectionEventHandler?.Invoke(ConnectionEvent.Disconnected, AndroidNativeInterfaceImpl.ToConnectionEventReason(reason));
 		}
 	}
