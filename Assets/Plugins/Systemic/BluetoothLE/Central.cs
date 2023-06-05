@@ -54,6 +54,10 @@ namespace Systemic.Unity.BluetoothLE
     /// - A <see cref="GameObject"/> named SystemicBleCentral is created upon calling <see cref="Initialize"/>
     /// and destroyed on calling <see cref="Shutdown"/>.
     ///
+    /// For Android, be sure to update the application manifest with the necessary Bluetooth permissions
+    /// listed in <c>Assets\Plugins\Systemic\Plugins\Android\AndroidManifest.xml</c>.
+    /// If your application doesn't already have manifest, just copy the one provided in <c>Assets\Plugins\Android</c>.
+    ///
     /// This class leverages <see cref="NativeInterface"/> to perform most of its operations.
     /// </remarks>
     /// <example>

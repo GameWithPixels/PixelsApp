@@ -102,8 +102,33 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
         public bool Initialize(NativeBluetoothCallback onBluetoothEvent)
         {
 #if UNITY_2018_3_OR_NEWER
-            if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+            bool is31OrAbove = false;
+            try
             {
+                int start = 4 + SystemInfo.operatingSystem.IndexOf("API-");
+                int end = SystemInfo.operatingSystem.IndexOf(" ", start + 1);
+                int apiLevel = int.Parse(SystemInfo.operatingSystem.Substring(start, end - start));
+                is31OrAbove = apiLevel >= 31;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Got error while parsing operatingSystem = {SystemInfo.operatingSystem}");
+                Debug.LogException(e);
+
+            }
+            if (is31OrAbove)
+            {
+                string scan = "android.permission.BLUETOOTH_SCAN";
+                string connect = "android.permission.BLUETOOTH_CONNECT";
+                if (!Permission.HasUserAuthorizedPermission(scan) || !Permission.HasUserAuthorizedPermission(connect))
+                {
+                    Debug.Log("Requesting scan & connect permission");
+                    Permission.RequestUserPermissions(new string[] { scan, connect });
+                }
+            }
+            else if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+            {
+                Debug.Log("Requesting fine location permission");
                 Permission.RequestUserPermission(Permission.FineLocation);
             }
 #endif
