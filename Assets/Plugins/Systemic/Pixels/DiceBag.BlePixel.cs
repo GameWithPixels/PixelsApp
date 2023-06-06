@@ -257,7 +257,7 @@ namespace Systemic.Unity.Pixels
                 void IncrementConnectCount()
                 {
                     ++_connectionCount;
-                    Debug.Log($"Pixel {SafeName}: Connecting, counter={_connectionCount}");
+                    Debug.Log($"Pixel {SafeName}: Got connect request, counter={_connectionCount}, state={connectionState}");
                 }
 
                 switch (connectionState)
@@ -313,7 +313,7 @@ namespace Systemic.Unity.Pixels
                     case PixelConnectionState.Connecting:
                     case PixelConnectionState.Identifying:
                         Debug.Assert(_connectionCount > 0);
-                        Debug.Log($"Pixel {SafeName}: Disconnecting, counter={_connectionCount}, forceDisconnect={forceDisconnect}");
+                        Debug.Log($"Pixel {SafeName}: Got disconnect request, counter={_connectionCount}, state={connectionState}, forceDisconnect={forceDisconnect}");
                         _connectionCount = forceDisconnect ? 0 : Mathf.Max(0, _connectionCount - 1);
 
                         if (_connectionCount == 0)
@@ -340,7 +340,6 @@ namespace Systemic.Unity.Pixels
                 Debug.Assert(connectionState == PixelConnectionState.Available);
                 if (connectionState == PixelConnectionState.Available)
                 {
-                    Debug.Log($"Pixel {SafeName}: Connecting...");
                     connectionState = PixelConnectionState.Connecting;
 
                     BluetoothLE.RequestEnumerator connectRequest = null;
@@ -473,16 +472,18 @@ namespace Systemic.Unity.Pixels
 
                     if (!connected)
                     {
+                        var prevState = connectionState;
+
                         // Reset connection count
                         //TODO Central may try to reconnect automatically! (if disconnected on timeout or access denied)
                         _connectionCount = 0;
                         connectionState = PixelConnectionState.Available;
 
-                        if (connectionState != PixelConnectionState.Disconnecting)
+                        if (prevState != PixelConnectionState.Disconnecting)
                         {
-                            Debug.LogWarning($"Pixel {SafeName}: Got disconnected unexpectedly while in state {connectionState}");
+                            Debug.LogWarning($"Pixel {SafeName}: Got disconnected unexpectedly while in state {prevState}");
 
-                            if ((connectionState == PixelConnectionState.Connecting) || (connectionState == PixelConnectionState.Identifying))
+                            if ((prevState == PixelConnectionState.Connecting) || (prevState == PixelConnectionState.Identifying))
                             {
                                 NotifyConnectionResult("Disconnected unexpectedly");
                             }

@@ -507,12 +507,17 @@ namespace Systemic.Unity.BluetoothLE
             EnsureRunningOnMainThread();
 
             var pInf = GetPeripheralInfo(peripheral);
-            var nativeHandle = pInf.NativeHandle;
-            pInf.NativeHandle = new NativePeripheralHandle();
+            Debug.Log($"[BLE {pInf.Name}] Disconnecting{(pInf.NativeHandle.IsValid ? "" : " invalid peripheral")}, last known state is {pInf.State}");
 
-            Debug.Log($"[BLE {pInf.Name}] Disconnecting{(nativeHandle.IsValid ? "" : " invalid peripheral")}, last known state is {pInf.State}");
-
-            return new Internal.DisconnectRequestEnumerator(nativeHandle);
+            return new Internal.DisconnectRequestEnumerator(pInf.NativeHandle, (nativeHandle) =>
+            {
+                //TODO releasing the peripheral now will break the next attempt to connect
+                //     if done before this callback runs Also an unexpected disconnect won't
+                //     release the peripheral.
+                // Release peripheral even if the disconnect might have failed
+                //NativeInterface.ReleasePeripheral(nativeHandle);
+                //pInf.NativeHandle = new NativePeripheralHandle();
+            });
         }
 
         //! @}

@@ -1,4 +1,6 @@
 
+using System;
+
 namespace Systemic.Unity.BluetoothLE.Internal
 {
     /// <summary>
@@ -6,11 +8,13 @@ namespace Systemic.Unity.BluetoothLE.Internal
     /// </summary>
     internal sealed class DisconnectRequestEnumerator : RequestEnumerator
     {
-        bool _released;
+        Action<NativePeripheralHandle> _onDone;
 
-        public DisconnectRequestEnumerator(NativePeripheralHandle peripheral)
+        public DisconnectRequestEnumerator(NativePeripheralHandle peripheral, Action<NativePeripheralHandle> onDone = null)
             : base(RequestOperation.DisconnectPeripheral, peripheral, 0)
         {
+            _onDone = onDone;
+
             if (Peripheral.IsValid)
             {
                 NativeInterface.DisconnectPeripheral(peripheral, SetResult);
@@ -26,11 +30,10 @@ namespace Systemic.Unity.BluetoothLE.Internal
             bool done = !base.MoveNext();
 
             // Are we done with the disconnect?
-            if (done && Peripheral.IsValid && (!_released))
+            if (done && Peripheral.IsValid)
             {
-                // Release peripheral even if the disconnect might have failed
-                NativeInterface.ReleasePeripheral(Peripheral);
-                _released = true;
+                _onDone?.Invoke(Peripheral);
+                _onDone = null;
             }
 
             return !done;
