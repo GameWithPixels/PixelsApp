@@ -119,7 +119,7 @@ public class EditActionPlayAnimation
     public EditAnimation animation;
     [PlaybackFace, Name("Play on Face")]
     public int faceIndex = -1;
-    [IntSlider, IntRange(1, 10), Name("Repeat Count")]
+    // Disabled for now, unsupported in firmware [IntSlider, IntRange(1, 10), Name("Repeat Count")]
     public int loopCount = 1;
 
     public override ActionType type { get { return ActionType.PlayAnimation; } }
