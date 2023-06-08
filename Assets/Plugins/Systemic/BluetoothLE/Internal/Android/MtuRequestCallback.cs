@@ -1,3 +1,5 @@
+// Ignore Spelling: Mtu
+
 using UnityEngine;
 
 namespace Systemic.Unity.BluetoothLE.Internal.Android

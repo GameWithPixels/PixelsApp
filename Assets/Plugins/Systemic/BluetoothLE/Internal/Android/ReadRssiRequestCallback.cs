@@ -1,3 +1,5 @@
+// Ignore Spelling: Rssi
+
 using UnityEngine;
 
 namespace Systemic.Unity.BluetoothLE.Internal.Android

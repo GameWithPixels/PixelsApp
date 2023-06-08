@@ -1,3 +1,5 @@
+// Ignore Spelling: Rssi Uuid
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

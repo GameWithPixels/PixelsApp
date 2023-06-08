@@ -1,3 +1,5 @@
+// Ignore Spelling: Mtu Rssi Uuid Uuids
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -125,7 +127,9 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
             "unsupported";
 #endif
 
-        delegate void CentralStateUpdateCallback(bool isAvailable);
+        enum AdapterState { Unsupported, Unavailable, Disabled, Enabled };
+
+        delegate void CentralStateUpdateCallback(AdapterState state);
         delegate void DiscoveredPeripheralCallback([MarshalAs(UnmanagedType.LPStr)] string advertisementDataJson);
         delegate void RequestStatusCallback(RequestStatus errorCode);
         delegate void PeripheralConnectionEventCallback(ulong peripheralId, int connectionEvent, int reason);
@@ -188,7 +192,29 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
 
         public bool Initialize(NativeBluetoothCallback onBluetoothEvent)
         {
-            CentralStateUpdateCallback onCentralStateUpdate = available => onBluetoothEvent(available ? BluetoothStatus.Enabled : BluetoothStatus.Disabled);
+            CentralStateUpdateCallback onCentralStateUpdate = state =>
+            {
+                if (onBluetoothEvent != null)
+                {
+                    var status = BluetoothStatus.Unknown;
+                    switch (state)
+                    {
+                        case AdapterState.Unsupported:
+                            status = BluetoothStatus.Unsupported;
+                            break;
+                        case AdapterState.Unavailable:
+                            status = BluetoothStatus.Unavailable;
+                            break;
+                        case AdapterState.Disabled:
+                            status = BluetoothStatus.Disabled;
+                            break;
+                        case AdapterState.Enabled:
+                            status = BluetoothStatus.Ready;
+                            break;
+                    }
+                    onBluetoothEvent(status);
+                }
+            };
             bool success = sgBleInitialize(true, onCentralStateUpdate);
             if (success)
             {

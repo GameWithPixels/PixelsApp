@@ -38,7 +38,7 @@ namespace Systemic.Unity.Pixels
         /// <summary>
         /// Indicates whether we are ready for scanning and connecting to peripherals.
         /// </summary>
-        public static bool IsReady => Central.IsReady;
+        public static bool IsReady => Central.Status == BluetoothLE.BluetoothStatus.Ready;
 
         /// <summary>
         /// Indicates whether we are scanning for Pixel dice.

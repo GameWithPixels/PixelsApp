@@ -1,6 +1,7 @@
+// Ignore Spelling: Mtu Rssi Uuid Uuids
+
 using System;
 using UnityEngine;
-using UnityEngine.Android;
 
 namespace Systemic.Unity.BluetoothLE.Internal.Android
 {
@@ -101,7 +102,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 
         public bool Initialize(NativeBluetoothCallback onBluetoothEvent)
         {
-#if UNITY_2018_3_OR_NEWER
+#if UNITY_2018_3_OR_NEWER && UNITY_ANDROID
             bool is31OrAbove = false;
             try
             {
@@ -133,7 +134,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
             }
 #endif
             //TODO bluetooth availability events
-            onBluetoothEvent((_scannerClass != null) && (_peripheralClass != null) ? BluetoothStatus.Enabled : BluetoothStatus.Disabled);
+            onBluetoothEvent((_scannerClass != null) && (_peripheralClass != null) ? BluetoothStatus.Ready : BluetoothStatus.Disabled);
             return true;
         }
 

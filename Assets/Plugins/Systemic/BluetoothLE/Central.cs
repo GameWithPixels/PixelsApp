@@ -1,3 +1,5 @@
+// Ignore Spelling: Mtu Rssi Uuid Uuids
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -116,6 +118,7 @@ namespace Systemic.Unity.BluetoothLE
         /// </summary>
         public const int DefaultRequestTimeout = 10;
 
+
         /// <summary>
         /// Indicates whether <see cref="Central"/> is ready for scanning and connecting to peripherals.
         /// Reasons for not being ready are:
@@ -124,12 +127,12 @@ namespace Systemic.Unity.BluetoothLE
         /// - The host device either doesn't have a Bluetooth radio, doesn't have permission to use the radio
         ///   or it's radio is turned off.
         /// </summary>
-        public static bool IsReady { get; private set; }
+        public static BluetoothStatus Status { get; private set; } = BluetoothStatus.Unknown;
 
         /// <summary>
-        /// Indicates whether a scan is currently on-going.
+        /// Indicates whether a Bluetooth scan is on-going.
         /// </summary>
-        public static bool IsScanning { get; private set; }
+        public static bool IsScanning { get; private set; } = false;
 
         /// <summary>
         /// Gets the list of all scanned peripherals since <see cref="Initialize"/> was called.
@@ -147,11 +150,12 @@ namespace Systemic.Unity.BluetoothLE
             }
         }
 
-        //TODO ReadyPeripherals ??
         /// <summary>
-        /// Gets the list of peripherals to which <see cref="Central"/> is connected.
+        /// Gets the list of peripherals to which <see cref="Central"/> is connected
+        /// and that ready to communicate with (meaning services and characteristics have been
+        /// discovered and MTU has beens set).
         /// </summary>
-        public static ScannedPeripheral[] ConnectedPeripherals
+        public static ScannedPeripheral[] ReadyPeripherals
         {
             get
             {
@@ -164,7 +168,15 @@ namespace Systemic.Unity.BluetoothLE
             }
         }
 
-        //TODO add scan status event
+        /// <summary>
+        /// Occurs when <see cref="Status"/> changes.
+        /// </summary>
+        public static event Action<BluetoothStatus> StatusChanged;
+
+        /// <summary>
+        /// Occurs when <see cref="IsScanning"/> changes.
+        /// </summary>
+        public static event Action<bool> IsScanningChanged;
 
         /// <summary>
         /// Occurs when a peripheral is discovered or re-discovered.
@@ -179,8 +191,7 @@ namespace Systemic.Unity.BluetoothLE
 
         /// <summary>
         /// Initializes the static class.
-        /// The <see cref="IsReady"/> property is set to <c>true</c> once the instance is ready
-        /// to scan for and connect to BLE peripherals.
+        /// The <see cref="Status"/> property is updated to reflect the availability of Bluetooth.
         /// </summary>
         /// <returns>
         /// Indicates whether the call has succeeded.
@@ -198,9 +209,14 @@ namespace Systemic.Unity.BluetoothLE
             // Initialize NativeInterface and subscribe to get notified when the Bluetooth radio status changes
             bool success = NativeInterface.Initialize(status =>
             {
-                Debug.Log($"[BLE] Bluetooth radio status: {status}");
-                IsReady = status == BluetoothStatus.Enabled;
-                IsScanning = IsScanning && IsReady;
+                EnqueueAction(() =>
+                {
+                    UpdateStatus(status);
+                    if (status != BluetoothStatus.Ready)
+                    {
+                        UpdateIsScanning(false);
+                    }
+                });
             });
 
             if (!success)
@@ -224,7 +240,8 @@ namespace Systemic.Unity.BluetoothLE
 
             // Reset states
             _peripheralsInfo.Clear();
-            IsScanning = IsReady = false;
+            UpdateStatus(BluetoothStatus.Unknown);
+            UpdateIsScanning(false);
 
             // Shutdown native interface and destroy companion mono behaviour
             NativeInterface.Shutdown();
@@ -243,13 +260,13 @@ namespace Systemic.Unity.BluetoothLE
         /// Specifying one more service required for the peripherals saves battery on mobile devices.
         /// </summary>
         /// <param name="serviceUuids">List of services that the peripheral should advertise, may be null or empty.</param>
-        /// <returns>Indicates whether the call has succeeded. It fails if <see cref="IsReady"/> is <c>false</c>.</returns>
+        /// <returns>Indicates whether the call has succeeded. It fails if <see cref="Status"/> is not <c>Ready</c>.</returns>
         public static bool ScanForPeripheralsWithServices(IEnumerable<Guid> serviceUuids = null)
         {
             EnsureRunningOnMainThread();
 
             // We must be ready
-            if (!IsReady)
+            if (Status != BluetoothStatus.Ready)
             {
                 Debug.LogError("[BLE] Central not ready for scanning");
                 return false;
@@ -259,7 +276,7 @@ namespace Systemic.Unity.BluetoothLE
             var requiredServices = serviceUuids?.ToArray() ?? Array.Empty<Guid>();
 
             // Start scanning
-            IsScanning = NativeInterface.StartScan(serviceUuids, scannedPeripheral =>
+            bool isScanning = NativeInterface.StartScan(serviceUuids, scannedPeripheral =>
             {
                 EnqueueAction(() =>
                 {
@@ -279,7 +296,7 @@ namespace Systemic.Unity.BluetoothLE
                 });
             });
 
-            if (IsScanning)
+            if (isScanning)
             {
                 Debug.Log($"[BLE] Started scan for BLE peripherals with services {serviceUuids?.Select(g => g.ToString()).Aggregate((a, b) => a + ", " + b)}");
             }
@@ -288,7 +305,9 @@ namespace Systemic.Unity.BluetoothLE
                 Debug.LogError("[BLE] Failed to start scanning for peripherals");
             }
 
-            return IsScanning;
+            UpdateIsScanning(isScanning);
+
+            return isScanning;
         }
 
         /// <summary>
@@ -301,7 +320,7 @@ namespace Systemic.Unity.BluetoothLE
             Debug.Log($"[BLE] Stopping scan");
 
             NativeInterface.StopScan();
-            IsScanning = false;
+            UpdateIsScanning(false);
         }
 
         //! @}
@@ -857,6 +876,26 @@ namespace Systemic.Unity.BluetoothLE
 
         //! @}
 
+        private static void UpdateStatus(BluetoothStatus status)
+        {
+            if (Status != status)
+            {
+                Debug.Log($"[BLE] Status changed from {Status} to {status}");
+                Status = status;
+                StatusChanged?.Invoke(status);
+            }
+        }
+
+        private static void UpdateIsScanning(bool isScanning)
+        {
+            if (IsScanning != isScanning)
+            {
+                Debug.Log($"[BLE] IsScanning changed from {IsScanning} to {isScanning}");
+                IsScanning = isScanning;
+                IsScanningChanged?.Invoke(isScanning);
+            }
+        }
+
         // Throws an exception if we are not running on the main thread
         private static void EnsureRunningOnMainThread()
         {
@@ -931,20 +970,28 @@ namespace Systemic.Unity.BluetoothLE
         // Queues an action to be invoked on the next frame update
         static void EnqueueAction(Action action)
         {
-            InternalBehaviour.Instance?.EnqueueAction(action);
+            var instance = InternalBehaviour.Instance;
+            if (instance)
+            {
+                instance.EnqueueAction(action);
+            }
         }
 
         // Queues an action to be invoked on the next frame update but only if the peripheral is still in our list
         static void EnqueuePeripheralAction(PeripheralInfo pInf, Action action)
         {
-            InternalBehaviour.Instance?.EnqueueAction(() =>
+            var instance = InternalBehaviour.Instance;
+            if (instance)
             {
-                Debug.Assert(pInf.ScannedPeripheral != null);
-                if (_peripheralsInfo.ContainsKey(pInf.ScannedPeripheral?.SystemId))
+                instance.EnqueueAction(() =>
                 {
-                    action();
-                }
-            });
+                    Debug.Assert(pInf.ScannedPeripheral != null);
+                    if (_peripheralsInfo.ContainsKey(pInf.ScannedPeripheral?.SystemId))
+                    {
+                        action();
+                    }
+                });
+            }
         }
 
         #endregion

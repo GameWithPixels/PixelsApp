@@ -7,11 +7,23 @@ namespace Systemic.Unity.BluetoothLE
     /// </summary>
     public enum BluetoothStatus
     {
-        /// Bluetooth radio is disabled.
+        /// <see cref="Central"/> has not been initialized yet, is initializing or has shutdown.
+        Unknown,
+
+        /// The system doesn't have a compatible Bluetooth adapter.
+        Unsupported,
+
+        /// The Bluetooth radio is resetting or in a uncontrollable state.
+        Unavailable,
+
+        /// The Bluetooth radio is disabled.
         Disabled,
 
-        /// Bluetooth radio is enabled.
-        Enabled,
+        /// The access to Bluetooth hasn't been authorized by user.
+        Unauthorized,
+
+        /// The Bluetooth radio is enabled and ready for use.
+        Ready,
     }
 
     /// <summary>

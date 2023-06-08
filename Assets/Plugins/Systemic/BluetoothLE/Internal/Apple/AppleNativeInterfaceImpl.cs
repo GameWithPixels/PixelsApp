@@ -1,3 +1,5 @@
+// Ignore Spelling: Mtu Rssi Uuid Uuids
+
 using AOT;
 using System;
 using System.Collections.Generic;
@@ -157,7 +159,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
         {
             try
             {
-                _onBluetoothEvent(available ? BluetoothStatus.Enabled : BluetoothStatus.Disabled);
+                _onBluetoothEvent(available ? BluetoothStatus.Ready : BluetoothStatus.Disabled);
             }
             catch (Exception e)
             {
