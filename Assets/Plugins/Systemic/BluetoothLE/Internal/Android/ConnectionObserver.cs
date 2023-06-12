@@ -18,7 +18,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 		/// <param name="device">The device that is connecting.</param>
 		void onDeviceConnecting(AndroidJavaObject device)
         {
-			Debug.Log($"[BLE] ConnectionObserver ==> onDeviceConnecting");
+			//Debug.Log($"[BLE] ConnectionObserver ==> onDeviceConnecting");
 			_connectionEventHandler?.Invoke(ConnectionEvent.Connecting, ConnectionEventReason.Success);
 		}
 
@@ -29,7 +29,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 		/// <param name="device">The device that got connected.</param>
 		void onDeviceConnected(AndroidJavaObject device)
         {
-			Debug.Log($"[BLE] ConnectionObserver ==> onDeviceConnected");
+			//Debug.Log($"[BLE] ConnectionObserver ==> onDeviceConnected");
 			_connectionEventHandler?.Invoke(ConnectionEvent.Connected, ConnectionEventReason.Success);
 		}
 
@@ -40,7 +40,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 		/// <param name="reason">The reason of failure.</param>
 		void onDeviceFailedToConnect(AndroidJavaObject device, int reason)
         {
-			Debug.Log($"[BLE] ConnectionObserver ==> onDeviceFailedToConnect: {(AndroidConnectionEventReason)reason}");
+			//Debug.Log($"[BLE] ConnectionObserver ==> onDeviceFailedToConnect: {(AndroidConnectionEventReason)reason}");
 			_connectionEventHandler?.Invoke(ConnectionEvent.FailedToConnect, AndroidNativeInterfaceImpl.ToConnectionEventReason(reason));
 		}
 
@@ -50,7 +50,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 		/// <param name="device">The device that is ready.</param>
 		void onDeviceReady(AndroidJavaObject device)
         {
-			Debug.Log($"[BLE] ConnectionObserver ==> onDeviceReady");
+			//Debug.Log($"[BLE] ConnectionObserver ==> onDeviceReady");
 			_connectionEventHandler?.Invoke(ConnectionEvent.Ready, ConnectionEventReason.Success);
 		}
 
@@ -71,7 +71,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 		/// <param name="reason">The reason of the disconnection.</param>
 		void onDeviceDisconnected(AndroidJavaObject device, int reason)
         {
-			Debug.Log($"[BLE] ConnectionObserver ==> onDeviceDisconnected: {(AndroidConnectionEventReason)reason}");
+			//Debug.Log($"[BLE] ConnectionObserver ==> onDeviceDisconnected: {(AndroidConnectionEventReason)reason}");
 			_connectionEventHandler?.Invoke(ConnectionEvent.Disconnected, AndroidNativeInterfaceImpl.ToConnectionEventReason(reason));
 		}
 	}

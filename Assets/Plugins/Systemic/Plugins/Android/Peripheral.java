@@ -268,7 +268,7 @@ public final class Peripheral
     {
         // Get the Bluetooth Manager
         Context currentActivity
-            = com.unity3d.player.UnityPlayer.currentActivity.getApplicationContext();
+            = UnityPlayer.currentActivity.getApplicationContext();
         BluetoothManager bluetoothManager
             = (BluetoothManager)currentActivity.getSystemService(Context.BLUETOOTH_SERVICE);
 

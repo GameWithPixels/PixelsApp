@@ -2,6 +2,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Android;
 
 namespace Systemic.Unity.BluetoothLE.Internal.Android
 {
@@ -41,7 +42,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 
         // From Nordic's FailCallback
         REASON_DEVICE_DISCONNECTED = -1,
-        REASON_DEVICE_NOT_SUPPORTED = -2,
+        REASON_DEVICE_NOT_SUPPORTED = -2, // Device doesn't have the required services
         REASON_NULL_ATTRIBUTE = -3,
         REASON_REQUEST_FAILED = -4,
         REASON_TIMEOUT = -5,
@@ -99,47 +100,107 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
         const string PeripheralClassName = "com.systemic.bluetoothle.Peripheral";
         readonly AndroidJavaClass _scannerClass = new AndroidJavaClass("com.systemic.bluetoothle.Scanner");
         readonly AndroidJavaClass _peripheralClass = new AndroidJavaClass(PeripheralClassName);
+        readonly AndroidJavaClass _bluetoothStateClass = new AndroidJavaClass("com.systemic.bluetoothle.BluetoothState");
 
-        public bool Initialize(NativeBluetoothCallback onBluetoothEvent)
+        BluetoothStatus _bluetoothStatus = BluetoothStatus.Unknown;
+        bool _waitingForPermission = false;
+
+        static readonly bool _is31OrAbove = false;
+        static readonly string ScanPermission = "android.permission.BLUETOOTH_SCAN";
+        static readonly string ConnectPermission = "android.permission.BLUETOOTH_CONNECT";
+        
+        static AndroidNativeInterfaceImpl()
         {
-#if UNITY_2018_3_OR_NEWER && UNITY_ANDROID
-            bool is31OrAbove = false;
             try
             {
                 int start = 4 + SystemInfo.operatingSystem.IndexOf("API-");
                 int end = SystemInfo.operatingSystem.IndexOf(" ", start + 1);
                 int apiLevel = int.Parse(SystemInfo.operatingSystem.Substring(start, end - start));
-                is31OrAbove = apiLevel >= 31;
+                _is31OrAbove = apiLevel >= 31;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Got error while parsing operatingSystem = {SystemInfo.operatingSystem}");
+                Debug.LogError($"Error parsing SystemInfo.operatingSystem = {SystemInfo.operatingSystem}");
                 Debug.LogException(e);
-
             }
-            if (is31OrAbove)
+        }
+
+        static bool HasPermission()
+        {
+            return _is31OrAbove
+                ? Permission.HasUserAuthorizedPermission(ScanPermission) && Permission.HasUserAuthorizedPermission(ConnectPermission)
+                : Permission.HasUserAuthorizedPermission(Permission.FineLocation);
+        }
+
+        void UpdateBluetoothStatus(BluetoothState state, NativeBluetoothCallback onBluetoothEvent)
+        {
+            var newStatus = HasPermission()
+                ? (state == BluetoothState.On ? BluetoothStatus.Ready : BluetoothStatus.Disabled)
+                : BluetoothStatus.Unauthorized;
+            if (_bluetoothStatus != newStatus)
             {
-                string scan = "android.permission.BLUETOOTH_SCAN";
-                string connect = "android.permission.BLUETOOTH_CONNECT";
-                if (!Permission.HasUserAuthorizedPermission(scan) || !Permission.HasUserAuthorizedPermission(connect))
+                _bluetoothStatus = newStatus;
+                onBluetoothEvent?.Invoke(newStatus);
+            }
+        }
+
+        void RefreshBluetoothStatus(NativeBluetoothCallback onBluetoothEvent)
+        {
+            var state = BluetoothStateCallback.ToState(_bluetoothStateClass.CallStatic<int>("GetState"));
+            if (state.HasValue)
+            {
+                UpdateBluetoothStatus(state.Value, onBluetoothEvent);
+            }
+        }
+
+        public bool Initialize(NativeBluetoothCallback onBluetoothEvent)
+        {
+#if UNITY_2018_3_OR_NEWER && UNITY_ANDROID
+            if (!HasPermission())
+            {
+                _waitingForPermission = true;
+                Action<string> update = (string permissionName) =>
+                {
+                    if ((permissionName == Permission.FineLocation) || (permissionName == ScanPermission) || (permissionName == ConnectPermission))
+                    {
+                        _waitingForPermission = false;
+                        RefreshBluetoothStatus(onBluetoothEvent);
+                    }
+                };
+                var callback = new PermissionCallbacks();
+                callback.PermissionGranted += update;
+                callback.PermissionDenied += update;
+                callback.PermissionDeniedAndDontAskAgain += update;
+                if (_is31OrAbove)
                 {
                     Debug.Log("Requesting scan & connect permission");
-                    Permission.RequestUserPermissions(new string[] { scan, connect });
+                    Permission.RequestUserPermissions(new string[] { ScanPermission, ConnectPermission }, callback);
+                }
+                else
+                {
+                    Debug.Log("Requesting fine location permission");
+                    Permission.RequestUserPermission(Permission.FineLocation, callback);
                 }
             }
-            else if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
-            {
-                Debug.Log("Requesting fine location permission");
-                Permission.RequestUserPermission(Permission.FineLocation);
-            }
 #endif
-            //TODO bluetooth availability events
-            onBluetoothEvent((_scannerClass != null) && (_peripheralClass != null) ? BluetoothStatus.Ready : BluetoothStatus.Disabled);
-            return true;
+            if (_bluetoothStateClass != null)
+            {
+                if (!_waitingForPermission)
+                {
+                    RefreshBluetoothStatus(onBluetoothEvent);
+                }
+                _bluetoothStateClass.CallStatic("Start", new BluetoothStateCallback((state) =>
+                {
+                    UpdateBluetoothStatus(state, onBluetoothEvent);
+                }));
+            }
+            return (_scannerClass != null) && (_peripheralClass != null) && (_bluetoothStateClass != null);
         }
 
         public void Shutdown()
         {
+            _bluetoothStateClass?.CallStatic("Stop");
+            _bluetoothStatus = BluetoothStatus.Unknown;
         }
 
         public bool StartScan(string requiredServiceUuids, Action<INativeDevice, NativeAdvertisementDataJson> onScannedPeripheral)
