@@ -45,7 +45,7 @@ namespace Systemic.Unity.BluetoothLE
     /// A static class with methods for discovering, connecting to, and interacting with Bluetooth
     /// Low Energy (BLE) peripherals.
     /// 
-    /// Use the <see cref="ScanForPeripheralsWithServices"/> method to discover available BLE peripherals.
+    /// Use the <see cref="StartScanning"/> method to discover available BLE peripherals.
     /// Then connect to a scanned peripheral with a call to <see cref="ConnectPeripheralAsync"/>.
     /// Once connected, the peripheral can be queried for its name, MTU, RSSI, services and characteristics.
     /// Characteristics can be read, written and subscribed to.
@@ -261,7 +261,7 @@ namespace Systemic.Unity.BluetoothLE
         /// </summary>
         /// <param name="serviceUuids">List of services that the peripheral should advertise, may be null or empty.</param>
         /// <returns>Indicates whether the call has succeeded. It fails if <see cref="Status"/> is not <c>Ready</c>.</returns>
-        public static bool ScanForPeripheralsWithServices(IEnumerable<Guid> serviceUuids = null)
+        public static bool StartScanning(IEnumerable<Guid> serviceUuids = null)
         {
             EnsureRunningOnMainThread();
 
@@ -313,7 +313,7 @@ namespace Systemic.Unity.BluetoothLE
         /// <summary>
         /// Stops an on-going BLE scan.
         /// </summary>
-        public static void StopScan()
+        public static void StopScanning()
         {
             EnsureRunningOnMainThread();
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using BluetoothStatus = Systemic.Unity.BluetoothLE.BluetoothStatus;
 using Central = Systemic.Unity.BluetoothLE.Central;
 using Peripheral = Systemic.Unity.BluetoothLE.ScannedPeripheral;
 
@@ -19,6 +20,19 @@ namespace Systemic.Unity.Pixels
     /// </summary>
     public static partial class DiceBag
     {
+        /// <summary>
+        /// Return status when starting a scan with <see cref="ScanForPixels"/>.
+        /// In case of error, check <see cref="BluetoothStatus"/> for more information
+        /// about the current Bluetooth state. Note that it is possible that the state
+        /// changed since the attempt to start scanning.
+        /// </summary>
+        public enum ScanStatus
+        {
+            Started,
+            NotReady,
+            Error,
+        }
+
         // Count the number of scan requests and cancel scanning only after the same number of stop scan requests
         static int _scanRequestCount;
 
@@ -36,14 +50,24 @@ namespace Systemic.Unity.Pixels
         static PlayAudioClipCallback _playAudioClip;
 
         /// <summary>
+        /// Bluetooth status event, <see cref="Central.StatusChanged"/> event.
+        /// </summary>
+        public static event System.Action<BluetoothStatus> BluetoothStatusChanged;
+
+        /// <summary>
+        /// Bluetooth status, <see cref="Central.Status"/> property.
+        /// </summary>
+        public static BluetoothStatus BluetoothStatus => Central.Status;
+
+        /// <summary>
         /// Indicates whether we are ready for scanning and connecting to peripherals.
         /// </summary>
-        public static bool IsReady => Central.Status == BluetoothLE.BluetoothStatus.Ready;
+        public static bool IsReady => Central.Status == BluetoothStatus.Ready;
 
         /// <summary>
         /// Indicates whether we are scanning for Pixel dice.
         /// </summary>
-        public static bool IsScanning => _scanRequestCount > 0; //TODO update when Bluetooth radio turned off
+        public static bool IsScanning => _scanRequestCount > 0;
 
         /// <summary>
         /// Gets the list of all Pixels we know about.
@@ -66,20 +90,44 @@ namespace Systemic.Unity.Pixels
         /// </summary>
         public static event System.Action<Pixel> PixelDiscovered;
 
+        /// <summary>
+        /// Initialize the instance and the Bluetooth stack.
+        /// Be sure to call this method before any other one of this singleton.
+        /// </summary>
+        public static void Initialize()
+        {
+            InternalBehaviour.Create();
+        }
+
         #region Scan for Pixels
 
         /// <summary>
         /// Starts scanning for Pixel dice.
         /// </summary>
-        public static void ScanForPixels()
+        public static ScanStatus ScanForPixels()
         {
-            InternalBehaviour.Create();
-            Central.Initialize();
+            InternalBehaviour.CheckValid();
 
-            ++_scanRequestCount;
-            Central.PeripheralDiscovered -= OnPeripheralDiscovered; // Prevents from subscribing twice
-            Central.PeripheralDiscovered += OnPeripheralDiscovered;
-            Central.ScanForPeripheralsWithServices(new[] { PixelBleUuids.Service });
+            if (IsReady)
+            {
+                ++_scanRequestCount;
+                Central.PeripheralDiscovered -= OnPeripheralDiscovered; // Prevents from subscribing twice
+                Central.PeripheralDiscovered += OnPeripheralDiscovered;
+                if (!Central.StartScanning(new[] { PixelBleUuids.Service }))
+                {
+                    StopScanning();
+                    return ScanStatus.Error;
+                }
+                else
+                {
+                    return ScanStatus.Started;
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Central not ready for scanning, status is {Central.Status}");
+                return ScanStatus.NotReady;
+            }
         }
 
         /// <summary>
@@ -88,6 +136,11 @@ namespace Systemic.Unity.Pixels
         /// <param name="forceStop">If true stops scanning regardless of the number of scan calls that were made.</param>
         public static void StopScanning(bool forceStop = false)
         {
+            if (!InternalBehaviour.CheckValid(noThrow: true))
+            {
+                return;
+            }
+
             if (_scanRequestCount > 0)
             {
                 _scanRequestCount = forceStop ? 0 : Mathf.Max(0, _scanRequestCount - 1);
@@ -95,7 +148,7 @@ namespace Systemic.Unity.Pixels
                 if (_scanRequestCount == 0)
                 {
                     Central.PeripheralDiscovered -= OnPeripheralDiscovered;
-                    Central.StopScan();
+                    Central.StopScanning();
                 }
             }
         }
@@ -212,6 +265,8 @@ namespace Systemic.Unity.Pixels
         /// <returns>The coroutine running the request.</returns>
         public static Coroutine ConnectPixel(Pixel pixel, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null)
         {
+            InternalBehaviour.CheckValid();
+
             if (pixel == null) throw new System.ArgumentNullException(nameof(pixel));
             if (requestCancelFunc == null) throw new System.ArgumentNullException(nameof(requestCancelFunc));
 
@@ -237,6 +292,8 @@ namespace Systemic.Unity.Pixels
         /// <returns>The coroutine running the request.</returns>
         public static Coroutine ConnectPixels(IEnumerable<Pixel> pixels, System.Func<bool> requestCancelFunc, ConnectionResultCallback onResult = null)
         {
+            InternalBehaviour.CheckValid();
+
             if (pixels == null) throw new System.ArgumentNullException(nameof(pixels));
             if (requestCancelFunc == null) throw new System.ArgumentNullException(nameof(requestCancelFunc));
 
@@ -322,6 +379,8 @@ namespace Systemic.Unity.Pixels
         /// <returns>The coroutine running the request.</returns>
         public static Coroutine DisconnectPixel(Pixel pixel, bool forceDisconnect = false)
         {
+            InternalBehaviour.CheckValid();
+
             var blePixel = (BlePixel)pixel;
             return StartCoroutine(DisconnectAsync());
 
@@ -347,8 +406,6 @@ namespace Systemic.Unity.Pixels
         // Destroys a Pixel instance and remove it from internal lists
         static void DestroyPixel(BlePixel pixel)
         {
-            InternalBehaviour.Create();
-
             Debug.Assert(pixel);
             if (pixel)
             {
@@ -364,6 +421,15 @@ namespace Systemic.Unity.Pixels
 
         #endregion
 
+        private static void OnBluetoothStatusChanged(BluetoothStatus status)
+        {
+            if (status != BluetoothStatus.Ready)
+            {
+                StopScanning(forceStop: true);
+            }
+            BluetoothStatusChanged?.Invoke(status);
+        }
+
         #region PersistentMonoBehaviourSingleton
 
         /// <summary>
@@ -376,6 +442,24 @@ namespace Systemic.Unity.Pixels
         {
             // Instance name
             string BluetoothLE.Internal.IPersistentMonoBehaviourSingleton.GameObjectName => "SystemicPixelsDiceBag";
+
+            protected override void OnEnable()
+            {
+                base.OnEnable();
+                Central.StatusChanged += OnBluetoothStatusChanged;
+                if (Central.Status != BluetoothStatus.Unknown)
+                {
+                    OnBluetoothStatusChanged(Central.Status);
+                }
+                Central.Initialize();
+            }
+
+            protected override void OnDisable()
+            {
+                Central.Shutdown();
+                Central.StatusChanged -= OnBluetoothStatusChanged;
+                base.OnDisable();
+            }
 
             // Update is called once per frame
             protected override void Update()

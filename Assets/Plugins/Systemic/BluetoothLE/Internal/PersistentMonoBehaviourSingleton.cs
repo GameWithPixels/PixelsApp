@@ -75,7 +75,7 @@ namespace Systemic.Unity.BluetoothLE.Internal
         }
 
         // Called when the instance becomes enabled and active
-        void OnEnable()
+        protected virtual void OnEnable()
         {
             // Safeguard
             if ((Instance != null) && (Instance != this))
@@ -86,7 +86,7 @@ namespace Systemic.Unity.BluetoothLE.Internal
         }
 
         // Called when the instance becomes disabled or inactive
-        void OnDisable()
+        protected virtual void OnDisable()
         {
             if (Instance == this)
             {

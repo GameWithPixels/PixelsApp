@@ -11,6 +11,7 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
     [System.Serializable]
     public class Data
     {
+        public bool bluetoothExplanationShown = false;
         public bool displayWhatsNew = true;
         public bool mainTutorialEnabled = true;
         public bool homeTutorialEnabled = true;
@@ -27,6 +28,7 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
 
     public string pathname => Path.Combine(Application.persistentDataPath, AppConstants.Instance.SettingsFilename);
 
+    public bool bluetoothExplanationShown => data.bluetoothExplanationShown;
     public bool displayWhatsNew => data.displayWhatsNew;
     public bool mainTutorialEnabled => data.mainTutorialEnabled;
     public bool homeTutorialEnabled => data.homeTutorialEnabled;
@@ -37,6 +39,12 @@ public class AppSettings : SingletonMonoBehaviour<AppSettings>
     public bool ruleTutorialEnabled => data.ruleTutorialEnabled;
     public bool animationsTutorialEnabled => data.animationsTutorialEnabled;
     public bool animationTutorialEnabled => data.animationTutorialEnabled;
+
+    public void SetBluetoothExplanationShown()
+    {
+        data.bluetoothExplanationShown = true;
+        SaveData();
+    }
 
     public void SetDisplayWhatsNew(bool value)
     {

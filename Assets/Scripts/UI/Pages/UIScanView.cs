@@ -27,7 +27,11 @@ public class UIScanView
 
     void OnEnable()
     {
-        base.SetupHeader(false, false, "Scanning", null);
+        // Subscribe to Bluetooth status
+        DiceBag.BluetoothStatusChanged += OnBluetoothStatusChanged;
+
+        SetupHeader(false, false, "Scanning", null);
+
         RefreshView();
 
         StartCoroutine(BeginScanCr());
@@ -39,13 +43,17 @@ public class UIScanView
                 yield return null;
             }
             DiceBag.PixelDiscovered += OnDieDiscovered;
-            DiceBag.ScanForPixels();
-            pairSelectedDice.SetActive(false);
+
+            if (DiceBag.ScanForPixels() == DiceBag.ScanStatus.Started)
+            {
+                pairSelectedDice.SetActive(false);
+            }
         }
     }
 
     void OnDisable()
     {
+        DiceBag.BluetoothStatusChanged -= OnBluetoothStatusChanged;
         DiceBag.PixelDiscovered -= OnDieDiscovered;
         DiceBag.StopScanning();
         foreach (var die in discoveredDice)
@@ -54,6 +62,11 @@ public class UIScanView
         }
         selectedDice.Clear();
         discoveredDice.Clear();
+    }
+
+    void OnBluetoothStatusChanged(Systemic.Unity.BluetoothLE.BluetoothStatus status)
+    {
+        NavigationManager.Instance.GoBack();
     }
 
     void RefreshView()

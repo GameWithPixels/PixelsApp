@@ -8,6 +8,7 @@ using Systemic.Unity.Pixels.Profiles;
 using System.IO;
 using SimpleFileBrowser;
 using Systemic.Unity.Pixels;
+using Systemic.Unity.BluetoothLE;
 
 public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 {
@@ -251,15 +252,27 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
             {
                 try
                 {
-                    Debug.Log($"Scanning for dice {string.Join(", ", missingDice.Select(ed => ed.name))}"
+                    Debug.Log($"Attempting to start scanning for dice {string.Join(", ", missingDice.Select(ed => ed.name))}"
                         + $" with timeout of {AppConstants.Instance.ScanTimeout}s");
-                    DiceBag.ScanForPixels();
 
-                    // Wait for all dice to be scanned, or timeout
-                    float scanTimeout = Time.realtimeSinceStartup + AppConstants.Instance.ScanTimeout;
-                    yield return new WaitUntil(() => missingDice.All(ed => ed.die != null)
-                        || (Time.realtimeSinceStartup > scanTimeout)
-                        || (!calleeGameObject.activeInHierarchy));
+                    DiceBag.ScanForPixels();
+                    if (DiceBag.IsReady && !DiceBag.IsScanning)
+                    {
+                        // Wait just a bit before scanning as it sometimes fails to start scanning
+                        // on Windows when called right after Bluetooth has been re-enabled
+                        Debug.Log("Second attempt at start scanning");
+                        yield return new WaitForSeconds(0.3f);
+                        DiceBag.ScanForPixels();
+                    }
+
+                    if (DiceBag.IsScanning)
+                    {
+                        // Wait for all dice to be scanned, or timeout
+                        float scanTimeout = Time.realtimeSinceStartup + AppConstants.Instance.ScanTimeout;
+                        yield return new WaitUntil(() => missingDice.All(ed => ed.die != null)
+                            || (Time.realtimeSinceStartup > scanTimeout)
+                            || (!calleeGameObject.activeInHierarchy));
+                    }
                 }
                 finally
                 {
@@ -769,15 +782,58 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
 #endif
     }
 
+    public string GetBluetoothMessage(BluetoothStatus status)
+    {
+        switch (status)
+        {
+            case BluetoothStatus.Unknown:
+            case BluetoothStatus.Unavailable:
+                return "Internal error, failed to initialize Bluetooth.";
+            case BluetoothStatus.Unsupported:
+                return "Unfortunately your device doesn't seem to support Bluetooth, the Pixels app won't be able to connect to Pixels dice.";
+            case BluetoothStatus.Disabled:
+                return "Please enable Bluetooth to allow the Pixels app to scan for and connect to Pixels dice.";
+            case BluetoothStatus.Unauthorized:
+                return "Please give the Pixels app permission to use Bluetooth to let it scan for and connect to Pixels dice.";
+        }
+        return null;
+    }
+
     // Start is called before the first frame update
     IEnumerator Start()
     {
         Debug.Log($"Running app version {Application.version}");
 
-        yield return null; // Wait on frame before accessing DiceBag
+        if (!AppSettings.Instance.bluetoothExplanationShown)
+        {
+            ShowDialogBox("Bluetooth Required", "In order to connect to your Pixels dice, the Pixels app needs permission to use Bluetooth.", closeAction: (_) => StartCoroutine(Initialize()));
+        }
+        else
+        {
+            yield return null; // Wait on frame before accessing DiceBag
+            yield return Initialize();
+        }
+    }
 
-        // Initialize Central
-        Systemic.Unity.BluetoothLE.Central.Initialize();
+    IEnumerator Initialize()
+    {
+        AppSettings.Instance.SetBluetoothExplanationShown();
+
+        // Subscribe to events
+        DiceBag.BluetoothStatusChanged += (status) =>
+        {
+            // Don't show a message to the user when status is unavailable.
+            // The BLE adapter might be reseting or in an error state, there is nothing to do but wait
+            // (and we don't want to ask the user to restart their device).
+            if (status != BluetoothStatus.Unknown && status != BluetoothStatus.Unavailable && status != BluetoothStatus.Ready)
+            {
+                string msg = GetBluetoothMessage(status);
+                if (msg != null)
+                {
+                    ShowDialogBox($"Bluetooth {status}", msg);
+                }
+            }
+        };
 
         DiceBag.PixelDiscovered += pixel =>
         {
@@ -802,6 +858,9 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         {
             AudioClipManager.Instance.PlayAudioClip(clipId);
         });
+
+        // And initialize
+        DiceBag.Initialize();
 
         while (!DiceBag.IsReady) yield return null;
 

@@ -244,7 +244,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Windows
                     Debug.LogException(e);
                 }
             };
-            // Starts a new scan if on is already in progress
+            // Starts a new scan and replace previous one if still ongoing
             bool success = sgBleStartScan(requiredServiceUuids, onDiscoveredPeripheral);
             if (success)
             {

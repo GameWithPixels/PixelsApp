@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-using Dice;
 using Systemic.Unity.Pixels;
+
+using BluetoothStatus = Systemic.Unity.BluetoothLE.BluetoothStatus;
 
 public class UIDicePoolView
     : UIPage
 {
     [Header("Controls")]
+    public Text errorMessage;
+    public GameObject mainView;
     public GameObject contentRoot;
     public Button addNewDiceButton;
     public UIDicePoolRefreshButton refreshButton;
@@ -26,16 +29,21 @@ public class UIDicePoolView
     void Awake()
     {
         addNewDiceButton.onClick.AddListener(AddNewDice);
-        refreshButton.onClick.AddListener(ForceRefresh);
+        refreshButton.onClick.AddListener(ConnectAllDice);
+
+        // Subscribe to Bluetooth status changes
+        DiceBag.BluetoothStatusChanged += OnBluetoothStatusChanged;
+    }
+
+    void OnDestroy()
+    {
+        DiceBag.BluetoothStatusChanged -= OnBluetoothStatusChanged;
     }
 
     public override void Enter(object context)
     {
         base.Enter(context);
-
-        // Connect to all the dice in the pool if possible
-        connectAllDiceCoroutine = ConnectAllDice();
-        StartCoroutine(connectAllDiceCoroutine);
+        OnBluetoothStatusChanged(DiceBag.BluetoothStatus);
     }
 
     public override void Leave()
@@ -56,7 +64,7 @@ public class UIDicePoolView
 
     void OnEnable()
     {
-        base.SetupHeader(true, false, "Dice Bag", null);
+        SetupHeader(true, false, "Dice Bag", null);
         RefreshView();
 
         PixelsApp.Instance.onDieAdded += OnDieAdded;
@@ -73,9 +81,22 @@ public class UIDicePoolView
 
         foreach (var uidie in pairedDice)
         {
-            DestroyPairedDie(uidie);
+            DestroyPairedDie(uidie);    
         }
         pairedDice.Clear();
+    }
+
+    void OnBluetoothStatusChanged(BluetoothStatus status)
+    {
+        errorMessage.text = PixelsApp.Instance.GetBluetoothMessage(status);
+        bool ready = status == BluetoothStatus.Ready;
+        errorMessage.gameObject.SetActive(!ready);
+        mainView.SetActive(ready);
+        if (isActiveAndEnabled && ready)
+        {
+            RefreshView();
+            ConnectAllDice();
+        }
     }
 
     UIPairedDieToken CreatePairedDie(EditDie die)
@@ -100,6 +121,12 @@ public class UIDicePoolView
 
     void RefreshView()
     {
+        if (!mainView.activeInHierarchy)
+        {
+            // No Bluetooth
+            return;
+        }
+
         // Assume all pool dice will be destroyed
         var toDestroy = new List<UIPairedDieToken>(pairedDice);
         foreach (var editDie in AppDataSet.Instance.dice)
@@ -152,19 +179,29 @@ public class UIDicePoolView
         refreshButton.StartRotating();
     }
 
-    IEnumerator ConnectAllDice()
+    void ConnectAllDice()
     {
-        try
+        if (connectAllDiceCoroutine == null && mainView.activeInHierarchy)
         {
-            OnBeginRefreshPool();
-            yield return PixelsApp.Instance.ConnectAllDice(gameObject, editDie => connectedDice.Add(editDie));
-            RefreshView();
+            // Connect to all the dice in the pool if possible
+            connectAllDiceCoroutine = ConnectAllCr();
+            StartCoroutine(connectAllDiceCoroutine);
         }
-        finally
+
+        IEnumerator ConnectAllCr()
         {
-            OnEndRefreshPool();
+            try
+            {
+                OnBeginRefreshPool();
+                yield return PixelsApp.Instance.ConnectAllDice(gameObject, editDie => connectedDice.Add(editDie));
+                RefreshView();
+            }
+            finally
+            {
+                OnEndRefreshPool();
+            }
+            connectAllDiceCoroutine = null;
         }
-        connectAllDiceCoroutine = null;
     }
 
     void OnEndRefreshPool()
@@ -172,16 +209,6 @@ public class UIDicePoolView
         if (refreshButton.rotating)
         {
             refreshButton.StopRotating();
-        }
-    }
-
-    void ForceRefresh()
-    {
-        if (connectAllDiceCoroutine == null)
-        {
-            // Connect to all the dice in the pool if possible
-            connectAllDiceCoroutine = ConnectAllDice();
-            StartCoroutine(connectAllDiceCoroutine);
         }
     }
 }
