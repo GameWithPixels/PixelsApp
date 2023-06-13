@@ -24,10 +24,12 @@ public class EditProfile
     {
         // Add our rules to the set
         int rulesOffset = set.rules.Count;
+        int i = 0;
         foreach (var editRule in rules)
         {
-            var rule = editRule.ToRule(editSet, set);
+            var rule = editRule.ToRule(editSet, set, i);
             set.rules.Add(rule);
+            ++i;
         }
 
         return new Profile()

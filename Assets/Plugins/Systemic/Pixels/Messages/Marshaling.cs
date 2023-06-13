@@ -141,8 +141,8 @@ namespace Systemic.Unity.Pixels.Messages
                     case MessageType.PlayAnimationEvent:
                         ret = FromByteArray<PlayAnimationEvent>(data);
                         break;
-                    case MessageType.PlaySound:
-                        ret = FromByteArray<PlaySound>(data);
+                    case MessageType.RemoteAction:
+                        ret = FromByteArray<RemoteAction>(data);
                         break;
                     case MessageType.StopAnimation:
                         ret = FromByteArray<StopAnimation>(data);
@@ -163,7 +163,7 @@ namespace Systemic.Unity.Pixels.Messages
                         ret = FromByteArray<BlinkAck>(data);
                         break;
                     case MessageType.ProgramDefaultAnimationSetFinished:
-                        ret = FromByteArray<ProgramDefaultAnimSetFinished>(data);
+                        ret = FromByteArray<ProgramDefaultAnimationSetFinished>(data);
                         break;
                     case MessageType.DefaultAnimationSetColor:
                         ret = FromByteArray<DefaultAnimationSetColor>(data);
@@ -241,7 +241,7 @@ namespace Systemic.Unity.Pixels.Messages
                         ret = FromByteArray<Temperature>(data);
                         break;
                     case MessageType.PrintAnimControllerState:
-                        ret = FromByteArray<PrintAnimControllerState>(data);
+                        ret = FromByteArray<PrintAnimationControllerState>(data);
                         break;
                     default:
                         throw new System.Exception($"Unhandled DieMessage type {type} for marshaling");

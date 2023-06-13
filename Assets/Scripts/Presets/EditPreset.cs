@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Ignore Spelling: serializer
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;

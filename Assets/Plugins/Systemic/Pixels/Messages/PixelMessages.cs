@@ -1,3 +1,5 @@
+// Ignore Spelling: rgb mcu Loopback Ack accel
+
 using System.Runtime.InteropServices;
 
 namespace Systemic.Unity.Pixels.Messages
@@ -241,7 +243,7 @@ namespace Systemic.Unity.Pixels.Messages
     public class PlayAnimationEvent : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.PlayAnimationEvent;
-        public byte evt;
+        public byte @event;
         public byte remapFace;
         public byte loop;
     }
@@ -255,10 +257,10 @@ namespace Systemic.Unity.Pixels.Messages
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class PlaySound : IPixelMessage
+    public class RemoteAction : IPixelMessage
     {
-        public MessageType type { get; set; } = MessageType.PlaySound;
-        public ushort clipId;
+        public MessageType type { get; set; } = MessageType.RemoteAction;
+        public ushort actionId;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -275,7 +277,7 @@ namespace Systemic.Unity.Pixels.Messages
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class ProgramDefaultAnimSetFinished : IPixelMessage
+    public class ProgramDefaultAnimationSetFinished : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.ProgramDefaultAnimationSetFinished;
     }
@@ -500,7 +502,7 @@ namespace Systemic.Unity.Pixels.Messages
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class PrintAnimControllerState : IPixelMessage
+    public class PrintAnimationControllerState : IPixelMessage
     {
         public MessageType type { get; set; } = MessageType.PrintAnimControllerState;
     }

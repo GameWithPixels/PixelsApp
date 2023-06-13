@@ -36,7 +36,7 @@ namespace Systemic.Unity.Pixels.Messages
         PlayAnimation,
         PlayAnimationEvent,
         StopAnimation,
-        PlaySound,
+        RemoteAction,
         RequestRollState,
         RequestAnimationSet,
         RequestSettings,

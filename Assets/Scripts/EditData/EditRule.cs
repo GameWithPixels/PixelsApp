@@ -18,7 +18,7 @@ public class EditRule
         this.actions = actions ?? new List<EditAction>();
     }
 
-    public Rule ToRule(EditDataSet editSet, DataSet set)
+    public Rule ToRule(EditDataSet editSet, DataSet set, int ruleId)
     {
         // Create our condition
         int conditionIndex = set.conditions.Count;
@@ -30,9 +30,11 @@ public class EditRule
 
         // Create our action
         int actionOffset = set.actions.Count;
+        int actionId = ruleId << 8;
         foreach (var editAction in actions)
         {
-            var act = editAction.ToAction(editSet, set);
+            var act = editAction.ToAction(editSet, set, actionId);
+            ++actionId;
             set.actions.Add(act);
         }
 
@@ -52,13 +54,13 @@ public class EditRule
         };
     }
 
-    public void CopyTo(EditRule dest)
+    public void CopyTo(EditRule rule)
     {
-        dest.condition = condition?.Duplicate();
-        dest.actions.Clear();
+        rule.condition = condition?.Duplicate();
+        rule.actions.Clear();
         foreach (var action in actions)
         {
-            dest.actions.Add(action.Duplicate());
+            rule.actions.Add(action.Duplicate());
         }
     }
 

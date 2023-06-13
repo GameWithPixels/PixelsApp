@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Ignore Spelling: serializer
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
@@ -17,7 +19,7 @@ public abstract class EditAction
 {
     [JsonIgnore]
     public abstract ActionType type { get; }
-    public abstract IAction ToAction(EditDataSet editSet, DataSet set);
+    public abstract IAction ToAction(EditDataSet editSet, DataSet set, int actionId);
     public abstract EditAction Duplicate();
     public abstract bool IsSame(EditAction editAction); // Don't want to override Equals
 
@@ -123,7 +125,7 @@ public class EditActionPlayAnimation
     public int loopCount = 1;
 
     public override ActionType type { get { return ActionType.PlayAnimation; } }
-    public override IAction ToAction(EditDataSet editSet, DataSet set)
+    public override IAction ToAction(EditDataSet editSet, DataSet set, int actionId)
     {
         return new ActionPlayAnimation()
         {
@@ -263,10 +265,11 @@ public class EditActionPlayAudioClip
     [Name("Audio Clip")]
     public AudioClips.EditAudioClip clip;
     public override ActionType type { get { return ActionType.PlayAudioClip; } }
-    public override IAction ToAction(EditDataSet editSet, DataSet set)
+    public override IAction ToAction(EditDataSet editSet, DataSet set, int actionId)
     {
         return new ActionPlayAudioClip()
         {
+            // TODO for now use the clip id instead of action id
             clipId = (byte)(clip?.id ?? 0),
         };
     }

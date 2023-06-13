@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿// Ignore Spelling: mcu
+
+using System.Collections.Generic;
 using Systemic.Unity.Pixels.Messages;
 using UnityEngine;
 
@@ -187,7 +189,7 @@ namespace Systemic.Unity.Pixels
         public int rssi { get; private set; }
 
         /// <summary>
-        /// Pixel microcontroller temperature in degree Celsius.
+        /// Pixel micro-controller temperature in degree Celsius.
         /// </summary>
         public float mcuTemperature { get; private set; }
 
@@ -425,7 +427,7 @@ namespace Systemic.Unity.Pixels
             _messageHandlers.Add(MessageType.Telemetry, msg => ProcessTelemetryMessage((Telemetry)msg));
             _messageHandlers.Add(MessageType.DebugLog, msg => ProcessDebugLogMessage((DebugLog)msg));
             _messageHandlers.Add(MessageType.NotifyUser, msg => ProcessNotifyUserMessage((NotifyUser)msg));
-            _messageHandlers.Add(MessageType.PlaySound, msg => ProcessPlayAudioClip((PlaySound)msg));
+            _messageHandlers.Add(MessageType.RemoteAction, msg => ProcessRemoteAction((RemoteAction)msg));
 
             void ProcessIAmADieMessage(IAmADie message)
             {
@@ -497,13 +499,16 @@ namespace Systemic.Unity.Pixels
                 bool cancel = message.cancel != 0;
                 //float timeout = message.timeout_s;
                 string text = Marshaling.BytesToString(message.data);
+                Debug.Log($"Request to notify user with message {text}");
                 _notifyUser?.Invoke(this, text, cancel,
                     res => PostMessage(new NotifyUserAck() { okCancel = (byte)(res ? 1 : 0) }));
             }
 
-            void ProcessPlayAudioClip(PlaySound message)
+            void ProcessRemoteAction(RemoteAction message)
             {
-                _playAudioClip?.Invoke(this, message.clipId);
+                // TODO for now we treat all remote actions as PlayAudioClip
+                Debug.Log($"Request to play audio clip {message.actionId}");
+                _playAudioClip?.Invoke(this, message.actionId);
             }
         }
 
