@@ -53,7 +53,7 @@ bool sgBleInitialize(BluetoothStateUpdateCallback onBluetoothEvent)
     {
         // Allocate every time (set to nil in shutdown)
         _central = [[SGBleCentralManagerDelegate alloc] initWithStateUpdateHandler:^(CBManagerState state) {
-            if (onBluetoothEvent) onBluetoothEvent(state >= CBManagerStatePoweredOn);
+            if (onBluetoothEvent) onBluetoothEvent(state);
         }];
     }
     
@@ -166,10 +166,10 @@ bool sgBleCreatePeripheral(peripheral_id_t peripheralId,
     SGBlePeripheralQueue *sgPeripheral = [[SGBlePeripheralQueue alloc] initWithPeripheral:cbPeripheral
                                                                    centralManagerDelegate:_central];
     sgPeripheral.connectionEventHandler = ^(SGBlePeripheralQueue *peripheral, SGBleConnectionEvent connectionEvent, SGBleConnectionEventReason reason) {
-        //TODO check valid peripheral
-        if (onPeripheralConnectionEvent)
+        // Check if we still hold a reference to the peripheral
+        if (onPeripheralConnectionEvent && [_peripherals.allValues containsObject:peripheral])
             onPeripheralConnectionEvent(requestIndex,
-                                        getPeripheralId(cbPeripheral),
+                                        getPeripheralId(peripheral),
                                         (int)connectionEvent,
                                         (int)reason);
     };

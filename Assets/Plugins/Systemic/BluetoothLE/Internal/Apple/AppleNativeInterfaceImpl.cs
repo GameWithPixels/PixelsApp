@@ -14,6 +14,16 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
 {
     internal sealed class AppleNativeInterfaceImpl : INativeInterfaceImpl
     {
+        enum BluetoothState
+        {
+            Unknown, // The Bluetooth manager’s state is unknown.
+            Resetting, // Connection with the system service was momentarily lost.
+            Unsupported, // Device doesn’t support the Bluetooth low energy central or client role.
+            Unauthorized, // Application isn’t authorized to use the Bluetooth low energy role.
+            PoweredOff, // Bluetooth is currently powered off.
+            PoweredOn, // Bluetooth is currently powered on and available to use.
+        }
+
         #region INativeDevice and INativePeripheralHandleImpl implementations
 
         sealed class NativeCBPeripheral : INativeDevice
@@ -84,7 +94,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
             "unsupported";
 #endif
 
-        delegate void CentralStateUpdateCallback(bool isAvailable);
+        delegate void CentralStateUpdateCallback(BluetoothState state);
         delegate void DiscoveredPeripheralCallback(string advertisementDataJson);
         delegate void PeripheralConnectionEventCallback(RequestIndex requestIndex, string peripheralId, int connectionEvent, int reason);
         delegate void RequestStatusCallback(RequestIndex requestIndex, int errorCode);
@@ -155,11 +165,24 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
         static volatile RequestIndex _requestIndex;
 
         [MonoPInvokeCallback(typeof(CentralStateUpdateCallback))]
-        static void OnCentralStateUpdate(bool available)
+        static void OnCentralStateUpdate(BluetoothState state)
         {
             try
             {
-                _onBluetoothEvent(available ? BluetoothStatus.Ready : BluetoothStatus.Disabled);
+                BluetoothStatus? status = null;
+                switch (state)
+                {
+                    case BluetoothState.Unknown: status = BluetoothStatus.Unknown; break;
+                    case BluetoothState.Resetting: status = BluetoothStatus.Unavailable; break;
+                    case BluetoothState.Unsupported: status = BluetoothStatus.Unsupported; break;
+                    case BluetoothState.Unauthorized: status = BluetoothStatus.Unauthorized; break;
+                    case BluetoothState.PoweredOff: status = BluetoothStatus.Disabled; break;
+                    case BluetoothState.PoweredOn: status = BluetoothStatus.Ready; break;
+                }
+                if (status.HasValue)
+                {
+                    _onBluetoothEvent(status.Value);
+                }
             }
             catch (Exception e)
             {

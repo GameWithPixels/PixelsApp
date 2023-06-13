@@ -26,7 +26,7 @@ using characteristic_index_t = std::uint32_t;
 using characteristic_property_t = std::uint64_t;
 
 /// Callback notifying of a change of the host device Bluetooth state, for example radio turned on or off.
-typedef void (*BluetoothStateUpdateCallback)(bool available);
+typedef void (*BluetoothStateUpdateCallback)(int state);
 
 /// Callback notifying of the discovery of a BLE peripheral, with its advertisement data as a JSON string.
 typedef void (*DiscoveredPeripheralCallback)(const char *advertisementDataJson);
