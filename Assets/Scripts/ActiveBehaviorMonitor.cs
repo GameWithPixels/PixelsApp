@@ -31,7 +31,9 @@ public class ActiveBehaviorMonitor : MonoBehaviour
             {
                 // Connect to the new die
                 connectedDice.Add(editDie);
+                Debug.Log($"Attempting to connect to {editDie.name} because it has a profile with audio clips");
                 PixelsApp.Instance.ConnectDie(editDie, gameObject, onFailed: (_, err) => connectedDice.Remove(editDie));
+                // When it fails to connect once, the die is removed from the list!!!
             }
         }
 
