@@ -28,7 +28,7 @@ namespace Systemic.Unity.BluetoothLE.Internal.Apple
                 var plist = new PlistDocument();
                 plist.ReadFromFile(plistPath);
 
-                string bleDesc = "Uses Bluetooth to communicate with Pixel dice.";
+                string bleDesc = "Uses Bluetooth to communicate with Pixels dice.";
                 plist.root.SetString("NSBluetoothPeripheralUsageDescription", bleDesc); // For deployment target earlier than iOS 13
                 plist.root.SetString("NSBluetoothAlwaysUsageDescription", bleDesc);
                 plist.WriteToFile(plistPath);
