@@ -475,7 +475,6 @@ namespace Systemic.Unity.Pixels
                         var prevState = connectionState;
 
                         // Reset connection count
-                        //TODO Central may try to reconnect automatically! (if disconnected on timeout or access denied)
                         _connectionCount = 0;
                         connectionState = PixelConnectionState.Available;
 

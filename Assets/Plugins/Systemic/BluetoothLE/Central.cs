@@ -357,6 +357,7 @@ namespace Systemic.Unity.BluetoothLE
         /// An enumerator meant to be run as a coroutine.
         /// See <see cref="RequestEnumerator"/> properties to get the request status.
         /// </returns>
+        /// <remarks>At the moment the Windows implementation timeouts at a maximum of 7 seconds.</remarks>
         public static RequestEnumerator ConnectPeripheralAsync(ScannedPeripheral peripheral, Action<ScannedPeripheral, bool> onConnectionEvent, float timeoutSec = 0)
         {
             if (timeoutSec < 0) throw new ArgumentException(nameof(timeoutSec) + " must be greater or equal to zero", nameof(timeoutSec));
@@ -366,8 +367,8 @@ namespace Systemic.Unity.BluetoothLE
             // Get peripheral state
             PeripheralInfo pInf = GetPeripheralInfo(peripheral);
 
-            //TODO handle case when another connection request for the same device is already under way
-            //TODO reject if state is not disconnected?
+            //TODO Native Android & Windows may timeout before the given timeout value
+            //TODO Handle case when another connection request for the same device is already under way
             //Debug.Assert(pInf?.ConnStatusChangedCallback == null);
 
             // We need a valid peripheral
@@ -418,19 +419,8 @@ namespace Systemic.Unity.BluetoothLE
                             {
                                 Debug.Log($"[BLE {pInf.Name}] Connect result is `{status}`");
 
-                                if (pInf.NativeHandle.IsValid
-                                    && ((status == RequestStatus.Timeout) || (status == RequestStatus.AccessDenied)))
-                                {
-                                    // Try again on timeout or access denied (which might happen
-                                    // if the peripheral got turned off or out of range if the middle of the connection process)
-                                    Debug.Log($"[BLE {pInf.Name}] Re-connecting...");
-                                    Connect(pInf, onResult);
-                                }
-                                else
-                                {
-                                    // We're either connected on in an invalid state, in both cases we stop trying to connect again
-                                    onResult(status);
-                                }
+                                // We're either connected on in an invalid state, in both cases we stop trying to connect again
+                                onResult(status);
                             }));
                     }
                 },
