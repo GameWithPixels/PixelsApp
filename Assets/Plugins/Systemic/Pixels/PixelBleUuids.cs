@@ -1,4 +1,5 @@
-﻿
+﻿// Ignore Spelling: Uuids Ble
+
 using System;
 
 namespace Systemic.Unity.Pixels

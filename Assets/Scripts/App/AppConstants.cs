@@ -11,7 +11,7 @@ public class AppConstants : SingletonMonoBehaviour<AppConstants>
     public float ConnectionTimeout = 10.0f;
     public float DiceRotationSpeedAvg = 10.0f;
     public float DiceRotationSpeedVar = 1.0f;
-    public Color DieUnavailableColor = Color.gray;
+    public Color DieUnavailableColor = Color.grey;
     public float MultiDiceRootRotationSpeedAvg = 2.0f;
     public float MultiDiceRootRotationSpeedVar = 0.4f;
     public string AudioClipsFolderName = "AudioClips";

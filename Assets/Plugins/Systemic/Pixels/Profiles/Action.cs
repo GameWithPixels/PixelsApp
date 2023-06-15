@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿// Ignore Spelling: anim
+
+using System.Runtime.InteropServices;
 
 namespace Systemic.Unity.Pixels.Profiles
 {

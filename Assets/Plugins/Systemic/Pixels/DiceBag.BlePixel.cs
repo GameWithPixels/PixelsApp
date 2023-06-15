@@ -87,7 +87,7 @@ namespace Systemic.Unity.Pixels
             /// <summary>
             /// Indicates whether the Pixel is either in the process of connecting and being ready, or ready to communicate.
             /// </summary>
-            public bool isConnectingOrReady => (connectionState == PixelConnectionState.Connecting)
+            public bool IsConnectingOrReady => (connectionState == PixelConnectionState.Connecting)
                     || (connectionState == PixelConnectionState.Identifying)
                     || (connectionState == PixelConnectionState.Ready);
 
@@ -537,8 +537,8 @@ namespace Systemic.Unity.Pixels
                     SetLastError(error);
                 }
 
-                Debug.Assert(isConnectingOrReady);
-                if (isConnectingOrReady)
+                Debug.Assert(IsConnectingOrReady);
+                if (IsConnectingOrReady)
                 {
                     Debug.Log($"Pixel {SafeName}: Disconnecting...");
                     _connectionCount = 0;
@@ -624,7 +624,7 @@ namespace Systemic.Unity.Pixels
                 _onConnectionResult = null;
                 _onDisconnectionResult = null;
 
-                bool disconnect = isConnectingOrReady;
+                bool disconnect = IsConnectingOrReady;
                 _connectionCount = 0;
 
                 Debug.Log($"Pixel {name}: Got destroyed (was connecting or connected: {disconnect})");

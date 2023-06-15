@@ -405,7 +405,7 @@ namespace Systemic.Unity.Pixels
             Debug.Assert(pixel);
             if (pixel)
             {
-                if (pixel.isConnectingOrReady)
+                if (pixel.IsConnectingOrReady)
                 {
                     Debug.LogWarning($"Destroying Pixel in {pixel.connectionState} state");
                 }

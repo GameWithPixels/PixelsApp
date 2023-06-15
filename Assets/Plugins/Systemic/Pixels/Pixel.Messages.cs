@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Ignore Spelling: Ack
+
+using System.Collections;
 using Systemic.Unity.Pixels.Animations;
 using Systemic.Unity.Pixels.Messages;
 using UnityEngine;

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Ignore Spelling: Utils
+
 using UnityEngine;
 
 namespace Systemic.Unity.Pixels

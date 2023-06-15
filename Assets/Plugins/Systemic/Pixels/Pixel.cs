@@ -54,7 +54,7 @@ namespace Systemic.Unity.Pixels
 
                 if (value != _connectionState)
                 {
-                    Debug.Log($"Pixel {SafeName}: Connection state change, {_connectionState} => {value}");
+                    Debug.Log($"Pixel {SafeName}: Connection state changed from {_connectionState} to {value}");
                     _connectionState = value;
                     try
                     {

@@ -174,7 +174,7 @@ namespace Systemic.Unity.BluetoothLE
             return arr?.Select(d => new ServiceData(BleUuid.StringToGuid(d.uuid), d.data)).ToArray() ?? Array.Empty<ServiceData>();
         }
 
-        // Converts a list of strings representing BLE UUIDS to an array of Guids
+        // Converts a list of strings representing BLE UUIDS to an array of GUUIDs
         private static Guid[] ToGuidArray(string[] uuids)
         {
             return uuids?.Select(BleUuid.StringToGuid).ToArray() ?? Array.Empty<Guid>();
