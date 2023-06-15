@@ -39,9 +39,6 @@ namespace Systemic.Unity.Pixels
         // List of known pixels
         static readonly HashSet<BlePixel> _pixels = new HashSet<BlePixel>();
 
-        // Pixels to be destroyed in the next frame update
-        static readonly HashSet<BlePixel> _pixelsToDestroy = new HashSet<BlePixel>();
-
         // Map of registered Pixels, the key is a Pixel system id and the value its name (may be empty)
         static readonly Dictionary<string, string> _registeredPixels = new Dictionary<string, string>();
 
@@ -182,7 +179,6 @@ namespace Systemic.Unity.Pixels
                 dieObj.transform.SetParent(InternalBehaviour.Instance.transform);
 
                 pixel = dieObj.AddComponent<BlePixel>();
-                pixel.DisconnectedUnexpectedly += () => DestroyPixel(pixel);
                 pixel.SubscribeToUserNotifyRequest(_notifyUser);
                 pixel.SubscribeToPlayAudioClipRequest(_playAudioClip);
 
@@ -416,7 +412,6 @@ namespace Systemic.Unity.Pixels
                 GameObject.Destroy(pixel.gameObject);
             }
             _pixels.Remove(pixel);
-            _pixelsToDestroy.Remove(pixel);
         }
 
         #endregion
@@ -459,33 +454,6 @@ namespace Systemic.Unity.Pixels
                 Central.Shutdown();
                 Central.StatusChanged -= OnBluetoothStatusChanged;
                 base.OnDisable();
-            }
-
-            // Update is called once per frame
-            protected override void Update()
-            {
-                // Destroys Pixels
-                List<BlePixel> destroyNow = null;
-                foreach (var pixel in _pixelsToDestroy)
-                {
-                    if (!pixel.isConnectingOrReady)
-                    {
-                        if (destroyNow == null)
-                        {
-                            destroyNow = new List<BlePixel>();
-                        }
-                        destroyNow.Add(pixel);
-                    }
-                }
-                if (destroyNow != null)
-                {
-                    foreach (var pixel in destroyNow)
-                    {
-                        DestroyPixel(pixel);
-                    }
-                }
-
-                base.Update();
             }
         }
 

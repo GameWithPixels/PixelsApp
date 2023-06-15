@@ -460,6 +460,14 @@ namespace Systemic.Unity.Pixels
                     var request = new SendMessageAndWaitForResponseEnumerator<WhoAreYou, IAmADie>(this) as IOperationEnumerator;
                     yield return request;
 
+                    if (request.IsTimeout)
+                    {
+                        // Try a second time when we got a timeout
+                        Debug.LogWarning($"Pixel {SafeName}: Second attempt at identifying");
+                        request = new SendMessageAndWaitForResponseEnumerator<WhoAreYou, IAmADie>(this);
+                        yield return request;
+                    }
+
                     // Report result
                     onResult(request);
                 }
