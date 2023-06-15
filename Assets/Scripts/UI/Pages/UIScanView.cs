@@ -182,7 +182,7 @@ public class UIScanView
     //     }
     // }
 
-    void OnDieStateChanged(Pixel die, PixelConnectionState oldState, PixelConnectionState newState)
+    void OnDieStateChanged(Pixel die, PixelConnectionState newState)
     {
         RefreshView();
     }

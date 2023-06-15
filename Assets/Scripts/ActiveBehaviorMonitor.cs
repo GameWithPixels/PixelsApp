@@ -1,46 +1,107 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Presets;
-using Dice;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Systemic.Unity.Pixels;
+using UnityEngine;
 
 public class ActiveBehaviorMonitor : MonoBehaviour
 {
-    List<EditDie> connectedDice = new List<EditDie>();
+    // List of "always connected" dice
+    HashSet<EditDie> connectedDice = new HashSet<EditDie>();
 
     // Start is called before the first frame update
     void Awake()
     {
-        PixelsApp.Instance.onDieProfileUpdatedEvent += OnProfileDownloadedEvent;
+        DiceBag.BluetoothStatusChanged += (status) =>
+        {
+            if (status == Systemic.Unity.BluetoothLE.BluetoothStatus.Ready)
+            {
+                Refresh();
+            }
+        };
+        PixelsApp.Instance.onDieProfileUpdatedEvent += (editDie) =>
+        {
+            if (!AddAndConnectIfRequired(editDie))
+            {
+                Remove(editDie, "no longer has a profile with audio", true);
+            }
+        };
     }
 
-    void OnProfileDownloadedEvent(EditDie editDie, EditProfile profile)
+    void Update()
     {
-        // Check whether we should stay connected to some of the dice
-        var toDisconnect = new List<EditDie>(connectedDice);
-        if (profile.CollectAudioClips().Any())
+        foreach (var pixel in DiceBag.ConnectedPixels.ToArray())
         {
-            // This die assignment uses a behavior that has audio clips, so stay connected to the die
-            if (connectedDice.Contains(editDie))
+            if (pixel.connectionState == PixelConnectionState.Ready)
+            {
+                var editDie = AppDataSet.Instance.dice.FirstOrDefault(d => d.die == pixel);
+                if (editDie != null)
+                {
+                    AddAndConnectIfRequired(editDie);
+                }
+            }
+        }
+    }
+
+    void Refresh()
+    {
+        var toDisconnect = new List<EditDie>(connectedDice);
+
+        // Check each die
+        foreach (var editDie in AppDataSet.Instance.dice)
+        {
+            if (AddAndConnectIfRequired(editDie))
             {
                 toDisconnect.Remove(editDie);
             }
-            else if (editDie != null)
-            {
-                // Connect to the new die
-                connectedDice.Add(editDie);
-                Debug.Log($"Attempting to connect to {editDie.name} because it has a profile with audio clips");
-                PixelsApp.Instance.ConnectDie(editDie, gameObject, onFailed: (_, err) => connectedDice.Remove(editDie));
-                // When it fails to connect once, the die is removed from the list!!!
-            }
         }
 
-        foreach (var d in toDisconnect)
+        // Disconnect other dice
+        foreach (var editDie in toDisconnect)
         {
-            connectedDice.Remove(d);
-            DiceBag.DisconnectPixel(d.die);
+            if (connectedDice.Contains(editDie))
+            {
+                Remove(editDie, "no longer has a profile with audio", true);
+            }
         }
     }
+
+    bool AddAndConnectIfRequired(EditDie editDie)
+    {
+        bool profileWithAudio = editDie.currentBehavior?.CollectAudioClips().Any() ?? false;
+        if (profileWithAudio && (!connectedDice.Contains(editDie)))
+        {
+            connectedDice.Add(editDie);
+            Debug.Log($"Attempting to connect to {editDie.name} because it has a profile with audio");
+            PixelsApp.Instance.ConnectDie(editDie, gameObject, onConnected:(_) =>
+            {
+                void onStateChanged(Pixel die, PixelConnectionState state)
+                {
+                    if (state != PixelConnectionState.Ready)
+                    {
+                        die.ConnectionStateChanged -= onStateChanged;
+                        Remove(editDie, "disconnected");
+                    }
+                };
+                editDie.die.ConnectionStateChanged += onStateChanged;
+            },
+            onFailed: (_, __) =>
+            {
+                Remove(editDie, "failed to connect");
+            });
+        }
+        return profileWithAudio;
+    }
+
+     void Remove(EditDie editDie, string reason, bool disconnect = false)
+     {
+        if (connectedDice.Contains(editDie))
+        {
+            Debug.Log($"Removing {editDie.name} from always connected list because it {reason}");
+            connectedDice.Remove(editDie);
+            if (disconnect)
+            {
+                DiceBag.DisconnectPixel(editDie.die);
+            }
+        }
+     }
 }

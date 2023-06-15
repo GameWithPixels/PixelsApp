@@ -36,9 +36,8 @@ namespace Systemic.Unity.Pixels
     /// Delegate for Pixel connection state events.
     /// </summary>
     /// <param name="pixel">The source of the event.</param>
-    /// <param name="previousState">The previous connection state.</param>
     /// <param name="state">The current connection sate.</param>
-    public delegate void ConnectionStateChangedEventHandler(Pixel pixel, PixelConnectionState previousState, PixelConnectionState state);
+    public delegate void ConnectionStateChangedEventHandler(Pixel pixel, PixelConnectionState state);
 
     /// <summary>
     /// Delegate for Pixel communication error events.

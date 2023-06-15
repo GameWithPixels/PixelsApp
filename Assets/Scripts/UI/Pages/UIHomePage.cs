@@ -68,7 +68,7 @@ public class UIHomePage
         dismissMessagesButton.onClick.AddListener(CloseWhatsNew);
         editPresetsButton.onClick.AddListener(() => NavigationManager.Instance.GoToRoot(UIPage.PageId.Presets));
         editProfilesButton.onClick.AddListener(() => NavigationManager.Instance.GoToRoot(UIPage.PageId.Behaviors));
-        PixelsApp.Instance.onDieProfileUpdatedEvent += (_, __) => UpdatePresetAndProfileStatuses();
+        PixelsApp.Instance.onDieProfileUpdatedEvent += (_) => UpdatePresetAndProfileStatuses();
     }
 
     UIHomePresetToken CreatePresetToken(EditPreset preset)

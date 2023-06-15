@@ -184,7 +184,7 @@ public class UIPairedDieView : MonoBehaviour
         }
     }
 
-    void OnConnectionStateChanged(Pixel die, PixelConnectionState oldState, PixelConnectionState newState)
+    void OnConnectionStateChanged(Pixel die, PixelConnectionState state)
     {
         UpdateState();
     }

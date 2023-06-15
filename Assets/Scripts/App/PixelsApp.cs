@@ -26,7 +26,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
     public UIPatternPicker patternPicker;
     public UIAudioClipPicker audioClipPicker;
 
-    public delegate void OnDieProfileUpdatedEvent(EditDie die, EditProfile profile);
+    public delegate void OnDieProfileUpdatedEvent(EditDie die);
     public OnDieProfileUpdatedEvent onDieProfileUpdatedEvent;
 
     [Header("Controls")]
@@ -412,7 +412,7 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
                                         else
                                         {
                                             editDie.currentBehavior = profile;
-                                            onDieProfileUpdatedEvent?.Invoke(editDie, editDie.currentBehavior);
+                                            onDieProfileUpdatedEvent?.Invoke(editDie);
                                             success = true;
                                         }
                                     }
@@ -863,14 +863,5 @@ public class PixelsApp : SingletonMonoBehaviour<PixelsApp>
         DiceBag.Initialize();
 
         while (!DiceBag.IsReady) yield return null;
-
-        // Pretend to have updated the current preset on load
-        foreach (var editDie in AppDataSet.Instance.dice)
-        {
-            if (editDie.currentBehavior != null)
-            {
-                onDieProfileUpdatedEvent?.Invoke(editDie, editDie.currentBehavior);
-            }
-        }
     }
 }
