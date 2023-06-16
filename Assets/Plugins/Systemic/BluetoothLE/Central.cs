@@ -870,7 +870,7 @@ namespace Systemic.Unity.BluetoothLE
         {
             if (Status != status)
             {
-                Debug.Log($"[BLE] Status changed from {Status} to {status}");
+                Debug.Log($"[BLE] Bluetooth status changed from {Status} to {status}");
                 Status = status;
                 StatusChanged?.Invoke(status);
             }

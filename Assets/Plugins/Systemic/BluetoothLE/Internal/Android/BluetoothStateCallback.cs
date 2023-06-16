@@ -24,8 +24,8 @@ namespace Systemic.Unity.BluetoothLE.Internal.Android
 
         void onStateChanged(int stateValue)
         {
-            Debug.Log($"[BLE] onStateChanged ==> {stateValue}");
             var state = ToState(stateValue);
+            //Debug.Log($"[BLE] onStateChanged ==> {state?.ToString() ?? "Unknown"} ({stateValue})");
             if (state.HasValue)
             {
                 _onStateChanged?.Invoke(state.Value);
