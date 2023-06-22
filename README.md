@@ -3,6 +3,12 @@
 Mobile (iOS & Android, phones only) and Windows app that connects to the Pixels dice.
 Please note that the Windows app is a rendering the UI as it would on a phone, it's not optimized for desktop screens.
 
+The app is available on the Apple App Store [here](
+  https://apps.apple.com/us/app/pixels-the-electronic-dice/id1532993928
+) and on Google Play [here](
+  https://play.google.com/store/apps/details?id=com.SystemicGames.Pixels
+).
+
 With this app you may create and preview LED's patterns, activate profiles and manage presets.
 
 Find our online guide [here](https://github.com/GameWithPixels/PixelsApp/wiki/Pixels-App-Guide).
