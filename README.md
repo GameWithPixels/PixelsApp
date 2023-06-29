@@ -1,6 +1,6 @@
 # PixelsApp
 
-Mobile (iOS & Android, phones only) and Windows app that connects to the Pixels dice.
+Mobile (iOS & Android, phones only) and Windows app that connects to Pixels dice.
 Please note that the Windows app is a rendering the UI as it would on a phone, it's not optimized for desktop screens.
 
 The app is available on the Apple App Store [here](
@@ -9,13 +9,13 @@ The app is available on the Apple App Store [here](
   https://play.google.com/store/apps/details?id=com.SystemicGames.Pixels
 ).
 
-With this app you may create and preview LED's patterns, activate profiles and manage presets.
+With this app you may create and preview LED's animations, activate profiles and manage designs.
 
 Find our online guide [here](https://github.com/GameWithPixels/PixelsApp/wiki/Pixels-App-Guide).
 
-## Patterns
+## Animations
 
-Lighting patterns let you customize how a dice will light up.
+Animations let you customize how a dice will light up.
 There's a wide spectrum of possibilities, from a simple flash of colors to a rainbow effect, or more advanced effects such as waterfall, rotating rings, etc.
 
 ## Profiles
@@ -23,11 +23,6 @@ There's a wide spectrum of possibilities, from a simple flash of colors to a rai
 Profiles define when and how your dice will light up. A profile is made up of a list of rules.
 Each rule associates an event (for example *roll is equal to 1*, or *dice is picked up*) with an action
 such as playing a luminous pattern on the die or an audio clip in the app.
-
-## Presets
-
-A preset associate any number of dice with specific profiles to activate.
-It's quick way to switch all or a subset of your dice to different profiles at once.
 
 # External resources
 
