@@ -13,6 +13,12 @@ With this app you may create and preview LED's animations, activate profiles and
 
 Find our online guide [here](https://github.com/GameWithPixels/PixelsApp/wiki/Pixels-App-Guide).
 
+## Foreword
+
+Pixels are full of LEDs, smarts and no larger than regular dice, they can be
+customized to light up when and how you desire.
+Check our [website](https://gamewithpixels.com/) for more information.
+
 ## Animations
 
 Animations let you customize how a dice will light up.
@@ -27,6 +33,15 @@ such as playing a luminous pattern on the die or an audio clip in the app.
 # External resources
 
 ## Unity packages
+
+### PixelsUnityPlugin
+
+The app is using our [PixelsUnityPlugin](
+  https://github.com/GameWithPixels/PixelsUnityPlugin
+) to access the host OS Bluetooth LE stack.
+See the plugin's [documentation](
+  https://gamewithpixels.github.io/PixelsUnityPlugin/index.html
+) for more information.
 
 ### Paid packages
 
