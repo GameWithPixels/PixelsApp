@@ -159,13 +159,11 @@ namespace Systemic.Unity.Pixels.Animations
         : IAnimationPreset
     {
         public AnimationType type { get; set; } = AnimationType.Keyframed;
-        public byte padding_type { get; set; } // to keep duration 16-bit aligned
+        public byte traveling { get; set; } = 0;
         public ushort duration { get; set; } // in ms
 
         public ushort tracksOffset; // Offset into a global buffer of tracks
         public ushort trackCount;
-        public byte flowOrder; // boolean, if true the indices are led indices, not face indices
-        public byte paddingOrder;
 
         public AnimationInstance CreateInstance(DataSet.AnimationBits bits)
         {
@@ -207,7 +205,7 @@ namespace Systemic.Unity.Pixels.Animations
                 int count = track.evaluate(animationBits, trackTime, indices, colors);
                 for (int j = 0; j < count; ++j)
                 {
-                    if (preset.flowOrder != 0)
+                    if (preset.traveling != 0)
                     {
                         // Use reverse lookup so that the indices are actually led Indices, not face indices
                         retIndices[totalCount + j] = Constants.getFaceIndex(indices[j]);

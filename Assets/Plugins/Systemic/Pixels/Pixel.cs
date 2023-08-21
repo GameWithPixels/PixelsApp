@@ -477,13 +477,22 @@ namespace Systemic.Unity.Pixels
 
             void ProcessTelemetryMessage(Telemetry message)
             {
-                NotifyRollState(message.accelFrame.rollState, message.accelFrame.faceIndex);
+                NotifyRollState(message.rollState, message.faceIndex);
                 NotifyBatteryLevel(message.batteryLevelPercent, message.batteryState >= PixelBatteryState.Charging);
                 NotifyRssi(message.rssi);
                 NotifyTemperature(message.mcuTemperatureTimes100, message.batteryTemperatureTimes100);
 
                 // Notify
-                _notifyTelemetry?.Invoke(this, message.accelFrame);
+                AccelerationFrame frame = new AccelerationFrame();
+                frame.accX = (float)message.accXTimes1000 / 1000.0f;
+                frame.accY = (float)message.accYTimes1000 / 1000.0f;
+                frame.accZ = (float)message.accZTimes1000 / 1000.0f;
+                frame.faceConfidence = (float)message.faceConfidenceTimes1000 / 1000.0f;
+                frame.time = message.time;
+                frame.rollState = message.rollState;
+                frame.faceIndex = message.faceIndex;
+        
+                _notifyTelemetry?.Invoke(this, frame);
             }
 
             void ProcessDebugLogMessage(DebugLog message)

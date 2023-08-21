@@ -24,7 +24,7 @@ namespace Systemic.Unity.Pixels.Animations
     public interface IAnimationPreset
     {
         AnimationType type { get; set; }
-        byte padding_type { get; set; } // to keep duration 16-bit aligned
+        byte traveling { get; set; } // If 1 indices are led indices, not face indices
         ushort duration { get; set; } // in ms
         AnimationInstance CreateInstance(DataSet.AnimationBits bits);
     };

@@ -17,12 +17,11 @@ namespace Systemic.Unity.Pixels.Animations
         // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
         // 17, 1, 19, 13, 3, 10, 8, 5, 15, 7, 9, 11, 14, 4, 12, 0, 18, 2, 16, 6
         public AnimationType type { get; set; } = AnimationType.Rainbow;
-        public byte padding_type { get; set; }
+        public byte traveling { get; set; } = 0;
         public ushort duration { get; set; }
         public uint faceMask;
         public byte count;
         public byte fade;
-        public byte traveling;
         public byte intensity;
 
         public AnimationInstance CreateInstance(DataSet.AnimationBits bits)

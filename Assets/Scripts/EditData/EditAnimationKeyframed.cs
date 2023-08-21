@@ -84,10 +84,10 @@ public class EditAnimationKeyframed
         //var tracks = patternCopy.ToRGBTracks(editSet, bits);
         return new AnimationKeyframed
         {
+            traveling = traveling ? (byte)1 : (byte)0,
             duration = (ushort)(duration * 1000), // stored in milliseconds
             tracksOffset = (ushort)editSet.getPatternRGBTrackOffset(pattern),
             trackCount = (ushort)pattern.gradients.Count,
-            flowOrder = traveling ? (byte)1 : (byte)0,
         };
     }
 

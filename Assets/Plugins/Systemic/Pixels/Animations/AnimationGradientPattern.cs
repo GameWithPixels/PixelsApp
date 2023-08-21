@@ -156,7 +156,7 @@ namespace Systemic.Unity.Pixels.Animations
         : IAnimationPreset
     {
         public AnimationType type { get; set; } = AnimationType.GradientPattern;
-        public byte padding_type { get; set; } // to keep duration 16-bit aligned
+        public byte traveling { get; set; } = 0;
         public ushort duration { get; set; } // in ms
 
         public ushort tracksOffset; // Offset into a global buffer of tracks

@@ -1,5 +1,6 @@
 // Ignore Spelling: rgb mcu Loopback Ack accel
 
+using System;
 using System.Runtime.InteropServices;
 
 namespace Systemic.Unity.Pixels.Messages
@@ -63,7 +64,17 @@ namespace Systemic.Unity.Pixels.Messages
     {
         public MessageType type { get; set; } = MessageType.Telemetry;
 
-        public AccelerationFrame accelFrame;
+        public Int16 accXTimes1000;
+        public Int16 accYTimes1000;
+        public Int16 accZTimes1000;
+
+        public int faceConfidenceTimes1000;
+
+        public uint time;
+
+        public PixelRollState rollState;
+
+        public byte faceIndex;
 
         // Battery and power
         public byte batteryLevelPercent;
