@@ -12,7 +12,7 @@ namespace Systemic.Unity.Pixels.Animations
         : IAnimationPreset
     {
         public AnimationType type { get; set; } = AnimationType.Gradient;
-        public byte traveling { get; set; } = 0;
+        public AnimationFlags animFlags { get; set; } = AnimationFlags.None;
         public ushort duration { get; set; }
         public float radiusInner;
         public float radiusOuter;

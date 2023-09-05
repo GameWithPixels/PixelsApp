@@ -1,4 +1,5 @@
 ﻿
+using System;
 /// <summary>
 /// Set of types for manipulating Pixel LEDs animations data.
 /// </summary>
@@ -17,6 +18,14 @@ namespace Systemic.Unity.Pixels.Animations
         Gradient,
     };
 
+    [Flags]
+    public enum AnimationFlags : byte
+    {
+        None,
+        Traveling = 1,
+        UseLedIndices = 2,
+    };
+
     /// <summary>
     /// Base class for animation presets. All presets have a few properties in common.
     /// Presets are stored in flash, so do not have methods or vtables or anything like that.
@@ -24,7 +33,7 @@ namespace Systemic.Unity.Pixels.Animations
     public interface IAnimationPreset
     {
         AnimationType type { get; set; }
-        byte traveling { get; set; } // If 1 indices are led indices, not face indices
+        AnimationFlags animFlags { get; set; }
         ushort duration { get; set; } // in ms
         AnimationInstance CreateInstance(DataSet.AnimationBits bits);
     };

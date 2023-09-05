@@ -17,7 +17,7 @@ namespace Systemic.Unity.Pixels.Animations
         // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
         // 17, 1, 19, 13, 3, 10, 8, 5, 15, 7, 9, 11, 14, 4, 12, 0, 18, 2, 16, 6
         public AnimationType type { get; set; } = AnimationType.Rainbow;
-        public byte traveling { get; set; } = 0;
+        public AnimationFlags animFlags { get; set; } = AnimationFlags.UseLedIndices;
         public ushort duration { get; set; }
         public uint faceMask;
         public byte count;
@@ -64,14 +64,14 @@ namespace Systemic.Unity.Pixels.Animations
             }
 
             int retCount = 0;
-            if (preset.traveling != 0)
+            if (preset.animFlags.HasFlag(AnimationFlags.Traveling))
             {
                 // Fill the indices and colors for the anim controller to know how to update LEDs
                 for (int i = 0; i < Constants.MaxLEDsCount; ++i)
                 {
                     if ((preset.faceMask & (1 << i)) != 0)
                     {
-                        retIndices[retCount] = Constants.getFaceIndex(i);
+                        retIndices[retCount] = i;
                         retColors[retCount] = GammaUtils.Gamma(ColorUIntUtils.RainbowWheel((byte)((wheelPos + i * 256 / Constants.MaxLEDsCount) % 256), intensity));
                         retCount++;
                     }

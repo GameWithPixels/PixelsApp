@@ -159,7 +159,7 @@ namespace Systemic.Unity.Pixels.Animations
         : IAnimationPreset
     {
         public AnimationType type { get; set; } = AnimationType.Keyframed;
-        public byte traveling { get; set; } = 0;
+        public AnimationFlags animFlags { get; set; } = AnimationFlags.None;
         public ushort duration { get; set; } // in ms
 
         public ushort tracksOffset; // Offset into a global buffer of tracks
@@ -205,15 +205,7 @@ namespace Systemic.Unity.Pixels.Animations
                 int count = track.evaluate(animationBits, trackTime, indices, colors);
                 for (int j = 0; j < count; ++j)
                 {
-                    if (preset.traveling != 0)
-                    {
-                        // Use reverse lookup so that the indices are actually led Indices, not face indices
-                        retIndices[totalCount + j] = Constants.getFaceIndex(indices[j]);
-                    }
-                    else
-                    {
-                        retIndices[totalCount + j] = indices[j];
-                    }
+                    retIndices[totalCount + j] = indices[j];
                     retColors[totalCount + j] = colors[j];
                 }
                 totalCount += count;

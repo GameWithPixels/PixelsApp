@@ -31,7 +31,7 @@ public class EditAnimationRainbow
             faceMask = (uint)faces,
             fade = (byte)(255.0f * fade),
             count = (byte)count,
-            traveling = traveling ? (byte)1 : (byte)0,
+            animFlags = (traveling ? AnimationFlags.Traveling : AnimationFlags.None) | AnimationFlags.UseLedIndices,
             intensity = (byte)(intensity * 255.0f),
         };
     }

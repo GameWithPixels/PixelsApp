@@ -215,9 +215,10 @@ public class DiceRendererDice : MonoBehaviour
                         }
                         else
                         {
-                            int [] retIndices = new int[20];
+                            int[] animRetIndices = new int[20];
+                            int[] retIndices = new int[20];
                             uint[] retColors = new uint[20];
-                            int ledCount = currentInstance.updateLEDs(time, retIndices, retColors);
+                            int ledCount = currentInstance.updateLEDs(time, animRetIndices, retColors);
                             for (int t = 0; t < ledCount; ++t)
                             {
                                 uint color = retColors[t];
@@ -226,6 +227,15 @@ public class DiceRendererDice : MonoBehaviour
                                     ColorUIntUtils.GetGreen(color),
                                     ColorUIntUtils.GetBlue(color),
                                     255);
+
+                                if (currentInstance.animationPreset.animFlags.HasFlag(AnimationFlags.UseLedIndices))
+                                {
+                                    retIndices[t] = Constants.getFaceIndex(animRetIndices[t]);
+                                }
+                                else
+                                {
+                                    retIndices[t] = animRetIndices[t];
+                                }
                                 _faceReversedColors[retIndices[t]] = GammaUtils.ReverseGamma(color32);
                             }
                         }
