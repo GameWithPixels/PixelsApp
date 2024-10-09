@@ -1,0 +1,28 @@
+name: Sync Wiki Content
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Fetch Wiki Content
+        run: |
+          curl -L https://raw.githubusercontent.com/wiki/GameWithPixels/PixelsApp/Pixels-App-Guide.md -o AppGuide.md
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add AppGuide.md
+          git commit -m "Update App Guide from wiki"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
