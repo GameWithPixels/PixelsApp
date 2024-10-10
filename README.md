@@ -1,5 +1,11 @@
 # PixelsApp
 
+> [!WARNING]  
+> This is the repository of the legacy Pixels App that was developed at the time of the Kickstarter campaign.
+> It is not supported any longer but concepts such as Profile, Rule and Animation remain relevant.
+> 
+> You may find the source code of the new Pixels app [here](https://github.com/GameWithPixels/pixels-js/tree/main/apps/pixels-app).
+
 Mobile (iOS & Android, phones only) and Windows app that connects to Pixels dice.
 Please note that the Windows app is a rendering the UI as it would on a phone, it's not optimized for desktop screens.
 
